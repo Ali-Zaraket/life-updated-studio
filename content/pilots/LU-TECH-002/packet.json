@@ -330,6 +330,9 @@
     "round3Changes": "After independent review round 2: background definition (e7), Figure 7 caption (e8), extended e4, reminder limitation reworded, new claim c-pre10-background (e9); beat 2 cut; beats 3-5, visuals and caption revised as suggested.",
     "round4Changes": "After round 3: e9 extended to include its Android 10 sentence; e10 adds the per-app settings-page passage; hook drops 'actually'; timeline padding trimmed.",
     "round5Changes": "After round 4: e2 and e3 locators corrected to the real section headings; c-approximate-applies no longer lists caption; e11 (context) quotes the Android 10 dialog sentence behind the c-android11-settings limitation.",
-    "lastRecheckAt": "2026-10-22T11:13:04.482Z"
+    "lastRecheckAt": "2026-10-22T11:13:04.482Z",
+    "round6Changes": "Hash binding excludes lastCheckedAt; live recheck confirmed all passages; page hash now over normalised text.",
+    "round7Changes": "Hook narration changed to 'An Android app wants your location. That access has two parts.' (round-6 review); hook visual says panels.",
+    "reviewStatus": "Round 7 (claude-opus-5-5, independent evidence agent): all six claims pass, bound to the current script and ledger. AI verification only, not qualified human review."
   }
 }
