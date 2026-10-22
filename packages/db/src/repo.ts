@@ -32,7 +32,7 @@ import * as t from './schema';
 
 export const newId = (prefix: string) => `${prefix}_${randomUUID()}`;
 const iso = (d: Date) => d.toISOString();
-type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
+export type Tx = Parameters<Parameters<Db['transaction']>[0]>[0];
 type Conn = Db | Tx;
 
 export class DomainError extends Error {
@@ -173,7 +173,7 @@ export async function getEpisode(db: Conn, id: string) {
   return row;
 }
 
-async function applyTransition(
+export async function applyTransition(
   tx: Tx,
   ep: typeof t.episodes.$inferSelect,
   to: EpisodeState,
@@ -184,6 +184,15 @@ async function applyTransition(
   const from = ep.state as EpisodeState;
   const check = checkTransition({ from, to, actor, reason, heldFrom: ep.heldFrom as MainState | null });
   if (!check.ok) throw new DomainError('invalid_transition', check.error);
+  if ((from === 'blocked' || from === 'failed') && (to === 'approved' || to === 'scheduled')) {
+    // Resuming into the publish path needs a live approval for the current version (e.g. after a correction revoked it).
+    const live = await tx
+      .select({ id: t.approvals.id })
+      .from(t.approvals)
+      .innerJoin(t.releasePackages, eq(t.releasePackages.id, t.approvals.releasePackageId))
+      .where(and(eq(t.releasePackages.episodeId, ep.id), eq(t.releasePackages.episodeVersionId, ep.currentVersionId ?? ''), isNull(t.approvals.revokedAt)));
+    if (live.length === 0) throw new DomainError('approval_required', `cannot resume to ${to}: no live approval for the current version`);
+  }
   const entersHold = to === 'blocked' || to === 'failed' || to === 'cancelled';
   const leavesHold = from === 'blocked' || from === 'failed' || from === 'cancelled';
   const heldFrom = entersHold ? (leavesHold ? ep.heldFrom : from) : null;
@@ -371,7 +380,7 @@ async function revokeApprovalsForEpisode(tx: Tx, episodeId: string, reason: stri
   return live.map((r) => r.id);
 }
 
-async function revokeInTx(tx: Tx, approvalId: string, reason: string, actor: Actor, now: Date): Promise<void> {
+export async function revokeInTx(tx: Tx, approvalId: string, reason: string, actor: Actor, now: Date): Promise<void> {
   await tx.update(t.approvals).set({ revokedAt: iso(now), revokedReason: reason }).where(eq(t.approvals.id, approvalId));
   await tx
     .update(t.publishJobs)
