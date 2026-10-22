@@ -151,7 +151,7 @@ export const AUTHORITY_APPEAL_PATTERNS: readonly PhrasePattern[] = [
  */
 export const ENGAGEMENT_PATTERNS: readonly PhrasePattern[] = [
   w('like', String.raw`\b(?:give|leave|drop)\s+(?:it|this|us|me)\s+a\s+like\b|\b(?:hit|smash|tap|press)\s+(?:that\s+|the\s+)?like\b|\blike\s+(?:and|&|\+)\s+(?:follow|subscribe|share|comment|save)\b|\blike\s+(?:this|the|my|our)\s+(?:video|reel|post)\b|\blike\s+if\s+you\b`),
-  w('follow', String.raw`\bfollow\s+(?:us|me|for\s+more|along|the\s+(?:account|page|series)|@\w+)\b|\bfollow\s+@`),
+  w('follow', String.raw`\bfollow\s+(?:us|me|for\s+more|along|the\s+(?:account|page|series)|@\w+)\b|\bfollow\s+@|\bfollow\s+for\s+(?:part|the\s+(?:next|rest|answer|full)|daily|weekly|updates|tips|episode)\b|(?:^|[.!?]\s+)follow\s+for\b`),
   w('subscribe', String.raw`\bsubscrib(?:e|ed|ing)\b`),
   w('share', String.raw`\bshare\s+(?:this|it)\s+(?:video|reel|post|with\s+(?:a\s+friend|someone|your))\b|\bshare\s+with\s+(?:a\s+friend|someone\s+who)\b|\bsend\s+(?:this|it)\s+to\s+(?:a\s+friend|someone)\b`),
   w('comment', String.raw`\bcomment\s+(?:below|down\s+below|if|your|what|with|['"]\w+)\b|\b(?:in|to)\s+the\s+comments\b|\b(?:drop|leave)\s+(?:a|your)\s+comment\b`),

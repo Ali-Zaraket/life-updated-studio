@@ -19,7 +19,8 @@
     "studio": "pnpm --filter @life/studio dev",
     "audition": "tsx --env-file-if-exists=.env.local packages/media/scripts/audition.ts",
     "db:backup": "tsx --env-file-if-exists=.env.local packages/db/scripts/backup.ts backup",
-    "db:restore": "tsx --env-file-if-exists=.env.local packages/db/scripts/backup.ts restore"
+    "db:restore": "tsx --env-file-if-exists=.env.local packages/db/scripts/backup.ts restore",
+    "draft": "tsx --env-file-if-exists=.env.local apps/worker/src/draft-cli.ts"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",

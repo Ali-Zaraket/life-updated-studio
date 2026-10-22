@@ -19,6 +19,8 @@ describe('creative rules: engagement begging', () => {
     'Tag a friend who always taps allow.',
     'Give it a like.',
     'SMASH THAT LIKE BUTTON',
+    'Follow for part two!',
+    'Follow for daily updates.',
   ])('blocks "%s"', (text) => {
     const w = world();
     beat(w, 'twist').narration += ` ${text}`;
@@ -37,6 +39,7 @@ describe('creative rules: engagement begging', () => {
   it.each([
     'Apps are likely to ask again later.',
     'It works like this: the system checks first.',
+    'Side effects can follow for several days.',
     'Apps may share location with partners, which is a shared memory of where you went.',
     'Follow these steps in settings.',
     'Researchers comment on the design of permission prompts.',
