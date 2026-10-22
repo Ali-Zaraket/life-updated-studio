@@ -21,7 +21,8 @@
     "db:backup": "tsx --env-file-if-exists=.env.local packages/db/scripts/backup.ts backup",
     "db:restore": "tsx --env-file-if-exists=.env.local packages/db/scripts/backup.ts restore",
     "draft": "tsx --env-file-if-exists=.env.local apps/worker/src/draft-cli.ts",
-    "pilot:load": "tsx --env-file-if-exists=.env.local apps/worker/src/pilot-cli.ts"
+    "pilot:load": "tsx --env-file-if-exists=.env.local apps/worker/src/pilot-cli.ts",
+    "pilot:subject": "tsx apps/worker/src/pilot-subject.ts"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",

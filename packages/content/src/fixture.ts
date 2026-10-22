@@ -8,6 +8,7 @@
  */
 import { reviewSubjectSha256, type Claim, type ClaimEvidence, type EpisodeLink, type EpisodeVersionContent, type ReviewRecord, type Source, type Topic } from '@life/contracts';
 import type { EvidencePacket } from './types';
+import { claimLedgerSha256 } from './ledger';
 
 export const FIXTURE_EPISODE_CODE = 'LU-TECH-001';
 export const FIXTURE_TOPIC_ID = 'fixture-topic-tech-location';
@@ -240,7 +241,7 @@ export function fixturePacket(now: Date): FixtureBundle {
   };
 
   // Fixture reviews are bound to this exact fixture script, like real ones.
-  const subjectSha256 = reviewSubjectSha256(version);
+  const subjectSha256 = reviewSubjectSha256({ ...version, claimLedgerSha256: claimLedgerSha256(claims, evidence) });
   for (const r of reviews) r.subjectSha256 = subjectSha256;
 
   return { packet: { topic, sources, claims, evidence, reviews }, version, link };

@@ -100,8 +100,7 @@
       "topicId": "pilot-tech-android-location-choices",
       "text": "If the user grants only approximate location, the app has only approximate location, including in the background.",
       "locations": [
-        "narration",
-        "caption"
+        "narration"
       ],
       "status": "supported",
       "statusReason": null,
@@ -196,7 +195,7 @@
       "sourceId": "src-android-background-location",
       "stance": "supports",
       "supportingPassage": "On Android 11 (API level 30) and higher, however, the system dialog doesn't include the Allow all the time option. Instead, users must enable background location on a settings page, as shown in figure 7.",
-      "locator": "Section: Request background location",
+      "locator": "Section: Permission dialog contents depend on target SDK version",
       "studyType": null,
       "population": null,
       "limitations": null,
@@ -208,7 +207,7 @@
       "sourceId": "src-android-location-permissions",
       "stance": "supports",
       "supportingPassage": "If the user grants the approximate location permission, your app only has access to approximate location, regardless of which location permissions your app declares.",
-      "locator": "Section: Approximate location",
+      "locator": "Section: Accuracy (paragraph after the Approximate and Precise definitions)",
       "studyType": null,
       "population": null,
       "limitations": null,
@@ -297,6 +296,18 @@
       "population": null,
       "limitations": null,
       "createdAt": "2026-10-22T10:36:27.000Z"
+    },
+    {
+      "id": "e11",
+      "claimId": "c-android11-settings",
+      "sourceId": "src-android-background-location",
+      "stance": "context",
+      "supportingPassage": "When a feature in your app requests background location on a device that runs Android 10 (API level 29), the system permissions dialog includes an option named Allow all the time. If the user selects this option, the feature in your app gains background location access.",
+      "locator": "Section: Permission dialog contents depend on target SDK version",
+      "studyType": null,
+      "population": null,
+      "limitations": "Backs the limitation (Android 10 showed the option in the dialog).",
+      "createdAt": "2026-10-22T10:36:27.000Z"
     }
   ],
   "reviews": [],
@@ -317,6 +328,7 @@
     "publishedAtNote": "publishedAt holds each page's 'Last updated' date; Google does not publish a first-publication date.",
     "round2Changes": "After independent review round 1 (reviews/round-1*.json): added c-foreground-definition; revised beats 2-5, visuals and caption as suggested.",
     "round3Changes": "After independent review round 2: background definition (e7), Figure 7 caption (e8), extended e4, reminder limitation reworded, new claim c-pre10-background (e9); beat 2 cut; beats 3-5, visuals and caption revised as suggested.",
-    "round4Changes": "After round 3: e9 extended to include its Android 10 sentence; e10 adds the per-app settings-page passage; hook drops 'actually'; timeline padding trimmed."
+    "round4Changes": "After round 3: e9 extended to include its Android 10 sentence; e10 adds the per-app settings-page passage; hook drops 'actually'; timeline padding trimmed.",
+    "round5Changes": "After round 4: e2 and e3 locators corrected to the real section headings; c-approximate-applies no longer lists caption; e11 (context) quotes the Android 10 dialog sentence behind the c-android11-settings limitation."
   }
 }

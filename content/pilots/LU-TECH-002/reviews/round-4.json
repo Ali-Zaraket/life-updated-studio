@@ -1,0 +1,80 @@
+[
+  {
+    "id": "rev-ai-r4-LU-TECH-002-c-two-characteristics",
+    "claimId": "c-two-characteristics",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 4)",
+    "verdict": "pass",
+    "notes": "Evidence check: passage(s) found verbatim (whitespace-normalised, exactly one occurrence each) in source-text snapshots retrieved 2026-10-22T10:36:27Z. e1 is in request-location-permissions.txt under 'Types of location access'; locator correct. The claim matches e1 exactly. Script uses: hook 'An Android app asks for your location. You're making two choices.' is a user-facing restatement of the two characteristics; it is broad (on Android 11+ the background choice is not in the pop-up), but beat 2 says so within about 15 s and the source supports that the user grants both background access and approximate vs precise (e3, e4). Mechanism 'First: when ... Second: how exact, precise or approximate' and caption line 1 ('two parts: when (foreground or background) and how exact (precise or approximate)') stay within e1. Hook visual is generic (no real UI text) and labelled 'Illustration'. No change required.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "08029142f4834cda2f1c088c0a7af698fb7faed43debffd2775fda6959eac4f4",
+    "createdAt": "2026-10-22T10:58:25.000Z"
+  },
+  {
+    "id": "rev-ai-r4-LU-TECH-002-c-android11-settings",
+    "claimId": "c-android11-settings",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 4)",
+    "verdict": "pass_with_changes",
+    "notes": "Evidence check: passage(s) found verbatim (whitespace-normalised, exactly one occurrence each) in source-text snapshots retrieved 2026-10-22T10:36:27Z. Substance: the claim matches e2, with e8 (Figure 7 caption, locator correct) and e10 (under 'App targets Android 10 or lower', locator correct) supporting the per-app settings page and the 'Allow all the time' label. Script uses: beat 2 'On Android 11 and newer, background access isn't in the pop-up; it's a separate option in settings', beat 3 'in each app's location permission settings, check whether it's allowed all the time', and caption 'the settings-page step is Android 11+' all stay within e2+e8+e10. No script or caption change. REQUIRED LEDGER CHANGE (accuracy of evidence location): e2.locator reads 'Section: Request background location', which is the page title (H1), not the section. In request-background-location.txt the passage sits under the heading 'Permission dialog contents depend on target SDK version' (line 50; passage at lines 55-57). Replace e2.locator with exactly: 'Section: Permission dialog contents depend on target SDK version'. This edit does not change the script subject hash, but the claim needs a fresh AI review after it.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "08029142f4834cda2f1c088c0a7af698fb7faed43debffd2775fda6959eac4f4",
+    "createdAt": "2026-10-22T10:58:25.000Z"
+  },
+  {
+    "id": "rev-ai-r4-LU-TECH-002-c-approximate-applies",
+    "claimId": "c-approximate-applies",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 4)",
+    "verdict": "pass_with_changes",
+    "notes": "Evidence check: passage(s) found verbatim (whitespace-normalised, exactly one occurrence each) in source-text snapshots retrieved 2026-10-22T10:36:27Z. Substance: the claim matches e3+e4 (e4 locator 'User can affect background location accuracy' correct); the same page also says 'The background location precision is the same as the foreground location precision' (Background location section), consistent with it. Script uses: beat 2 'Grant approximate, and the app only gets approximate location, even in the background' stays within e3+e4; beat 3 'pick approximate where it's offered and your exact spot isn't needed' is advice and is correctly hedged ('where it's offered'), since the sources do not say which versions or screens offer the choice. No script or caption change. REQUIRED LEDGER CHANGE (accuracy of evidence location): e3.locator reads 'Section: Approximate location', but request-location-permissions.txt has no section of that name. The passage (lines 144-146) is in the 'Accuracy' section, after both the 'Approximate' and the 'Precise' definitions, not inside the 'Approximate' entry. Replace e3.locator with exactly: 'Section: Accuracy (paragraph after the Approximate and Precise definitions)'. This edit does not change the script subject hash, but the claim needs a fresh AI review after it. Optional: the claim lists 'caption' among its locations but no caption line asserts it (the scope line only mirrors its limitation).",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "08029142f4834cda2f1c088c0a7af698fb7faed43debffd2775fda6959eac4f4",
+    "createdAt": "2026-10-22T10:58:25.000Z"
+  },
+  {
+    "id": "rev-ai-r4-LU-TECH-002-c-background-reminder",
+    "claimId": "c-background-reminder",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 4)",
+    "verdict": "pass",
+    "notes": "Evidence check: passage(s) found verbatim (whitespace-normalised, exactly one occurrence each) in source-text snapshots retrieved 2026-10-22T10:36:27Z. e5 is under 'Reminder of background location grant' in request-location-permissions.txt; locator correct. The claim matches e5. Script uses: twist 'on Android 10 and newer, after you allow an app all the time, Android schedules a reminder the first time it uses location in the background' keeps the version (Android 10 / API 29 and higher), the 'after the user grants' anchor, the 'first time' trigger and 'schedules' from e5, and does not say when it appears or that it repeats. 'A good moment to check it still needs it' is advice, not a factual claim. Visual is labelled 'Illustration — not Android's actual notification'. No change required.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "08029142f4834cda2f1c088c0a7af698fb7faed43debffd2775fda6959eac4f4",
+    "createdAt": "2026-10-22T10:58:25.000Z"
+  },
+  {
+    "id": "rev-ai-r4-LU-TECH-002-c-foreground-definition",
+    "claimId": "c-foreground-definition",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 4)",
+    "verdict": "pass",
+    "notes": "Evidence check: passage(s) found verbatim (whitespace-normalised, exactly one occurrence each) in source-text snapshots retrieved 2026-10-22T10:36:27Z. e6 is under 'Foreground location' and e7 under 'Background location' in request-location-permissions.txt; both locators correct. The claim matches e6+e7. Script uses: 'Foreground: the app is on screen, or running with an ongoing notification' is a plain-language gloss of 'An activity that belongs to your app is visible' and 'running a foreground service ... showing a persistent notification'; 'Background: any other time' matches e7 ('any situation other than ...'). The gloss does not assert that any ongoing notification grants foreground status, only that a running app shows one. Beat 2 visual uses the same wording and is labelled 'Illustration'. No change required.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "08029142f4834cda2f1c088c0a7af698fb7faed43debffd2775fda6959eac4f4",
+    "createdAt": "2026-10-22T10:58:25.000Z"
+  },
+  {
+    "id": "rev-ai-r4-LU-TECH-002-c-pre10-background",
+    "claimId": "c-pre10-background",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 4)",
+    "verdict": "pass",
+    "notes": "Evidence check: passage(s) found verbatim (whitespace-normalised, exactly one occurrence each) in source-text snapshots retrieved 2026-10-22T10:36:27Z. e9 is in request-location-permissions.txt under 'Background location', immediately after the Android 10 manifest requirement; locator correct. e9 now quotes the Android 10 (API level 29) sentence, so 'earlier versions of Android' is anchored to 10 within the passage itself; the numeric claim 'earlier than 10' and limitation 'Android 9 and earlier' are supported. Script uses: caption 'Background rules apply to Android 10 and newer (on earlier versions, foreground access includes background; ...)' stays within e9 ('includes' = 'automatically receives ... as well'). No change required.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "08029142f4834cda2f1c088c0a7af698fb7faed43debffd2775fda6959eac4f4",
+    "createdAt": "2026-10-22T10:58:25.000Z"
+  }
+]

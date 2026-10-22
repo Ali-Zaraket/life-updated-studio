@@ -120,7 +120,7 @@ export const ReviewRecord = z.object({
   /** Exact public wording this review authorizes, if any (e.g. never "doctor approved" without it). */
   authorizedDisplayWording: z.string().nullable(),
   /**
-   * For script reviews: reviewSubjectSha256 of the exact beats + caption reviewed.
+   * For script reviews: reviewSubjectSha256 of the exact beats, caption and claim ledger reviewed.
    * An AI verification only counts while the script still matches it.
    */
   subjectSha256: Sha256.nullable().optional(),
@@ -128,9 +128,13 @@ export const ReviewRecord = z.object({
 });
 export type ReviewRecord = z.infer<typeof ReviewRecord>;
 
-/** What an AI script review is bound to: the beats and caption, exactly. */
-export function reviewSubjectSha256(version: { beats: readonly unknown[]; caption: string }): string {
-  return hashCanonical({ beats: version.beats, caption: version.caption });
+/**
+ * What an AI script review is bound to: the beats and caption exactly, and the
+ * claim ledger (claims + evidence) they were checked against. Changing any of
+ * them requires a fresh review.
+ */
+export function reviewSubjectSha256(version: { beats: readonly unknown[]; caption: string; claimLedgerSha256: string }): string {
+  return hashCanonical({ beats: version.beats, caption: version.caption, claimLedgerSha256: version.claimLedgerSha256 });
 }
 
 export const Episode = z.object({

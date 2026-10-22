@@ -99,7 +99,7 @@ export async function runVerticalSlice(o: SliceOptions): Promise<SliceResult> {
 
   const caption = fixture.version.caption.replaceAll(FIXTURE_EPISODE_CODE, code);
   // FIXTURE ONLY: the placeholder reviews are re-bound to the caption carrying this run's code.
-  const subject = reviewSubjectSha256({ beats: fixture.version.beats, caption });
+  const subject = reviewSubjectSha256({ beats: fixture.version.beats, caption, claimLedgerSha256: claimLedgerSha256(fixture.packet.claims, fixture.packet.evidence) });
   await saveEvidencePacket(db, { ...fixture.packet, reviews: fixture.packet.reviews.map((r) => ({ ...r, id: `${r.id}-${code}`, subjectSha256: subject })) });
 
   const episodeId = await createEpisode(db, { code, topicId: fixture.packet.topic.id, format: 'everyday_mystery', actor: pipeline, now: clock });

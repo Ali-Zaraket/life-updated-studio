@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { reviewSubjectSha256 } from '@life/contracts';
-import { beat, evidence, world } from './helpers';
+import { beat, evidence, reseal, world } from './helpers';
 
 const aiIssues = (r: ReturnType<typeof evidence>) => r.issues.filter((i) => i.code === 'missing_ai_verification');
 
@@ -44,6 +44,13 @@ describe('AI verification is bound to the exact script', () => {
   it('reviews without a subject never count', () => {
     const w = world();
     for (const r of w.packet.reviews) r.subjectSha256 = null;
+    expect(aiIssues(evidence(w, undefined, { keepReviewBinding: true })).length).toBe(w.packet.claims.length);
+  });
+
+  it('an evidence edit after review also needs a fresh review', () => {
+    const w = world();
+    w.packet.evidence[0]!.locator = 'a corrected locator';
+    reseal(w);
     expect(aiIssues(evidence(w, undefined, { keepReviewBinding: true })).length).toBe(w.packet.claims.length);
   });
 });
