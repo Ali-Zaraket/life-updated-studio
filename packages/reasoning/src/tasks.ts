@@ -131,7 +131,7 @@ export function verifyScriptTask(i: { packet: PacketForPrompt; beats: ScriptBeat
 }
 
 /** Turns a verification result into review records for the claim ledger. */
-export function verificationToReviews(v: VerificationOutput, i: { model: string; now: Date; idPrefix: string }): ReviewRecord[] {
+export function verificationToReviews(v: VerificationOutput, i: { model: string; now: Date; idPrefix: string; subjectSha256: string }): ReviewRecord[] {
   return v.claims.map((c, n) => ({
     id: `${i.idPrefix}-${n}`,
     claimId: c.claimId,
@@ -142,6 +142,7 @@ export function verificationToReviews(v: VerificationOutput, i: { model: string;
     notes: [...c.problems, c.suggestedWording ? `Suggested: ${c.suggestedWording}` : ''].filter(Boolean).join(' | ') || 'No problems found.',
     documentRef: null,
     authorizedDisplayWording: null,
+    subjectSha256: i.subjectSha256,
     createdAt: i.now.toISOString(),
   }));
 }

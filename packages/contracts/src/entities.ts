@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { hashCanonical } from './canonical';
 import { Actor, EpisodeCode, EpisodeFormat, Id, IsoDateTime, Pillar, RiskTier, Sha256 } from './common';
 import { EpisodeState, MainState } from './workflow';
 
@@ -118,9 +119,19 @@ export const ReviewRecord = z.object({
   documentRef: z.string().nullable(),
   /** Exact public wording this review authorizes, if any (e.g. never "doctor approved" without it). */
   authorizedDisplayWording: z.string().nullable(),
+  /**
+   * For script reviews: reviewSubjectSha256 of the exact beats + caption reviewed.
+   * An AI verification only counts while the script still matches it.
+   */
+  subjectSha256: Sha256.nullable().optional(),
   createdAt: IsoDateTime,
 });
 export type ReviewRecord = z.infer<typeof ReviewRecord>;
+
+/** What an AI script review is bound to: the beats and caption, exactly. */
+export function reviewSubjectSha256(version: { beats: readonly unknown[]; caption: string }): string {
+  return hashCanonical({ beats: version.beats, caption: version.caption });
+}
 
 export const Episode = z.object({
   id: Id,

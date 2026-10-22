@@ -1,0 +1,1 @@
+ALTER TABLE "review_records" ADD COLUMN "subject_sha256" text;

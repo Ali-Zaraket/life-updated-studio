@@ -122,6 +122,7 @@ export const reviewRecords = pgTable('review_records', {
   notes: text('notes').notNull(),
   documentRef: text('document_ref'),
   authorizedDisplayWording: text('authorized_display_wording'),
+  subjectSha256: text('subject_sha256'),
   createdAt: createdAt(),
 });
 

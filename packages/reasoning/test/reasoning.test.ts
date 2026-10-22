@@ -133,7 +133,7 @@ describe('verification → review records', () => {
   it('records AI verification, never as qualified review', () => {
     const reviews = verificationToReviews(
       { claims: [{ claimId: 'c1', verdict: 'pass_with_changes', problems: ['add the caveat'], suggestedWording: 'often' }], beatProblems: [], overall: 'pass_with_changes', summary: '' },
-      { model: 'claude-opus-5-5', now: new Date('2026-10-22T10:00:00Z'), idPrefix: 'rev' },
+      { model: 'claude-opus-5-5', now: new Date('2026-10-22T10:00:00Z'), idPrefix: 'rev', subjectSha256: 'a'.repeat(64) },
     );
     expect(reviews[0]).toMatchObject({ reviewerKind: 'ai_verification', reviewer: 'claude-opus-5-5', verdict: 'pass_with_changes', authorizedDisplayWording: null });
   });

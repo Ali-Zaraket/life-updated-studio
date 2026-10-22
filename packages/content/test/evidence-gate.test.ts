@@ -470,7 +470,10 @@ describe('evidence gate: risk tiers and reviews', () => {
     const pass = w.packet.reviews.find((r) => r.claimId === C.settings)!;
     w.packet.reviews.push({ ...pass, id: 'fixture-review-fail', verdict: 'fail', createdAt: iso(-HOUR / 2) });
     expectBlocked(evidence(w), 'missing_ai_verification', { claimId: C.settings });
-    w.packet.reviews.push({ ...pass, id: 'fixture-review-repass', verdict: 'pass_with_changes', createdAt: iso(-HOUR / 4) });
+    // pass_with_changes is not a pass: the changes must be made and re-reviewed.
+    w.packet.reviews.push({ ...pass, id: 'fixture-review-changes', verdict: 'pass_with_changes', createdAt: iso(-HOUR / 4) });
+    expectBlocked(evidence(w), 'missing_ai_verification', { claimId: C.settings });
+    w.packet.reviews.push({ ...pass, id: 'fixture-review-repass', verdict: 'pass', createdAt: iso(-HOUR / 8) });
     expect(evidence(w).ok).toBe(true);
   });
 

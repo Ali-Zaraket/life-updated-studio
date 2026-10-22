@@ -1,4 +1,4 @@
-import type { EpisodeLink, EpisodeVersionContent, ReviewRecord } from '@life/contracts';
+import { reviewSubjectSha256, type EpisodeLink, type EpisodeVersionContent, type ReviewRecord } from '@life/contracts';
 import { expect } from 'vitest';
 import {
   claimLedgerSha256,
@@ -42,8 +42,18 @@ export function reseal(w: World): World {
   return w;
 }
 
-export const evidence = (w: World, now: Date = NOW): GateReport =>
-  evaluateEvidenceGate({ packet: w.packet, version: w.version, now });
+/**
+ * Evaluates the evidence gate. Fixture AI reviews are re-bound to the current
+ * script first, so a test that edits the script isolates the rule under test;
+ * pass `{ keepReviewBinding: true }` to test the binding itself.
+ */
+export const evidence = (w: World, now: Date = NOW, opts: { keepReviewBinding?: boolean } = {}): GateReport => {
+  if (!opts.keepReviewBinding) {
+    const subject = reviewSubjectSha256(w.version);
+    for (const r of w.packet.reviews) if (r.reviewer === 'fixture') r.subjectSha256 = subject;
+  }
+  return evaluateEvidenceGate({ packet: w.packet, version: w.version, now });
+};
 
 export const creative = (w: World): GateReport =>
   evaluateCreativeRules({ version: w.version, link: w.link, relatedEpisodeLive: w.relatedEpisodeLive, reviews: w.packet.reviews });

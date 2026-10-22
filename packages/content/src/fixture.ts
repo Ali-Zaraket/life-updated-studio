@@ -6,7 +6,7 @@
  * here can be mistaken for, or published as, a real citation. The episode code
  * LU-TECH-001 is placeholder text.
  */
-import type { Claim, ClaimEvidence, EpisodeLink, EpisodeVersionContent, ReviewRecord, Source, Topic } from '@life/contracts';
+import { reviewSubjectSha256, type Claim, type ClaimEvidence, type EpisodeLink, type EpisodeVersionContent, type ReviewRecord, type Source, type Topic } from '@life/contracts';
 import type { EvidencePacket } from './types';
 
 export const FIXTURE_EPISODE_CODE = 'LU-TECH-001';
@@ -238,6 +238,10 @@ export function fixturePacket(now: Date): FixtureBundle {
     relationshipReason: 'Second mechanism: inference from other information. Future episode, not yet produced.',
     endingReferencesRelated: false,
   };
+
+  // Fixture reviews are bound to this exact fixture script, like real ones.
+  const subjectSha256 = reviewSubjectSha256(version);
+  for (const r of reviews) r.subjectSha256 = subjectSha256;
 
   return { packet: { topic, sources, claims, evidence, reviews }, version, link };
 }

@@ -13,7 +13,7 @@ import { mkdtemp, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { claimLedgerSha256, evaluateCreativeRules, evaluateEvidenceGate, fixturePacket, FIXTURE_EPISODE_CODE } from '@life/content';
-import { buildApprovalPayload, signApproval, type Actor, type TrustedApprovalKeys } from '@life/contracts';
+import { buildApprovalPayload, reviewSubjectSha256, signApproval, type Actor, type TrustedApprovalKeys } from '@life/contracts';
 import {
   createEpisode,
   createEpisodeVersion,
@@ -93,17 +93,20 @@ export async function runVerticalSlice(o: SliceOptions): Promise<SliceResult> {
 
   // 1. Fixture topic, sources, claims, evidence, AI verification records.
   const fixture = fixturePacket(clock);
-  await saveEvidencePacket(db, fixture.packet);
   const existing = await db.select({ id: t.episodes.id }).from(t.episodes).where(like(t.episodes.code, 'LU-TECH-%'));
   const code = existing.length === 0 ? FIXTURE_EPISODE_CODE : `LU-TECH-${String(existing.length + 1).padStart(3, '0')}`;
   log(`[FIXTURE] topic "${fixture.packet.topic.title}" — ${fixture.packet.claims.length} claims, ${fixture.packet.sources.length} sources`);
+
+  const caption = fixture.version.caption.replaceAll(FIXTURE_EPISODE_CODE, code);
+  // FIXTURE ONLY: the placeholder reviews are re-bound to the caption carrying this run's code.
+  const subject = reviewSubjectSha256({ beats: fixture.version.beats, caption });
+  await saveEvidencePacket(db, { ...fixture.packet, reviews: fixture.packet.reviews.map((r) => ({ ...r, id: `${r.id}-${code}`, subjectSha256: subject })) });
 
   const episodeId = await createEpisode(db, { code, topicId: fixture.packet.topic.id, format: 'everyday_mystery', actor: pipeline, now: clock });
   await transitionEpisode(db, { episodeId, to: 'researching', actor: pipeline, now: clock });
   await transitionEpisode(db, { episodeId, to: 'evidence_ready', actor: pipeline, now: clock });
 
   // 2. Script version bound to the ledger it was written against.
-  const caption = fixture.version.caption.replaceAll(FIXTURE_EPISODE_CODE, code);
   const version = await createEpisodeVersion(db, {
     episodeId,
     content: { ...fixture.version, caption, claimLedgerSha256: claimLedgerSha256(fixture.packet.claims, fixture.packet.evidence) },

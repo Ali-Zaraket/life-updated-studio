@@ -1,4 +1,5 @@
 import {
+  reviewSubjectSha256,
   Claim as ClaimSchema,
   ClaimEvidence as ClaimEvidenceSchema,
   EpisodeVersionContent as EpisodeVersionContentSchema,
@@ -313,12 +314,22 @@ function checkClaim(ctx: Ctx, c: Claim): void {
   }
 
   // --- Reviews and risk tiers ---------------------------------------------
-  const ai = latestReview(ctx.packet.reviews, c.id, 'ai_verification');
-  if (!ai || !PASSING.has(ai.verdict)) {
+  // AI verification is bound to this exact script, and only a clean `pass` counts:
+  // `pass_with_changes` means "not until the changes are made and re-reviewed".
+  const subject = reviewSubjectSha256(ctx.version);
+  const anyAi = latestReview(ctx.packet.reviews, c.id, 'ai_verification');
+  const ai = latestReview(ctx.packet.reviews.filter((r) => r.subjectSha256 === subject), c.id, 'ai_verification');
+  if (!ai || ai.verdict !== 'pass') {
     issues.add(
       'missing_ai_verification',
       c.id,
-      ai ? `latest AI verification of claim ${c.id} is ${ai.verdict}` : `claim ${c.id} has no independent AI verification pass`,
+      ai
+        ? ai.verdict === 'pass_with_changes'
+          ? `AI verification of claim ${c.id} asked for changes; apply them and get a fresh review of the revised script`
+          : `latest AI verification of claim ${c.id} is ${ai.verdict}`
+        : anyAi
+          ? `claim ${c.id} was AI-verified against a different version of the script; re-review this version`
+          : `claim ${c.id} has no independent AI verification pass`,
     );
   }
   if (tier === 'high') {

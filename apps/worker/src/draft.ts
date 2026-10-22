@@ -1,5 +1,5 @@
 import { claimLedgerSha256, evaluateCreativeRules, evaluateEvidenceGate } from '@life/content';
-import type { Actor, EpisodeFormat } from '@life/contracts';
+import { reviewSubjectSha256, type Actor, type EpisodeFormat } from '@life/contracts';
 import {
   authorizeSpend,
   createEpisode,
@@ -81,7 +81,7 @@ export async function draftAndVerifyEpisode(deps: DraftDeps, i: { topicId: strin
 
   // Independent challenge: a separate request that never saw the drafting conversation.
   const verification = await runWithBudget(deps.reasoning, verifyScriptTask({ packet, beats: version.beats, caption: version.caption }), hooks);
-  const reviews = verificationToReviews(verification.output, { model: verification.model, now: deps.now(), idPrefix: `rev-${version.id}` });
+  const reviews = verificationToReviews(verification.output, { model: verification.model, now: deps.now(), idPrefix: `rev-${version.id}`, subjectSha256: reviewSubjectSha256(version) });
   await saveEvidencePacket(db, { topic: packet.topic, sources: [], claims: [], evidence: [], reviews });
 
   const fresh = await loadEvidencePacket(db, i.topicId);

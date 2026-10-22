@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { claimLedgerSha256, evaluateCreativeRules, evaluateEvidenceGate } from '@life/content';
 import { Claim, ClaimEvidence, EpisodeFormat, ReviewRecord, ScriptBeat, Source, Topic, type Actor } from '@life/contracts';
@@ -30,19 +30,17 @@ const ScriptFile = z.object({
 });
 
 /**
- * Loads a reviewed pilot directory (packet.json, script.json, optional
- * reviews.json) into the database and runs the gates. Re-running after new
+ * Loads a reviewed pilot directory (packet.json, script.json, reviews/*.json) into the database and runs the gates. Re-running after new
  * reviews or edits adds a new version; it never skips a gate or approves.
  */
 export async function loadPilot(db: Db, dir: string, now = new Date()): Promise<{ episodeId: string; state: string; blockers: string[] }> {
   const packet = PacketFile.parse(JSON.parse(await readFile(join(dir, 'packet.json'), 'utf8')));
   const script = ScriptFile.parse(JSON.parse(await readFile(join(dir, 'script.json'), 'utf8')));
-  const reviews = await readFile(join(dir, 'reviews.json'), 'utf8')
-    .then((s) => z.array(ReviewRecord).parse(JSON.parse(s)))
-    .catch((e: NodeJS.ErrnoException) => {
-      if (e.code === 'ENOENT') return [];
-      throw e;
-    });
+  // Every review round is kept (reviews/*.json); the gate only counts clean passes bound to the current script.
+  const reviewFiles = (await readdir(join(dir, 'reviews')).catch(() => [] as string[])).filter((f) => f.endsWith('.json')).sort();
+  const reviews = (
+    await Promise.all(reviewFiles.map(async (f) => z.array(ReviewRecord).parse(JSON.parse(await readFile(join(dir, 'reviews', f), 'utf8')))))
+  ).flat();
   const actor: Actor = { kind: 'system', component: 'pilot-loader' };
   await saveEvidencePacket(db, { ...packet, reviews: [...packet.reviews, ...reviews] });
 
