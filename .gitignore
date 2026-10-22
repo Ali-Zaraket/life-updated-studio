@@ -11,3 +11,4 @@ secrets/
 storage/
 *.pem
 !fixtures/**/*.pem
+auditions/

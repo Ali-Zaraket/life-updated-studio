@@ -17,6 +17,9 @@ export interface AuditionClip {
   costEstimateMicroUsd: number | null;
   sha256: string;
   mock: boolean;
+  /** The voice profile the audition run saved for this clip, when the manifest names it. */
+  profileId: string | null;
+  profileVersion: number | null;
 }
 
 const MAX_CLIP_BYTES = 50 * 1024 * 1024;
@@ -35,9 +38,9 @@ async function findManifests(dir: string, depth: number, out: string[]): Promise
 }
 
 /**
- * Manifest shape tolerated: `{ provider?, mock?, clips: [{ provider?, voiceLabel|label, voiceId, file|path,
- * durationSeconds, costEstimateMicroUsd | costEstimateUsd, sha256 }] }` (or a bare array of clips).
- * The format is not yet fixed by the audition script; unknown fields are ignored.
+ * Primary shape: the array written by `pnpm audition` (packages/media/scripts/audition.ts):
+ * `[{ provider, voiceId, label, file, sha256, durationSec, profileId, profileVersion, estimatedCostMicroUsd, source }]`.
+ * Older `{ clips: [...] }` shapes with voiceLabel/durationSeconds/costEstimate* are still accepted.
  */
 export function parseManifest(manifestRel: string, raw: unknown): AuditionClip[] {
   const top = (raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {}) as Record<string, unknown>;
@@ -54,17 +57,22 @@ export function parseManifest(manifestRel: string, raw: unknown): AuditionClip[]
     if (!file || !sha256 || !/^[0-9a-f]{64}$/.test(sha256) || !voiceId || !provider) return;
     if (file.startsWith('/') || file.split(/[\\/]/).includes('..')) return;
     const costUsd = num(r.costEstimateUsd);
+    const normalized = file.replace(/\\/g, '/');
     clips.push({
       manifestRel,
       index,
       provider,
       voiceLabel: str(r.voiceLabel) ?? str(r.label) ?? voiceId,
       voiceId,
-      fileRel: (baseDir ? `${baseDir}/` : '') + file.replace(/\\/g, '/'),
-      durationSeconds: num(r.durationSeconds),
-      costEstimateMicroUsd: num(r.costEstimateMicroUsd) ?? (costUsd === null ? null : Math.round(costUsd * 1_000_000)),
+      // `pnpm audition` writes paths relative to the storage root (auditions/<provider>/<label>.wav).
+      fileRel: normalized.startsWith('auditions/') ? normalized : (baseDir ? `${baseDir}/` : '') + normalized,
+      durationSeconds: num(r.durationSec) ?? num(r.durationSeconds),
+      costEstimateMicroUsd:
+        num(r.estimatedCostMicroUsd) ?? num(r.costEstimateMicroUsd) ?? (costUsd === null ? null : Math.round(costUsd * 1_000_000)),
       sha256,
-      mock: r.mock === true || top.mock === true,
+      mock: r.mock === true || top.mock === true || r.source === 'mock',
+      profileId: str(r.profileId),
+      profileVersion: typeof r.profileVersion === 'number' && Number.isInteger(r.profileVersion) ? r.profileVersion : null,
     });
   });
   return clips;

@@ -20,17 +20,27 @@ export async function chooseNarratorAction(fd: FormData): Promise<void> {
 
     const db = await getDb();
     const actor = { kind: 'owner', ownerId } as const;
-    const id = `${clip.provider}:${clip.voiceId}`;
-    const existing = await db.query.voiceProfiles.findMany({ where: (v, { eq }) => eq(v.id, id) });
-    let version = existing.reduce((m, v) => Math.max(m, v.version), 0);
-    if (version === 0) {
-      version = 1;
-      await saveVoiceProfile(db, {
-        id,
-        version,
-        actor,
-        profile: { provider: clip.provider, voiceId: clip.voiceId, voiceLabel: clip.voiceLabel, locale: 'en-US', source: 'audition', manifest: clip.manifestRel, clip: clip.fileRel },
-      });
+    let id: string;
+    let version: number;
+    if (clip.profileId && clip.profileVersion !== null) {
+      // Approve exactly the profile the audition run recorded (provider, voice, model version, accent).
+      id = clip.profileId;
+      version = clip.profileVersion;
+      const found = await db.query.voiceProfiles.findFirst({ where: (v, { and, eq }) => and(eq(v.id, id), eq(v.version, version)) });
+      if (!found) throw new UserError('The voice profile recorded for this clip is not in the database. Re-run the audition against this database.');
+    } else {
+      id = `${clip.provider}:${clip.voiceId}`;
+      const existing = await db.query.voiceProfiles.findMany({ where: (v, { eq }) => eq(v.id, id) });
+      version = existing.reduce((m, v) => Math.max(m, v.version), 0);
+      if (version === 0) {
+        version = 1;
+        await saveVoiceProfile(db, {
+          id,
+          version,
+          actor,
+          profile: { provider: clip.provider, voiceId: clip.voiceId, voiceLabel: clip.voiceLabel, locale: 'en-US', source: 'audition', manifest: clip.manifestRel, clip: clip.fileRel },
+        });
+      }
     }
     await approveVoiceProfile(db, { id, version, referenceClipSha256: actual, actor });
   } catch (e) {

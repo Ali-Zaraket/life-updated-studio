@@ -390,3 +390,5 @@ export function sha256File(path: string): Promise<string> {
     s.on('end', () => resolve(h.digest('hex')));
   });
 }
+
+export * from './tts/index';

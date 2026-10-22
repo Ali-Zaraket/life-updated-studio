@@ -1,0 +1,20 @@
+[
+  {
+    "provider": "elevenlabs",
+    "voiceId": "REPLACE_WITH_ELEVENLABS_VOICE_ID",
+    "label": "eleven-us-male-1",
+    "_help": "ElevenLabs dashboard: Voices > Voice Library, filter Gender=Male, Accent=American, Use case=Narration. Add a voice to My Voices, then copy its Voice ID (voice menu > Copy voice ID). Stock/library voices only, no cloning. Check the voice's licence allows commercial use. Optional field modelVersion overrides the default model id."
+  },
+  {
+    "provider": "google-chirp",
+    "voiceId": "REPLACE_WITH_GOOGLE_VOICE_NAME",
+    "label": "chirp-us-male-1",
+    "_help": "Google Cloud console: Text-to-Speech > Voices (or the Cloud TTS voice list docs). Filter language en-US, family Chirp3-HD, a male voice. The voiceId is the full voice name, shaped like en-US-Chirp3-HD-<Name> (copy it exactly from the list). The API key goes in GOOGLE_TTS_API_KEY (restrict it to the Text-to-Speech API)."
+  },
+  {
+    "provider": "cartesia",
+    "voiceId": "REPLACE_WITH_CARTESIA_VOICE_UUID",
+    "label": "cartesia-us-male-1",
+    "_help": "Cartesia playground (play.cartesia.ai): Voices library, filter English and a male voice with an American accent, pick a stock voice (not a clone), then copy its voice ID (a UUID). Optional field modelVersion overrides the default model id."
+  }
+]

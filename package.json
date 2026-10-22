@@ -16,7 +16,8 @@
     "db:migrate": "tsx --env-file-if-exists=.env.local packages/db/scripts/migrate.ts",
     "slice": "tsx --env-file-if-exists=.env.local apps/worker/src/slice.ts",
     "worker": "tsx --env-file-if-exists=.env.local apps/worker/src/main.ts",
-    "studio": "pnpm --filter @life/studio dev"
+    "studio": "pnpm --filter @life/studio dev",
+    "audition": "tsx --env-file-if-exists=.env.local packages/media/scripts/audition.ts"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",
