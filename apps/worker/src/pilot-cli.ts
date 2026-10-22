@@ -11,6 +11,7 @@ try {
   const r = await loadPilot(h.db, resolve(dir));
   console.log(`${dir}: ${r.state}${url ? '' : ' (in-memory check only)'}`);
   for (const b of r.blockers) console.log(`  - ${b}`);
+  if (r.state !== 'verified') process.exitCode = 1;
 } finally {
   await h.close();
 }

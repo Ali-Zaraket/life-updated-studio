@@ -1,0 +1,67 @@
+[
+  {
+    "id": "rev-ai-r2-LU-TECH-002-c-two-characteristics",
+    "claimId": "c-two-characteristics",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 2)",
+    "verdict": "pass_with_changes",
+    "notes": "Evidence verbatim check (whitespace-normalised) against source-text snapshot: e1 found in request-location-permissions.txt ('Types of location access'). Claim as worded is supported. Changes needed: (1) Caption first line 'When an Android app asks for your location, you're making two choices: when (foreground or background) ...' is read standalone, but on Android 11+ the pop-up does not offer background at all (e2). Replace with: 'Android location access has two parts: when (foreground or background) and how exact (precise or approximate).' (2) Beats 1 and 2 visuals end with 'Illustration.' but, unlike beat 5, do not say it is an on-screen label; beat 1 is a mock permission prompt. Make it explicit, e.g. append \"On-screen label: 'Illustration'.\" to beats 1-3 visuals. (3) Length: 138 words / 55.4 s timeline exceeds the 25-50 s default. Beat 2 ('Tap yes too fast, and you can miss what you gave away.') restates the hook and adds no evidence; cut it and shift timings (see round-2-notes.md). Hook narration itself can stay: beat 3 qualifies it immediately.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "7d1a4e7d17d92408f534ea69a020011de46cd16fe144bd36ba32029a5ba5d547",
+    "createdAt": "2026-10-22T10:49:40.000Z"
+  },
+  {
+    "id": "rev-ai-r2-LU-TECH-002-c-android11-settings",
+    "claimId": "c-android11-settings",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 2)",
+    "verdict": "pass_with_changes",
+    "notes": "Evidence verbatim check (whitespace-normalised) against source-text snapshot: e2 found in request-background-location.txt. Claim and version qualifier are correct; beat 3 line ('pop-up doesn't offer background access; that's a separate option in settings') stays within it (also holds for apps targeting Android 10 or lower, whose dialog only links to the settings page). Changes needed: (1) Takeaway 'So in your location settings, check which apps are allowed all the time' implies a phone-wide list; the sources document only a per-app settings page ('your app's location permission options on a settings page'). Use: 'So in each app's location permission settings, check whether it's allowed all the time, and pick approximate where it's offered and your exact spot isn't needed.' (2) The settings-page label comes from Figure 7's caption, not e2 (which concerns the dialog). Add evidence: 'Settings page includes an option called Allow all the time, which grants background location access.' plus the note that the label is localized ('The return value of this method is localized to the user's device language preference'). (3) Caption Limits states 'older versions include background with foreground' with no ledger claim. Add a claim with passage 'On earlier versions of Android, when your app receives foreground location access, it automatically receives background location access as well.' (request-location-permissions.txt, 'Background location'). (4) 'Menu names vary by phone maker' is not in the sources; the sources only support language localization. Use the hedge 'Menu names can differ by phone and language.'",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "7d1a4e7d17d92408f534ea69a020011de46cd16fe144bd36ba32029a5ba5d547",
+    "createdAt": "2026-10-22T10:49:40.000Z"
+  },
+  {
+    "id": "rev-ai-r2-LU-TECH-002-c-approximate-applies",
+    "claimId": "c-approximate-applies",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 2)",
+    "verdict": "pass_with_changes",
+    "notes": "Evidence verbatim check (whitespace-normalised) against source-text snapshot: e3 found in request-location-permissions.txt; e4 found in request-background-location.txt. Claim is supported; beat 3 'Grant approximate, and the app only gets approximate location, even in the background' stays within e3+e4. Changes needed: (1) The takeaway line citing this claim needs the rewrite given under c-android11-settings. (2) The takeaway tells viewers to 'pick approximate', but e3/e4 describe the consequence of granting approximate, not that the user is offered the choice. Extend e4 to start one sentence earlier: 'If the user requests approximate location, the user's choices in the location permissions dialog also apply to background location.' Neither snapshot says on which Android versions or for which apps the choice appears, so keep 'where it's offered'.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "7d1a4e7d17d92408f534ea69a020011de46cd16fe144bd36ba32029a5ba5d547",
+    "createdAt": "2026-10-22T10:49:40.000Z"
+  },
+  {
+    "id": "rev-ai-r2-LU-TECH-002-c-background-reminder",
+    "claimId": "c-background-reminder",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 2)",
+    "verdict": "pass_with_changes",
+    "notes": "Evidence verbatim check (whitespace-normalised) against source-text snapshot: e5 found in request-location-permissions.txt ('Reminder of background location grant'). Claim is supported; 'schedules' matches the source. Changes needed: (1) Beat 5 'the first time such an app uses your location in the background' drops the source's anchor 'for the first time after the user grants background location access'. A viewer who just found an app already allowed all the time (beat 4) may expect a reminder that will not come. Use: 'And on Android 10 and newer, after you allow an app all the time, Android schedules a reminder the first time it uses location in the background. A good moment to check it still needs it.' (2) Ledger limitation 'the reminder is sent once, on first background use' overstates: the source says a notification is scheduled on first background access after the grant; it does not say it is sent at once, or that no other reminders follow. Use: 'Android 10 (API level 29) and higher. The source describes one notification scheduled on the first background access after the grant; it does not say when it is shown or whether other reminders follow.' Visual is correctly labelled on screen as an illustration. Twist follows from the evidence and the main promise is resolved first (beats 3-4); nothing essential is withheld; endingReferencesRelated is false.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "7d1a4e7d17d92408f534ea69a020011de46cd16fe144bd36ba32029a5ba5d547",
+    "createdAt": "2026-10-22T10:49:40.000Z"
+  },
+  {
+    "id": "rev-ai-r2-LU-TECH-002-c-foreground-definition",
+    "claimId": "c-foreground-definition",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 2)",
+    "verdict": "pass_with_changes",
+    "notes": "Evidence verbatim check (whitespace-normalised) against source-text snapshot: e6 found in request-location-permissions.txt ('Foreground location'). Claim is supported. Changes needed: (1) Beat 3 'Foreground means the app is on screen or showing an ongoing notification' inverts the source: the source says a running foreground service shows a persistent notification, not that any app showing an ongoing notification is in the foreground. Use: 'Foreground: the app is on screen, or running with an ongoing notification. Background: any other time.' and mirror it in the beat 3 visual ('app on screen / running with ongoing notification = foreground'). (2) 'background is any other time' is a checkable claim not covered by e6 or the claim text. Add evidence (src-android-location-permissions, section 'Background location'): 'The system considers your app to be using background location if it accesses the device's current location in any situation other than the ones described in the foreground location section.' and extend the claim text accordingly (or add a separate claim).",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "7d1a4e7d17d92408f534ea69a020011de46cd16fe144bd36ba32029a5ba5d547",
+    "createdAt": "2026-10-22T10:49:40.000Z"
+  }
+]

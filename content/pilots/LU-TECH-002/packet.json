@@ -130,7 +130,7 @@
       "freshUntil": null,
       "lastCheckedAt": "2026-10-22T10:36:27.000Z",
       "permittedWording": null,
-      "limitations": "Android 10 (API level 29) and higher; the reminder is sent once, on first background use.",
+      "limitations": "Android 10 (API level 29) and higher. The source describes one notification scheduled on the first background access after the grant; it does not say when it is shown or whether other reminders follow.",
       "isNumeric": true,
       "isCausal": false,
       "isConsequential": true,
@@ -139,7 +139,7 @@
     {
       "id": "c-foreground-definition",
       "topicId": "pilot-tech-android-location-choices",
-      "text": "Android treats an app as using foreground location when one of its activities is visible or when it is running a foreground service, which shows a persistent notification; with a foreground service it keeps access after the user presses Home or turns the screen off.",
+      "text": "Android treats an app as using foreground location when one of its activities is visible or when it is running a foreground service, which shows a persistent notification; with a foreground service it keeps access after the user presses Home or turns the screen off. Any other location access counts as background.",
       "locations": [
         "narration"
       ],
@@ -152,6 +152,26 @@
       "permittedWording": null,
       "limitations": "Developer-facing definition; what users see in settings may be labelled differently.",
       "isNumeric": false,
+      "isCausal": false,
+      "isConsequential": true,
+      "singleOriginJustification": "Platform behaviour is defined by the platform owner: Android's official developer documentation is the authoritative source for how Android's own permission system works. Recheck the page before publication."
+    },
+    {
+      "id": "c-pre10-background",
+      "topicId": "pilot-tech-android-location-choices",
+      "text": "On Android versions earlier than 10, an app that receives foreground location access automatically receives background location access as well.",
+      "locations": [
+        "caption"
+      ],
+      "status": "supported",
+      "statusReason": null,
+      "riskTier": "low",
+      "timeSensitivity": "changing",
+      "freshUntil": null,
+      "lastCheckedAt": "2026-10-22T10:36:27.000Z",
+      "permittedWording": null,
+      "limitations": "Applies to Android 9 and earlier.",
+      "isNumeric": true,
       "isCausal": false,
       "isConsequential": true,
       "singleOriginJustification": "Platform behaviour is defined by the platform owner: Android's official developer documentation is the authoritative source for how Android's own permission system works. Recheck the page before publication."
@@ -199,7 +219,7 @@
       "claimId": "c-approximate-applies",
       "sourceId": "src-android-background-location",
       "stance": "supports",
-      "supportingPassage": "if the user grants your app the ACCESS_BACKGROUND_LOCATION permission but grants only approximate location access in the foreground, your app has only approximate location access in the background as well.",
+      "supportingPassage": "If the user requests approximate location, the user's choices in the location permissions dialog also apply to background location. In other words, if the user grants your app the ACCESS_BACKGROUND_LOCATION permission but grants only approximate location access in the foreground, your app has only approximate location access in the background as well.",
       "locator": "Section: User can affect background location accuracy",
       "studyType": null,
       "population": null,
@@ -229,6 +249,42 @@
       "population": null,
       "limitations": null,
       "createdAt": "2026-10-22T10:36:27.000Z"
+    },
+    {
+      "id": "e7",
+      "claimId": "c-foreground-definition",
+      "sourceId": "src-android-location-permissions",
+      "stance": "supports",
+      "supportingPassage": "The system considers your app to be using background location if it accesses the device's current location in any situation other than the ones described in the foreground location section.",
+      "locator": "Section: Background location",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-22T10:36:27.000Z"
+    },
+    {
+      "id": "e8",
+      "claimId": "c-android11-settings",
+      "sourceId": "src-android-background-location",
+      "stance": "supports",
+      "supportingPassage": "Figure 7. Settings page includes an option called Allow all the time, which grants background location access.",
+      "locator": "Figure 7 caption",
+      "studyType": null,
+      "population": null,
+      "limitations": "Label shown on the settings page; localized on non-English phones.",
+      "createdAt": "2026-10-22T10:36:27.000Z"
+    },
+    {
+      "id": "e9",
+      "claimId": "c-pre10-background",
+      "sourceId": "src-android-location-permissions",
+      "stance": "supports",
+      "supportingPassage": "On earlier versions of Android, when your app receives foreground location access, it automatically receives background location access as well.",
+      "locator": "Section: Background location (after the Android 10 manifest requirement)",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-22T10:36:27.000Z"
     }
   ],
   "reviews": [],
@@ -247,6 +303,7 @@
     "pageSha256Note": "contentSha256 / pageSha256 are sha256 of the raw HTML response as fetched, not of the extracted text.",
     "numericNote": "isNumeric is set where narration states Android version numbers, so the number rule can verify them.",
     "publishedAtNote": "publishedAt holds each page's 'Last updated' date; Google does not publish a first-publication date.",
-    "round2Changes": "After independent review round 1 (reviews/round-1*.json): added c-foreground-definition; revised beats 2-5, visuals and caption as suggested."
+    "round2Changes": "After independent review round 1 (reviews/round-1*.json): added c-foreground-definition; revised beats 2-5, visuals and caption as suggested.",
+    "round3Changes": "After independent review round 2: background definition (e7), Figure 7 caption (e8), extended e4, reminder limitation reworded, new claim c-pre10-background (e9); beat 2 cut; beats 3-5, visuals and caption revised as suggested."
   }
 }
