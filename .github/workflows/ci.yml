@@ -54,3 +54,29 @@ jobs:
           DATABASE_URL: postgres://ci@127.0.0.1:1/ci
           STUDIO_SESSION_SECRET: ci-placeholder-session-secret-not-used-0123456789
           LIFE_OWNER_ID: owner
+
+  postgres-races:
+    # Real server, separate connections: lease and publish-job races.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: life
+          POSTGRES_PASSWORD: ci-only-password
+          POSTGRES_DB: postgres
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U life" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm vitest run packages/db/test/pg-race.test.ts
+        env:
+          PG_TEST_URL: postgres://life:ci-only-password@127.0.0.1:5432/postgres

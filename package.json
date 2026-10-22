@@ -17,7 +17,9 @@
     "slice": "tsx --env-file-if-exists=.env.local apps/worker/src/slice.ts",
     "worker": "tsx --env-file-if-exists=.env.local apps/worker/src/main.ts",
     "studio": "pnpm --filter @life/studio dev",
-    "audition": "tsx --env-file-if-exists=.env.local packages/media/scripts/audition.ts"
+    "audition": "tsx --env-file-if-exists=.env.local packages/media/scripts/audition.ts",
+    "db:backup": "tsx --env-file-if-exists=.env.local packages/db/scripts/backup.ts backup",
+    "db:restore": "tsx --env-file-if-exists=.env.local packages/db/scripts/backup.ts restore"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",

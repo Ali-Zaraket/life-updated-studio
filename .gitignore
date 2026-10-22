@@ -12,3 +12,4 @@ storage/
 *.pem
 !fixtures/**/*.pem
 auditions/
+backups/
