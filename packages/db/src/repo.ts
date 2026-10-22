@@ -595,3 +595,32 @@ export async function approveVoiceProfile(db: Db, input: { id: string; version: 
     await audit(tx, { actor: input.actor, action: 'voice_profile.approved', entityType: 'voice_profile', entityId: `${input.id}@${input.version}`, details: { referenceClipSha256: input.referenceClipSha256 }, now });
   });
 }
+
+// ---------------------------------------------------------------- renders
+
+export interface RenderFileInput {
+  kind: 'master' | 'delivery' | 'cover' | 'subtitles_srt' | 'subtitles_vtt' | 'narration' | 'manifest';
+  uri: string;
+  sha256: string;
+  bytes: number;
+  mimeType: string;
+}
+
+/** Records a render and its output files (with hashes) for the reproducible render manifest. */
+export async function recordRender(
+  db: Db,
+  input: { episodeVersionId: string; kind: 'mock_preview' | 'full'; source: 'mock' | 'live'; manifest: unknown; validation: unknown; files: RenderFileInput[]; now?: Date },
+): Promise<{ renderId: string; assetIds: Record<string, string> }> {
+  const now = iso(input.now ?? new Date());
+  return db.transaction(async (tx) => {
+    const assetIds: Record<string, string> = {};
+    for (const f of input.files) {
+      const id = newId('asset');
+      assetIds[f.kind] = id;
+      await tx.insert(t.assets).values({ id, kind: f.kind, uri: f.uri, sha256: f.sha256, bytes: f.bytes, mimeType: f.mimeType, source: input.source, createdAt: now });
+    }
+    const renderId = newId('render');
+    await tx.insert(t.renders).values({ id: renderId, episodeVersionId: input.episodeVersionId, kind: input.kind, manifest: input.manifest ?? {}, outputAssetId: assetIds.delivery ?? null, validation: input.validation ?? null, source: input.source, createdAt: now });
+    return { renderId, assetIds };
+  });
+}

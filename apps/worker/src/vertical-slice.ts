@@ -19,6 +19,8 @@ import {
   createEpisodeVersion,
   createReleasePackage,
   ensureOwner,
+  recordRender,
+  type RenderFileInput,
   eq,
   like,
   getEpisode,
@@ -31,6 +33,7 @@ import {
   type Db,
 } from '@life/db';
 import { MockInsightsReader, MockInstagramPublisher } from '@life/instagram';
+import { renderEpisode, type TemplateName } from '@life/render';
 import { DELIVERY_SPEC, MockTtsProvider, probeMedia, renderMockPreview, sha256File, validateAgainstSpec, type VoiceProfile } from '@life/media';
 import { LocalStorage } from './storage';
 import { collectInsights, evidenceCheckFor, workerTick } from './tick';
@@ -60,6 +63,8 @@ export interface SliceOptions {
   /** Only allowed with a throwaway in-memory database. */
   simulateOwnerApproval: boolean;
   persistentDb: boolean;
+  /** Full Remotion render instead of the quick test-pattern preview. */
+  renderTemplate?: TemplateName;
   start?: Date;
   log?: (line: string) => void;
 }
@@ -125,25 +130,63 @@ export async function runVerticalSlice(o: SliceOptions): Promise<SliceResult> {
   const tts = await new MockTtsProvider().synthesize({ text: narration, profile: MOCK_VOICE, outPath: join(work, 'MOCK_narration.wav'), sampleRateHz: 48000 });
   await recordCost(db, { provider: 'mock-tts', operation: 'synthesize', units: narration.length, unitType: 'characters', amountMicroUsd: 0, estimated: false, source: 'mock', episodeId, now: clock });
 
-  let videoPath: string;
-  let coverPath: string;
-  try {
-    ({ videoPath, coverPath } = await renderMockPreview({ outDir: work, durationSec: Math.ceil(version.beats.at(-1)!.endSec), audioPath: tts.audioPath }));
-    const spec = validateAgainstSpec(await probeMedia(videoPath), DELIVERY_SPEC);
-    if (!spec.ok) throw new Error(`mock preview failed delivery spec: ${spec.issues.map((i) => i.code).join(', ')}`);
-    log(`MOCK preview rendered and passes ${DELIVERY_SPEC.name}`);
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err;
-    // No ffmpeg on this machine: placeholder bytes, clearly labelled.
-    videoPath = join(work, 'MOCK_placeholder_no_ffmpeg.mp4');
-    coverPath = join(work, 'MOCK_placeholder_no_ffmpeg.jpg');
-    await writeFile(videoPath, 'MOCK placeholder: ffmpeg not installed');
-    await writeFile(coverPath, 'MOCK placeholder: ffmpeg not installed');
-    log('ffmpeg not found: using labelled placeholder media (not spec-validated)');
-  }
   const base = `episodes/${code}/v${version.versionNumber}`;
-  const deliveryUri = await storage.put(videoPath, `${base}/MOCK_delivery.mp4`);
-  const coverUri = await storage.put(coverPath, `${base}/MOCK_cover.jpg`);
+  const fileRecord = async (kind: RenderFileInput['kind'], uri: string, mimeType: string): Promise<RenderFileInput> => {
+    const path = storage.resolve(uri);
+    return { kind, uri, sha256: await sha256File(path), bytes: (await stat(path)).size, mimeType };
+  };
+  let deliveryUri: string;
+  let coverUri: string;
+  if (o.renderTemplate) {
+    // Full render: 4K master, delivery, cover, captions (minutes, not seconds).
+    const r = await renderEpisode({
+      template: o.renderTemplate,
+      episodeCode: code,
+      title: fixture.packet.topic.title,
+      script: { versionId: version.id, sha256: version.contentSha256, beats: version.beats },
+      claimLedgerSha256: version.claimLedgerSha256,
+      narration: { audioPath: tts.audioPath, durationSec: tts.durationSec, source: 'mock', voiceProfile: null },
+      outDir: join(work, 'render'),
+    });
+    if (!r.ok) throw new Error(`render failed validation: ${JSON.stringify(r.validation)}`);
+    const put = (p: string, name: string) => storage.put(p, `${base}/${name}`);
+    deliveryUri = await put(r.paths.delivery, 'MOCK_delivery.mp4');
+    coverUri = await put(r.paths.cover, 'MOCK_cover.jpg');
+    const files = [
+      await fileRecord('delivery', deliveryUri, 'video/mp4'),
+      await fileRecord('cover', coverUri, 'image/jpeg'),
+      await fileRecord('master', await put(r.paths.master, 'MOCK_master.mov'), 'video/quicktime'),
+      await fileRecord('subtitles_srt', await put(r.paths.srt, 'MOCK_captions.srt'), 'application/x-subrip'),
+      await fileRecord('subtitles_vtt', await put(r.paths.vtt, 'MOCK_captions.vtt'), 'text/vtt'),
+    ];
+    await recordRender(db, { episodeVersionId: version.id, kind: 'full', source: 'mock', manifest: r.manifest, validation: r.validation, files, now: clock });
+    log(`MOCK-narrated ${o.renderTemplate} render: master, delivery and cover pass validation`);
+  } else {
+    let videoPath: string;
+    let coverPath: string;
+    let validation: unknown = null;
+    try {
+      ({ videoPath, coverPath } = await renderMockPreview({ outDir: work, durationSec: Math.ceil(version.beats.at(-1)!.endSec), audioPath: tts.audioPath }));
+      const spec = validateAgainstSpec(await probeMedia(videoPath), DELIVERY_SPEC);
+      if (!spec.ok) throw new Error(`mock preview failed delivery spec: ${spec.issues.map((i) => i.code).join(', ')}`);
+      validation = spec;
+      log(`MOCK preview rendered and passes ${DELIVERY_SPEC.name}`);
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code !== 'ENOENT') throw err;
+      // No ffmpeg on this machine: placeholder bytes, clearly labelled.
+      videoPath = join(work, 'MOCK_placeholder_no_ffmpeg.mp4');
+      coverPath = join(work, 'MOCK_placeholder_no_ffmpeg.jpg');
+      await writeFile(videoPath, 'MOCK placeholder: ffmpeg not installed');
+      await writeFile(coverPath, 'MOCK placeholder: ffmpeg not installed');
+      log('ffmpeg not found: using labelled placeholder media (not spec-validated)');
+    }
+    deliveryUri = await storage.put(videoPath, `${base}/MOCK_delivery.mp4`);
+    coverUri = await storage.put(coverPath, `${base}/MOCK_cover.jpg`);
+    await recordRender(db, {
+      episodeVersionId: version.id, kind: 'mock_preview', source: 'mock', manifest: { mock: true, kind: 'test-pattern preview' }, validation,
+      files: [await fileRecord('delivery', deliveryUri, 'video/mp4'), await fileRecord('cover', coverUri, 'image/jpeg')], now: clock,
+    });
+  }
   await transitionEpisode(db, { episodeId, to: 'preview_ready', actor: pipeline, now: clock });
 
   // 5. Release package: the exact thing the owner approves.

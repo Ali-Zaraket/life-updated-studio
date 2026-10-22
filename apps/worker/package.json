@@ -16,7 +16,8 @@
     "@life/media": "workspace:*",
     "@life/instagram": "workspace:*",
     "zod": "4.6.7",
-    "@life/reasoning": "workspace:*"
+    "@life/reasoning": "workspace:*",
+    "@life/render": "workspace:*"
   },
   "devDependencies": {}
 }

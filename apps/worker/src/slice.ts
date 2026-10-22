@@ -2,6 +2,7 @@
  *   pnpm slice
  *     In-memory database; runs the whole MOCK pipeline including a SIMULATED
  *     owner approval, then prints the mock insights.
+ *   LIFE_SLICE_RENDER=EverydayMystery pnpm slice   (full 4K render; takes minutes)
  *   DATABASE_URL=… pnpm slice
  *     Persistent database; stops at awaiting_user_approval. Approve in the
  *     studio, then `pnpm worker --once` publishes through the MOCK adapter.
@@ -23,6 +24,7 @@ try {
     accountId: process.env.INSTAGRAM_ACCOUNT_ID ?? 'mock-account',
     simulateOwnerApproval: !persistent,
     persistentDb: persistent,
+    renderTemplate: (process.env.LIFE_SLICE_RENDER as never) || undefined,
     log: (line) => console.log(`  ${line}`),
   });
   console.log(`\nSLICE (all MOCK) — ${result.code}: stopped at ${result.stoppedAt}`);
