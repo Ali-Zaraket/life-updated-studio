@@ -24,7 +24,7 @@ export async function createExperimentAction(fd: FormData): Promise<void> {
     const db = await getDb();
     const id = `exp_${randomUUID()}`;
     await db.transaction(async (tx) => {
-      await tx.insert(t.experiments).values({ id, hypothesis, change: composeChange(variable, baseline), evaluationWindow: window });
+      await tx.insert(t.experiments).values({ id, hypothesis, change: composeChange(variable, baseline), variable, baselineTemplate: baseline, evaluationWindow: window });
       await audit(tx, { actor: { kind: 'owner', ownerId }, action: 'experiment.created', entityType: 'experiment', entityId: id, details: { variable, window } });
     });
   } catch (e) {
@@ -42,7 +42,7 @@ export async function recordDecisionAction(fd: FormData): Promise<void> {
     const db = await getDb();
     await db.transaction(async (tx) => {
       // Recorded once; a revised judgment is a new experiment version.
-      const rows = await tx.update(t.experiments).set({ result: c.result, decision: c.decision, rollback: c.rollback }).where(and(eq(t.experiments.id, id), isNull(t.experiments.decision))).returning({ id: t.experiments.id });
+      const rows = await tx.update(t.experiments).set({ result: c.result, decision: c.decision, rollback: c.rollback, evidenceSummary: text(fd, 'evidence') || null, decidedAt: new Date().toISOString() }).where(and(eq(t.experiments.id, id), isNull(t.experiments.decision))).returning({ id: t.experiments.id });
       if (rows.length !== 1) throw new UserError('This experiment already has a decision or does not exist.');
       await audit(tx, { actor: { kind: 'owner', ownerId }, action: 'experiment.decided', entityType: 'experiment', entityId: id, details: { decision: c.decision, result: c.result } });
     });

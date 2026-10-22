@@ -29,7 +29,7 @@ export function checkDecision(i: DecisionInput): DecisionCheck {
   return { ok: true, result, decision: i.decision, rollback };
 }
 
-/** The schema has no baseline column; the one changed variable and the baseline template share `change`. */
+/** Readable summary stored in `change`; the structured `variable` and `baseline_template` columns are set alongside. */
 export function composeChange(variable: string, baseline: string): string {
   return `Variable changed (one only): ${variable.trim()}\nBaseline template: ${baseline.trim()}`;
 }

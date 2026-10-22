@@ -390,7 +390,12 @@ export const metricSnapshots = pgTable(
 export const experiments = pgTable('experiments', {
   id: text('id').primaryKey(),
   hypothesis: text('hypothesis').notNull(),
+  /** Human-readable summary; `variable` and `baselineTemplate` hold the structured parts. */
   change: text('change').notNull(),
+  variable: text('variable'),
+  baselineTemplate: text('baseline_template'),
+  evidenceSummary: text('evidence_summary'),
+  decidedAt: ts('decided_at'),
   evaluationWindow: text('evaluation_window').notNull(),
   result: text('result'),
   decision: text('decision'),
