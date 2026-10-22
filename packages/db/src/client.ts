@@ -12,14 +12,32 @@ export function migrationsFolder(): string {
   return join(dirname(fileURLToPath(import.meta.url)), '..', 'migrations');
 }
 
-/** In-process Postgres for tests: no daemon, no network. Migrated and ready. */
+let template: Promise<Blob | File> | null = null;
+
+/**
+ * In-process Postgres for tests: no daemon, no network. Migrated and ready.
+ * Without a dataDir, the first call migrates once and later calls clone that
+ * snapshot, which keeps the suite fast.
+ */
 export async function openPgliteDb(dataDir?: string): Promise<{ db: Db; close: () => Promise<void> }> {
   const { PGlite } = await import('@electric-sql/pglite');
   const { drizzle } = await import('drizzle-orm/pglite');
   const { migrate } = await import('drizzle-orm/pglite/migrator');
-  const client = new PGlite(dataDir);
+  if (dataDir) {
+    const client = new PGlite(dataDir);
+    const db = drizzle(client, { schema });
+    await migrate(db, { migrationsFolder: migrationsFolder() });
+    return { db: db as unknown as Db, close: () => client.close() };
+  }
+  template ??= (async () => {
+    const seed = new PGlite();
+    await migrate(drizzle(seed, { schema }), { migrationsFolder: migrationsFolder() });
+    const dump = await seed.dumpDataDir('none');
+    await seed.close();
+    return dump;
+  })();
+  const client = new PGlite({ loadDataDir: await template });
   const db = drizzle(client, { schema });
-  await migrate(db, { migrationsFolder: migrationsFolder() });
   return { db: db as unknown as Db, close: () => client.close() };
 }
 
