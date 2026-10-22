@@ -1,0 +1,56 @@
+name: CI
+
+# Deterministic checks only: no secrets, no network calls to Meta or TTS
+# providers, no publishing. Live smoke tests (tests/live/) never run here.
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # The owner develops on Windows; the cloud sessions run on Linux.
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install ffmpeg (media tests skip without it)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+
+  studio-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Build studio (placeholder env; nothing connects)
+        run: pnpm --filter @life/studio build
+        env:
+          DATABASE_URL: postgres://ci@127.0.0.1:1/ci
+          STUDIO_SESSION_SECRET: ci-placeholder-session-secret-not-used-0123456789
+          LIFE_OWNER_ID: owner
