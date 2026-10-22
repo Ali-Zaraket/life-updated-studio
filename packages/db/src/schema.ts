@@ -473,3 +473,46 @@ export const jobs = pgTable(
     index('jobs_ready').on(t.state, t.runAt),
   ],
 );
+
+/** A flagged problem with published or queued content and the owner's resolution. */
+export const corrections = pgTable(
+  'corrections',
+  {
+    id: text('id').primaryKey(),
+    trigger: jsonb('trigger').notNull(),
+    plan: jsonb('plan').notNull(),
+    planSha256: text('plan_sha256').notNull(),
+    status: text('status').notNull().default('open'),
+    flaggedBy: jsonb('flagged_by').notNull(),
+    resolution: text('resolution'),
+    resolvedBy: jsonb('resolved_by'),
+    createdAt: createdAt(),
+    resolvedAt: ts('resolved_at'),
+  },
+  (t) => [
+    check('corrections_status', sql`${t.status} in ('open','resolved','dismissed')`),
+    check('corrections_resolution', sql`${t.status} = 'open' or (${t.resolution} is not null and ${t.resolvedAt} is not null and ${t.resolvedBy} is not null)`),
+  ],
+);
+
+/** Instagram credentials, sealed with AES-256-GCM. The key lives only in local env. */
+export const instagramCredentials = pgTable('instagram_credentials', {
+  accountId: text('account_id').primaryKey(),
+  igUserId: text('ig_user_id').notNull(),
+  username: text('username'),
+  tokenSealed: text('token_sealed').notNull(),
+  keyId: text('key_id').notNull(),
+  scopes: jsonb('scopes').notNull(),
+  issuedAt: ts('issued_at').notNull(),
+  expiresAt: ts('expires_at').notNull(),
+  updatedAt: ts('updated_at').notNull().default(sql`now()`),
+});
+
+/** One-time OAuth `state` values; consumed on callback. */
+export const oauthStates = pgTable('oauth_states', {
+  state: text('state').primaryKey(),
+  purpose: text('purpose').notNull(),
+  createdAt: createdAt(),
+  expiresAt: ts('expires_at').notNull(),
+  usedAt: ts('used_at'),
+});
