@@ -2,17 +2,17 @@
   "beats": [
     {
       "startSec": 0.0,
-      "endSec": 5.0,
+      "endSec": 4.5,
       "role": "hook",
-      "narration": "An Android app asks for your location. You're actually making two choices.",
+      "narration": "An Android app asks for your location. You're making two choices.",
       "visual": "Generic permission prompt (no real UI text) splits into two labelled dials: WHEN and HOW EXACT. On-screen label: 'Illustration'.",
       "claimIds": [
         "c-two-characteristics"
       ]
     },
     {
-      "startSec": 5.0,
-      "endSec": 26.3,
+      "startSec": 4.5,
+      "endSec": 25.6,
       "role": "mechanism",
       "narration": "First: when. Foreground: the app is on screen, or running with an ongoing notification. Background: any other time. On Android 11 and newer, background access isn't in the pop-up; it's a separate option in settings. Second: how exact, precise or approximate. Grant approximate, and the app only gets approximate location, even in the background.",
       "visual": "Diagram: WHEN dial (app on screen / running with ongoing notification = foreground; any other time = background, with a settings-page icon). HOW EXACT dial (precise pin vs. wide circle). On-screen label: 'Illustration'.",
@@ -24,8 +24,8 @@
       ]
     },
     {
-      "startSec": 26.3,
-      "endSec": 36.8,
+      "startSec": 25.6,
+      "endSec": 35.9,
       "role": "takeaway",
       "narration": "So in each app's location permission settings, check whether it's allowed all the time, and pick approximate where it's offered and your exact spot isn't needed.",
       "visual": "Checklist card (text graphic, not a phone screen): 1) 'Allow all the time'? 2) approximate where offered and enough.",
@@ -35,8 +35,8 @@
       ]
     },
     {
-      "startSec": 36.8,
-      "endSec": 51.1,
+      "startSec": 35.9,
+      "endSec": 50.0,
       "role": "twist",
       "narration": "And on Android 10 and newer, after you allow an app all the time, Android schedules a reminder the first time it uses location in the background. A good moment to check it still needs it.",
       "visual": "Stylised card with on-screen label 'Illustration \u2014 not Android's actual notification'; must not look like a real screenshot.",

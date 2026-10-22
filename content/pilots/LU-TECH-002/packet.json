@@ -279,8 +279,20 @@
       "claimId": "c-pre10-background",
       "sourceId": "src-android-location-permissions",
       "stance": "supports",
-      "supportingPassage": "On earlier versions of Android, when your app receives foreground location access, it automatically receives background location access as well.",
+      "supportingPassage": "On Android 10 (API level 29) and higher, you must declare the ACCESS_BACKGROUND_LOCATION permission in your app's manifest in order to request background location access at runtime. On earlier versions of Android, when your app receives foreground location access, it automatically receives background location access as well.",
       "locator": "Section: Background location (after the Android 10 manifest requirement)",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-22T10:36:27.000Z"
+    },
+    {
+      "id": "e10",
+      "claimId": "c-android11-settings",
+      "sourceId": "src-android-background-location",
+      "stance": "supports",
+      "supportingPassage": "This dialog includes an option to navigate to your app's location permission options on a settings page.",
+      "locator": "Section: App targets Android 10 or lower",
       "studyType": null,
       "population": null,
       "limitations": null,
@@ -304,6 +316,7 @@
     "numericNote": "isNumeric is set where narration states Android version numbers, so the number rule can verify them.",
     "publishedAtNote": "publishedAt holds each page's 'Last updated' date; Google does not publish a first-publication date.",
     "round2Changes": "After independent review round 1 (reviews/round-1*.json): added c-foreground-definition; revised beats 2-5, visuals and caption as suggested.",
-    "round3Changes": "After independent review round 2: background definition (e7), Figure 7 caption (e8), extended e4, reminder limitation reworded, new claim c-pre10-background (e9); beat 2 cut; beats 3-5, visuals and caption revised as suggested."
+    "round3Changes": "After independent review round 2: background definition (e7), Figure 7 caption (e8), extended e4, reminder limitation reworded, new claim c-pre10-background (e9); beat 2 cut; beats 3-5, visuals and caption revised as suggested.",
+    "round4Changes": "After round 3: e9 extended to include its Android 10 sentence; e10 adds the per-app settings-page passage; hook drops 'actually'; timeline padding trimmed."
   }
 }
