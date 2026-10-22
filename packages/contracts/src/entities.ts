@@ -155,7 +155,13 @@ export const ScriptBeat = z.object({
   endSec: z.number().positive(),
   role: z.enum(['hook', 'problem', 'mechanism', 'takeaway', 'twist']),
   narration: z.string().min(1),
+  /** Direction for the motion designer. Never shown on screen. */
   visual: z.string().min(1),
+  /**
+   * Exact words shown on screen for this beat (diagram labels, checklist items).
+   * Reviewed and gated like narration. When absent, templates show only narration-derived text.
+   */
+  onScreenText: z.array(z.string().min(1).max(60)).max(5).optional(),
   claimIds: z.array(Id),
 });
 export type ScriptBeat = z.infer<typeof ScriptBeat>;

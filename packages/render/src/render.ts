@@ -227,7 +227,7 @@ export async function renderEpisode(input: RenderEpisodeInput): Promise<RenderRe
       title: input.title,
       mock,
       durationSec: fullDurationSec,
-      beats: scaled.map((b) => ({ startSec: b.startSec, endSec: b.endSec, role: b.role, narration: b.narration, visual: b.visual })),
+      beats: scaled.map((b) => ({ startSec: b.startSec, endSec: b.endSec, role: b.role, narration: b.narration, visual: b.visual, onScreenText: b.onScreenText })),
       cues,
     };
     return { cues, props };

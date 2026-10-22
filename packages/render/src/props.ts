@@ -7,6 +7,8 @@ export interface CompositionBeat {
   role: 'hook' | 'problem' | 'mechanism' | 'takeaway' | 'twist';
   narration: string;
   visual: string;
+  /** Reviewed on-screen text; the only source of diagram labels and checklist items. */
+  onScreenText?: string[];
 }
 
 /** Serializable input props for every composition (Remotion requires plain JSON). */

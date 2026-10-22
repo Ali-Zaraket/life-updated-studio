@@ -4,7 +4,7 @@ import { COLORS, type TemplateName } from '../theme';
 import type { CompositionBeat, EpisodeProps } from '../props';
 import { Background, BigText, Captions, Card, Header, IllustrationTag, Kicker, Pill, Reveal, STAGE, baseText, useInterFont } from './shared';
 import { HookCard, MechanismDiagram, ProblemCard, TakeawayCard, TwistCard } from './visuals';
-import { diagramLabels, firstSentence } from '../beat-text';
+import { firstSentence } from '../beat-text';
 
 const SEG_GAP = 40;
 
@@ -99,7 +99,7 @@ const UpdateBeat: React.FC<{ beat: CompositionBeat; beats: CompositionBeat[] }> 
 const DecisionBeat: React.FC<{ beat: CompositionBeat }> = ({ beat }) => {
   const colW = (STAGE.width - 120) / 2;
   const mech = beat.role === 'mechanism';
-  const labels = diagramLabels(beat.visual);
+  const labels = beat.onScreenText ?? [];
   const half = Math.ceil(labels.length / 2);
   const left = labels.slice(0, half);
   const right = labels.slice(half);

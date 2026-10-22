@@ -21,6 +21,13 @@
         "c-foreground-definition",
         "c-android11-settings",
         "c-approximate-applies"
+      ],
+      "onScreenText": [
+        "When: foreground or background",
+        "Foreground: on screen, or running with ongoing notification",
+        "Android 11+: background is a separate settings option",
+        "How exact: precise or approximate",
+        "Approximate stays approximate, even in background"
       ]
     },
     {
@@ -32,6 +39,10 @@
       "claimIds": [
         "c-android11-settings",
         "c-approximate-applies"
+      ],
+      "onScreenText": [
+        "Check each app: allowed all the time?",
+        "Pick approximate where offered and enough"
       ]
     },
     {

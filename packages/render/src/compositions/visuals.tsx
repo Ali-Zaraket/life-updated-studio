@@ -2,7 +2,7 @@ import React from 'react';
 import { interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
 import { COLORS } from '../theme';
 import { BigText, Card, Kicker, Reveal, STAGE, baseText } from './shared';
-import { checklistItems, diagramLabels, firstSentence, questionOf, stripTag } from '../beat-text';
+import { checklistItems, firstSentence, questionOf, stripTag } from '../beat-text';
 import type { CompositionBeat } from '../props';
 
 const W = STAGE.width;
@@ -59,7 +59,8 @@ export const MechanismDiagram: React.FC<{
 }> = ({ beat, labels, width = W, kicker = 'How it works', accent = COLORS.accent }) => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
-  const nodes = labels ?? diagramLabels(beat.visual);
+  // Only reviewed on-screen text becomes labels; the visual note is direction, never screen copy.
+  const nodes = labels ?? beat.onScreenText ?? [firstSentence(beat.narration)];
   const n = Math.max(nodes.length, 1);
   const gap = 110;
   const top = 190;
@@ -128,7 +129,7 @@ export const MechanismDiagram: React.FC<{
 export const TakeawayCard: React.FC<{ beat: CompositionBeat; kicker?: string; accent?: string }> = ({ beat, kicker = 'What to do', accent = COLORS.accent }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const items = checklistItems(beat.narration);
+  const items = beat.onScreenText ?? checklistItems(beat.narration);
   return (
     <div style={{ position: 'relative', width: W, height: H }}>
       <Reveal style={{ position: 'absolute', left: 0, top: 40 }}>
@@ -154,7 +155,8 @@ export const TakeawayCard: React.FC<{ beat: CompositionBeat; kicker?: string; ac
 };
 
 /** Twist question card. */
-export const TwistCard: React.FC<{ beat: CompositionBeat; kicker?: string }> = ({ beat, kicker = 'Next question' }) => {
+export const TwistCard: React.FC<{ beat: CompositionBeat; kicker?: string }> = ({ beat, kicker }) => {
+  const label = kicker ?? (questionOf(beat.narration).trim().endsWith('?') ? 'Next question' : 'One more thing');
   const frame = useCurrentFrame();
   const drift = interpolate(Math.sin(frame / 20), [-1, 1], [-14, 14]);
   return (
@@ -162,7 +164,7 @@ export const TwistCard: React.FC<{ beat: CompositionBeat; kicker?: string }> = (
       <Ring size={900} color={COLORS.panelLine} style={{ position: 'absolute', right: -200, bottom: 20 + drift }} stroke={22} />
       <div style={{ ...baseText, position: 'absolute', right: 160, bottom: 180 + drift, fontSize: 700, fontWeight: 700, color: COLORS.accent, opacity: 0.85, lineHeight: 1 }}>?</div>
       <Reveal style={{ position: 'absolute', left: 0, top: 80, width: W - 80 }}>
-        <Kicker>{kicker}</Kicker>
+        <Kicker>{label}</Kicker>
         <BigText size={112}>{questionOf(beat.narration)}</BigText>
       </Reveal>
     </div>

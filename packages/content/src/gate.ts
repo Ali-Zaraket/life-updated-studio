@@ -353,11 +353,12 @@ function checkScriptText(ctx: Ctx): void {
   version.beats.forEach((beat, i) => {
     const beatClaims = beat.claimIds.map((id) => claims.get(id)).filter((c): c is Claim => !!c);
     const where = `beat ${i} (${beat.role})`;
-    const num = findNumber(beat.narration);
+    const shown = [beat.narration, ...(beat.onScreenText ?? [])].join(' \n ');
+    const num = findNumber(shown);
     if (num !== null && !beatClaims.some((c) => c.isNumeric)) {
       issues.add('unsupported_number', null, `${where} narration states "${num}" but none of its claims is numeric`);
     }
-    const causal = findCausalLanguage(beat.narration);
+    const causal = findCausalLanguage(shown);
     if (causal !== null && !beatClaims.some((c) => c.isCausal)) {
       issues.add('causal_overclaim', null, `${where} narration says "${causal}" but none of its claims is causal`);
     }
@@ -420,6 +421,7 @@ function checkBadges(ctx: Ctx): void {
     ...version.beats.flatMap((b, i): [string, string][] => [
       [`beat ${i} narration`, b.narration],
       [`beat ${i} visual`, b.visual],
+      ...(b.onScreenText ?? []).map((t, k): [string, string] => [`beat ${i} on-screen ${k}`, t]),
     ]),
     ...version.sourceList.map((s, i): [string, string] => [`source list ${i}`, s]),
   ];

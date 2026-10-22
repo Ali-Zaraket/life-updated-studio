@@ -49,6 +49,7 @@ export function evaluateCreativeRules(input: CreativeRulesInput): GateReport {
   const texts: [string, string][] = [
     ...version.beats.map((b, i): [string, string] => [`beat ${i} (${b.role}) narration`, b.narration]),
     ...version.beats.map((b, i): [string, string] => [`beat ${i} (${b.role}) visual`, b.visual]),
+    ...version.beats.flatMap((b, i) => (b.onScreenText ?? []).map((t, k): [string, string] => [`beat ${i} (${b.role}) on-screen ${k}`, t])),
     ['caption', version.caption],
   ];
 
