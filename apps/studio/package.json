@@ -7,7 +7,9 @@
     "dev": "next dev --port 3100",
     "build": "next build",
     "start": "next start --port 3100",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "hash-passphrase": "tsx scripts/hash-passphrase.ts",
+    "approval-key": "tsx scripts/approval-key.ts"
   },
   "dependencies": {
     "@life/contracts": "workspace:*",
