@@ -1,3 +1,4 @@
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { PgDatabase, PgQueryResultHKT } from 'drizzle-orm/pg-core';
 import * as schema from './schema';
@@ -7,7 +8,8 @@ export type Schema = typeof schema;
 export type Db = PgDatabase<PgQueryResultHKT, Schema>;
 
 export function migrationsFolder(): string {
-  return fileURLToPath(new URL('../migrations', import.meta.url));
+  // Not `new URL('../migrations', import.meta.url)`: bundlers treat that as an asset import.
+  return join(dirname(fileURLToPath(import.meta.url)), '..', 'migrations');
 }
 
 /** In-process Postgres for tests: no daemon, no network. Migrated and ready. */

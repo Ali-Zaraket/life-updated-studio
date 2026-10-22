@@ -3,6 +3,7 @@ import {
   bigint,
   boolean,
   check,
+  customType,
   doublePrecision,
   index,
   integer,
@@ -10,12 +11,20 @@ import {
   pgTable,
   primaryKey,
   text,
-  timestamp,
   uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
-const ts = (name: string) => timestamp(name, { withTimezone: true, mode: 'string' });
-const createdAt = () => ts('created_at').notNull().defaultNow();
+/**
+ * timestamptz surfaced as an ISO-8601 string (`2026-10-22T08:30:00.000Z`), the
+ * format the contracts require, regardless of driver.
+ */
+const isoTimestamp = customType<{ data: string; driverData: string | Date }>({
+  dataType: () => 'timestamp with time zone',
+  fromDriver: (v) => (v instanceof Date ? v : new Date(v)).toISOString(),
+  toDriver: (v) => v,
+});
+const ts = (name: string) => isoTimestamp(name);
+const createdAt = () => ts('created_at').notNull().default(sql`now()`);
 
 /** Single-row table: the one person who may approve anything. */
 export const owners = pgTable(
@@ -130,7 +139,7 @@ export const episodes = pgTable(
     heldFrom: text('held_from'),
     currentVersionId: text('current_version_id'),
     createdAt: createdAt(),
-    updatedAt: ts('updated_at').notNull().defaultNow(),
+    updatedAt: ts('updated_at').notNull().default(sql`now()`),
   },
   (t) => [
     check('episodes_hold_reason', sql`${t.state} not in ('blocked','failed','cancelled') or (${t.stateReason} is not null and length(trim(${t.stateReason})) > 0)`),
@@ -309,7 +318,7 @@ export const publishJobs = pgTable(
     remoteMediaId: text('remote_media_id'),
     permalink: text('permalink'),
     createdAt: createdAt(),
-    updatedAt: ts('updated_at').notNull().defaultNow(),
+    updatedAt: ts('updated_at').notNull().default(sql`now()`),
   },
   (t) => [
     check('publish_jobs_mode', sql`${t.adapterMode} in ('mock','live')`),
@@ -431,7 +440,7 @@ export const settings = pgTable(
     pausedReason: text('paused_reason'),
     spendingStopped: boolean('spending_stopped').notNull().default(false),
     spendingCapMicroUsd: bigint('spending_cap_micro_usd', { mode: 'number' }),
-    updatedAt: ts('updated_at').notNull().defaultNow(),
+    updatedAt: ts('updated_at').notNull().default(sql`now()`),
     updatedBy: jsonb('updated_by'),
   },
   (t) => [
@@ -448,7 +457,7 @@ export const jobs = pgTable(
     kind: text('kind').notNull(),
     payload: jsonb('payload').notNull(),
     state: text('state').notNull().default('queued'),
-    runAt: ts('run_at').notNull().defaultNow(),
+    runAt: ts('run_at').notNull().default(sql`now()`),
     attempts: integer('attempts').notNull().default(0),
     maxAttempts: integer('max_attempts').notNull().default(5),
     leaseOwner: text('lease_owner'),
@@ -456,7 +465,7 @@ export const jobs = pgTable(
     lastError: text('last_error'),
     idempotencyKey: text('idempotency_key').unique(),
     createdAt: createdAt(),
-    updatedAt: ts('updated_at').notNull().defaultNow(),
+    updatedAt: ts('updated_at').notNull().default(sql`now()`),
   },
   (t) => [
     check('jobs_state', sql`${t.state} in ('queued','leased','succeeded','failed','cancelled')`),

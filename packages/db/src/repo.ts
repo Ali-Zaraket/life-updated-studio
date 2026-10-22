@@ -392,6 +392,13 @@ export async function revokeApproval(db: Db, input: { approvalId: string; reason
     const [ep] = await tx.select().from(t.episodes).where(eq(t.episodes.id, pkg.episodeId)).for('update');
     if (ep && (ep.state === 'approved' || ep.state === 'scheduled')) {
       await applyTransition(tx, ep, 'awaiting_user_approval', input.actor, `approval revoked: ${input.reason}`, now);
+    } else if (ep && ep.state === 'publishing') {
+      // A job was between attempts; nothing is live, but the episode needs a new package and approval.
+      const inFlight = await tx
+        .select({ id: t.publishJobs.id })
+        .from(t.publishJobs)
+        .where(and(eq(t.publishJobs.approvalId, row.id), inArray(t.publishJobs.state, ['creating_container', 'processing', 'publishing', 'confirming', 'needs_reconciliation'])));
+      if (inFlight.length === 0) await applyTransition(tx, ep, 'failed', input.actor, `approval revoked during publishing retries: ${input.reason}`, now);
     }
   });
 }
