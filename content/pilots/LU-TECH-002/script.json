@@ -2,65 +2,67 @@
   "beats": [
     {
       "startSec": 0.0,
-      "endSec": 5.2,
+      "endSec": 5.0,
       "role": "hook",
       "narration": "An Android app asks for your location. You're actually making two choices.",
-      "visual": "Phone permission prompt splits into two labelled dials: WHEN and HOW EXACT.",
+      "visual": "Generic permission prompt (no real UI text) splits into two labelled dials: WHEN and HOW EXACT. Illustration.",
       "claimIds": [
         "c-two-characteristics"
       ]
     },
     {
-      "startSec": 5.2,
-      "endSec": 10.8,
+      "startSec": 5.0,
+      "endSec": 10.0,
       "role": "problem",
-      "narration": "Tap yes too fast, and you can miss what you just gave away.",
-      "visual": "Thumb taps 'Allow'; the two dials blur past.",
+      "narration": "Tap yes too fast, and you can miss what you gave away.",
+      "visual": "A thumb taps an unlabelled button; the two dials blur past. Illustration.",
       "claimIds": [
         "c-two-characteristics"
       ]
     },
     {
-      "startSec": 10.8,
-      "endSec": 32.0,
+      "startSec": 10.0,
+      "endSec": 31.7,
       "role": "mechanism",
-      "narration": "First: when. In the foreground, roughly while you're using the app, or in the background. On Android 11 and newer, the pop-up can't grant background access; that's a separate switch on a settings page. Second: how exact. Precise, or approximate. Grant approximate, and that's all the app gets, even in the background.",
-      "visual": "Diagram: WHEN dial (foreground / background, with a settings-page icon on background); HOW EXACT dial (precise pin vs. wide circle). Illustration.",
+      "narration": "First: when. Foreground means the app is on screen or showing an ongoing notification; background is any other time. On Android 11 and newer, the pop-up doesn't offer background access; that's a separate option in settings. Second: how exact, precise or approximate. Grant approximate, and the app only gets approximate location, even in the background.",
+      "visual": "Diagram: WHEN dial (app on screen / ongoing notification = foreground; anything else = background, with a settings-page icon). HOW EXACT dial (precise pin vs. wide circle). Illustration.",
       "claimIds": [
         "c-two-characteristics",
+        "c-foreground-definition",
         "c-android11-settings",
         "c-approximate-applies"
       ]
     },
     {
-      "startSec": 32.0,
-      "endSec": 38.8,
+      "startSec": 31.7,
+      "endSec": 41.8,
       "role": "takeaway",
-      "narration": "So check which apps have background access, and choose approximate wherever your exact spot isn't needed.",
-      "visual": "Checklist card: 1) background access, 2) approximate where enough.",
+      "narration": "So in your location settings, check which apps are allowed all the time, and pick approximate where it's offered and your exact spot isn't needed.",
+      "visual": "Checklist card: 1) 'Allow all the time' apps, 2) approximate where offered and enough.",
       "claimIds": [
         "c-android11-settings",
         "c-approximate-applies"
       ]
     },
     {
-      "startSec": 38.8,
-      "endSec": 50.0,
+      "startSec": 41.8,
+      "endSec": 55.4,
       "role": "twist",
-      "narration": "And on Android 10 and newer, the first time an app uses your location in the background, Android sends a reminder. That's your moment to decide again.",
-      "visual": "Notification card slides in: 'reminder: this app can use location all the time' (illustrative wording). Illustration.",
+      "narration": "And on Android 10 and newer, the first time such an app uses your location in the background, Android schedules a reminder notification. That's a good moment to check whether it still needs it.",
+      "visual": "Stylised card with on-screen label 'Illustration \u2014 not Android's actual notification'; must not look like a real screenshot.",
       "claimIds": [
         "c-background-reminder"
       ]
     }
   ],
-  "caption": "When an Android app asks for your location, you're making two choices: when (foreground or background) and how exact (precise or approximate).\nLU-TECH-002\n\nSources:\n- Android Developers (Google), \"Request location permissions\", page updated 16 Oct 2026, retrieved 22 Oct 2026\n- Android Developers (Google), \"Request background location\", page updated 16 Oct 2026, retrieved 22 Oct 2026\nLimits: Android only; menu names vary by phone maker and Android version; this covers the location permission, not other ways an app might estimate where you are.",
+  "caption": "When an Android app asks for your location, you're making two choices: when (foreground or background) and how exact (precise or approximate).\nLU-TECH-002\n\nSources:\n- Android Developers (Google), \"Request location permissions\", developer.android.com/develop/sensors-and-location/location/permissions (page updated 16 Oct 2026, retrieved 22 Oct 2026)\n- Android Developers (Google), \"Request background location\", developer.android.com/develop/sensors-and-location/location/permissions/background (page updated 16 Oct 2026, retrieved 22 Oct 2026)\nLimits: Android only. Background rules apply to Android 10 and newer (older versions include background with foreground; the settings-page step is Android 11+). Version means your Android version, not your phone maker's software version. Menu names vary by phone maker. This covers the location permission, not other ways an app might estimate where you are.",
   "sourceList": [
-    "Android Developers (Google), Request location permissions, retrieved 2026-10-22",
-    "Android Developers (Google), Request background location, retrieved 2026-10-22"
+    "Android Developers (Google), Request location permissions, developer.android.com/develop/sensors-and-location/location/permissions, retrieved 2026-10-22",
+    "Android Developers (Google), Request background location, developer.android.com/develop/sensors-and-location/location/permissions/background, retrieved 2026-10-22"
   ],
   "claimIds": [
     "c-two-characteristics",
+    "c-foreground-definition",
     "c-android11-settings",
     "c-approximate-applies",
     "c-background-reminder"

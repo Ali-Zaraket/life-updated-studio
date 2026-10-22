@@ -135,6 +135,26 @@
       "isCausal": false,
       "isConsequential": true,
       "singleOriginJustification": "Platform behaviour is defined by the platform owner: Android's official developer documentation is the authoritative source for how Android's own permission system works. Recheck the page before publication."
+    },
+    {
+      "id": "c-foreground-definition",
+      "topicId": "pilot-tech-android-location-choices",
+      "text": "Android treats an app as using foreground location when one of its activities is visible or when it is running a foreground service, which shows a persistent notification; with a foreground service it keeps access after the user presses Home or turns the screen off.",
+      "locations": [
+        "narration"
+      ],
+      "status": "supported",
+      "statusReason": null,
+      "riskTier": "low",
+      "timeSensitivity": "changing",
+      "freshUntil": null,
+      "lastCheckedAt": "2026-10-22T10:36:27.000Z",
+      "permittedWording": null,
+      "limitations": "Developer-facing definition; what users see in settings may be labelled differently.",
+      "isNumeric": false,
+      "isCausal": false,
+      "isConsequential": true,
+      "singleOriginJustification": "Platform behaviour is defined by the platform owner: Android's official developer documentation is the authoritative source for how Android's own permission system works. Recheck the page before publication."
     }
   ],
   "evidence": [
@@ -197,6 +217,18 @@
       "population": null,
       "limitations": null,
       "createdAt": "2026-10-22T10:36:27.000Z"
+    },
+    {
+      "id": "e6",
+      "claimId": "c-foreground-definition",
+      "sourceId": "src-android-location-permissions",
+      "stance": "supports",
+      "supportingPassage": "The system considers your app to be using foreground location if a feature of your app accesses the device's current location in one of the following situations: An activity that belongs to your app is visible. Your app is running a foreground service. When a foreground service is running, the system raises user awareness by showing a persistent notification. Your app retains access when it's placed in the background, such as when the user presses the Home button on their device or turns their device's display off.",
+      "locator": "Section: Foreground location",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-22T10:36:27.000Z"
     }
   ],
   "reviews": [],
@@ -211,6 +243,10 @@
     "pageLastUpdated": {
       "src-android-location-permissions": "2026-10-16",
       "src-android-background-location": "2026-10-16"
-    }
+    },
+    "pageSha256Note": "contentSha256 / pageSha256 are sha256 of the raw HTML response as fetched, not of the extracted text.",
+    "numericNote": "isNumeric is set where narration states Android version numbers, so the number rule can verify them.",
+    "publishedAtNote": "publishedAt holds each page's 'Last updated' date; Google does not publish a first-publication date.",
+    "round2Changes": "After independent review round 1 (reviews/round-1*.json): added c-foreground-definition; revised beats 2-5, visuals and caption as suggested."
   }
 }
