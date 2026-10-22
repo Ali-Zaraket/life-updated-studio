@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { and, desc, eq, inArray, isNull, max } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, isNull, max } from 'drizzle-orm';
 import {
   CANCELLABLE_PUBLISH_STATES,
   EpisodeVersionContent,
@@ -508,4 +508,81 @@ export async function recordCost(
   e: { provider: string; operation: string; units: number; unitType: string; amountMicroUsd: number; estimated: boolean; source: 'mock' | 'manual_import' | 'live'; episodeId?: string | null; jobId?: string | null; now?: Date },
 ): Promise<void> {
   await db.insert(t.costEvents).values({ ...e, id: newId('cost'), episodeId: e.episodeId ?? null, jobId: e.jobId ?? null, createdAt: iso(e.now ?? new Date()) });
+}
+
+// ---------------------------------------------------------------- spending
+
+export interface SpendStatus {
+  capMicroUsd: number | null;
+  monthToDateMicroUsd: number;
+  /** Warn at half the cap (owner decision: warn at $50 of a $100 cap). */
+  warnAtMicroUsd: number | null;
+  stopped: boolean;
+}
+
+function monthStart(now: Date): string {
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+}
+
+/** Live (real-money) spend for the current UTC calendar month. Mock costs never count. */
+export async function spendStatus(db: Conn, now: Date): Promise<SpendStatus> {
+  const s = await getSettings(db);
+  const rows = await db
+    .select({ amount: t.costEvents.amountMicroUsd })
+    .from(t.costEvents)
+    .where(and(eq(t.costEvents.source, 'live'), gte(t.costEvents.createdAt, monthStart(now))));
+  const monthToDateMicroUsd = rows.reduce((sum, r) => sum + r.amount, 0);
+  return {
+    capMicroUsd: s.spendingCapMicroUsd,
+    monthToDateMicroUsd,
+    warnAtMicroUsd: s.spendingCapMicroUsd === null ? null : Math.floor(s.spendingCapMicroUsd / 2),
+    stopped: s.spendingStopped,
+  };
+}
+
+export type SpendDecision =
+  | { ok: true; warning: string | null; status: SpendStatus }
+  | { ok: false; reason: 'no_cap_authorized' | 'spending_stopped' | 'would_exceed_cap'; message: string; status: SpendStatus };
+
+/**
+ * Call BEFORE every paid provider request with a conservative estimate.
+ * Refuses when no cap is authorized, the stop is on, or the call would cross the cap.
+ */
+export async function authorizeSpend(
+  db: Conn,
+  input: { provider: string; operation: string; estimatedMicroUsd: number; now?: Date },
+): Promise<SpendDecision> {
+  const status = await spendStatus(db, input.now ?? new Date());
+  const usd = (m: number) => `$${(m / 1_000_000).toFixed(2)}`;
+  if (status.stopped) return { ok: false, reason: 'spending_stopped', message: 'the spending stop is on', status };
+  if (status.capMicroUsd === null) return { ok: false, reason: 'no_cap_authorized', message: 'no spending cap authorized; paid generation is disabled', status };
+  const after = status.monthToDateMicroUsd + Math.max(0, input.estimatedMicroUsd);
+  if (after > status.capMicroUsd) {
+    return { ok: false, reason: 'would_exceed_cap', message: `${input.provider} ${input.operation} (~${usd(input.estimatedMicroUsd)}) would take this month to ${usd(after)}, over the ${usd(status.capMicroUsd)} cap`, status };
+  }
+  const warning = status.warnAtMicroUsd !== null && after >= status.warnAtMicroUsd ? `month-to-date spend ${usd(after)} has reached the ${usd(status.warnAtMicroUsd)} warning level` : null;
+  return { ok: true, warning, status };
+}
+
+// ---------------------------------------------------------------- voice
+
+/** Stores a voice profile version. Approval is a separate, owner-only step. */
+export async function saveVoiceProfile(db: Db, input: { id: string; version: number; profile: unknown; actor: Actor; now?: Date }): Promise<void> {
+  await db.transaction(async (tx) => {
+    await tx.insert(t.voiceProfiles).values({ id: input.id, version: input.version, profile: input.profile, createdAt: iso(input.now ?? new Date()) });
+    await audit(tx, { actor: input.actor, action: 'voice_profile.saved', entityType: 'voice_profile', entityId: `${input.id}@${input.version}`, now: input.now });
+  });
+}
+
+/** The owner selects the narrator. Replacing an approved voice needs this again (brief §5). */
+export async function approveVoiceProfile(db: Db, input: { id: string; version: number; referenceClipSha256: string; actor: Actor; now?: Date }): Promise<void> {
+  if (input.actor.kind !== 'owner') throw new DomainError('owner_only', 'only the owner can approve a narrator voice');
+  const now = input.now ?? new Date();
+  await db.transaction(async (tx) => {
+    const [row] = await tx.select().from(t.voiceProfiles).where(and(eq(t.voiceProfiles.id, input.id), eq(t.voiceProfiles.version, input.version))).for('update');
+    if (!row) throw new DomainError('not_found', `voice profile ${input.id}@${input.version}`);
+    const profile = { ...(row.profile as Record<string, unknown>), approvedReferenceClipSha256: input.referenceClipSha256, approvedByOwnerAt: iso(now) };
+    await tx.update(t.voiceProfiles).set({ profile, approvedByOwnerAt: iso(now) }).where(and(eq(t.voiceProfiles.id, input.id), eq(t.voiceProfiles.version, input.version)));
+    await audit(tx, { actor: input.actor, action: 'voice_profile.approved', entityType: 'voice_profile', entityId: `${input.id}@${input.version}`, details: { referenceClipSha256: input.referenceClipSha256 }, now });
+  });
 }
