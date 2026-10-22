@@ -1,0 +1,80 @@
+[
+  {
+    "id": "rev-ai-r5-LU-TECH-002-c-two-characteristics",
+    "claimId": "c-two-characteristics",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 5)",
+    "verdict": "pass",
+    "notes": "Pass. e1 verbatim (request-location-permissions.txt lines 46-48) under the heading 'Types of location access' (line 45); locator correct. Hook 'You're making two choices', beat 2 'First: when ... Second: how exact, precise or approximate', the hook/mechanism dial visuals (WHEN / HOW EXACT, labelled 'Illustration') and caption line 1 stay within it. On Android 11+ the 'when' choice for background is not in the pop-up; beat 2 says so immediately, so the hook is not misleading. No change needed.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "ffb2c956dee3973e577e801454ac696bd787609f1058ace6a741d16633d9880d",
+    "createdAt": "2026-10-22T11:03:16.000Z"
+  },
+  {
+    "id": "rev-ai-r5-LU-TECH-002-c-android11-settings",
+    "claimId": "c-android11-settings",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 5)",
+    "verdict": "pass",
+    "notes": "Pass. e2 verbatim (request-background-location.txt lines 55-57); round-4 locator fix verified: it now names the real heading 'Permission dialog contents depend on target SDK version' (line 50). e8 verbatim (Figure 7 caption, lines 47-49). e10 verbatim (lines 76-78) under 'App targets Android 10 or lower' (line 75). e11 (context) verbatim (lines 51-54) under the same heading as e2 and backs the limitation 'Android 10 showed the option in the dialog'. Beat 2 'On Android 11 and newer, background access isn't in the pop-up; it's a separate option in settings', the takeaway's settings-page check and its 'Allow all the time' checklist label, and caption 'the settings-page step is Android 11+' stay within it. No change needed.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "ffb2c956dee3973e577e801454ac696bd787609f1058ace6a741d16633d9880d",
+    "createdAt": "2026-10-22T11:03:16.000Z"
+  },
+  {
+    "id": "rev-ai-r5-LU-TECH-002-c-approximate-applies",
+    "claimId": "c-approximate-applies",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 5)",
+    "verdict": "pass",
+    "notes": "Pass. e3 verbatim (request-location-permissions.txt lines 144-146); round-4 locator fix verified: the paragraph sits in the 'Accuracy' section (line 128) after the 'Approximate' (line 130) and 'Precise' (line 137) definitions, exactly as the locator now says. e4 verbatim (request-background-location.txt lines 82-86) under 'User can affect background location accuracy' (line 81). Beat 2 'Grant approximate, and the app only gets approximate location, even in the background' and the takeaway 'pick approximate where it's offered and your exact spot isn't needed' stay within it ('where it's offered' correctly hedges availability, which the sources do not settle). locations now ['narration'], which matches the script (no caption line asserts it). No change needed.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "ffb2c956dee3973e577e801454ac696bd787609f1058ace6a741d16633d9880d",
+    "createdAt": "2026-10-22T11:03:16.000Z"
+  },
+  {
+    "id": "rev-ai-r5-LU-TECH-002-c-background-reminder",
+    "claimId": "c-background-reminder",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 5)",
+    "verdict": "pass",
+    "notes": "Pass. e5 verbatim (request-location-permissions.txt lines 152-156) under 'Reminder of background location grant' (line 151); locator correct. Twist 'on Android 10 and newer, after you allow an app all the time, Android schedules a reminder the first time it uses location in the background' matches e5 and, like the limitation, does not say when it is shown or whether it repeats. 'A good moment to check it still needs it' is advice, not a factual claim. Visual is labelled 'Illustration - not Android's actual notification'. No change needed.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "ffb2c956dee3973e577e801454ac696bd787609f1058ace6a741d16633d9880d",
+    "createdAt": "2026-10-22T11:03:16.000Z"
+  },
+  {
+    "id": "rev-ai-r5-LU-TECH-002-c-foreground-definition",
+    "claimId": "c-foreground-definition",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 5)",
+    "verdict": "pass",
+    "notes": "Pass. e6 verbatim (lines 57-65) under 'Foreground location' (line 49); e7 verbatim (lines 110-112) under 'Background location' (line 101); locators correct. 'Foreground: the app is on screen, or running with an ongoing notification' is an accurate lay gloss of a visible activity or a foreground service with a persistent notification; 'Background: any other time' matches e7. Mechanism visual mirrors the narration and is labelled. No change needed.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "ffb2c956dee3973e577e801454ac696bd787609f1058ace6a741d16633d9880d",
+    "createdAt": "2026-10-22T11:03:16.000Z"
+  },
+  {
+    "id": "rev-ai-r5-LU-TECH-002-c-pre10-background",
+    "claimId": "c-pre10-background",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 5)",
+    "verdict": "pass",
+    "notes": "Pass. e9 verbatim (request-location-permissions.txt lines 115-119) in the 'Background location' section (line 101); the passage contains the Android 10 sentence, so the 'earlier than 10' boundary is in the quoted text. Caption 'on earlier versions, foreground access includes background' stays within it. Optional, non-blocking: the locator's parenthetical '(after the Android 10 manifest requirement)' predates e9 being extended to include that requirement; '(paragraph with the Android 10 manifest requirement)' would be more exact. The section is correct and the passage is unique, so this is not an accuracy error. No change needed.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "ffb2c956dee3973e577e801454ac696bd787609f1058ace6a741d16633d9880d",
+    "createdAt": "2026-10-22T11:03:16.000Z"
+  }
+]
