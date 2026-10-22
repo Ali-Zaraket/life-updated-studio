@@ -17,6 +17,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <strong>LIFE: UPDATED. studio</strong>
             <nav>
               <Link href="/">Dashboard</Link>
+              <Link href="/insights">Insights</Link>
               <Link href="/voice">Voice</Link>
               <Link href="/settings">Settings</Link>
               <Link href="/audit">Audit log</Link>
