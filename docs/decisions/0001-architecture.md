@@ -20,7 +20,7 @@
 7. **Reconciliation key.** Each caption carries the episode code (e.g. `LU-TECH-001`), used to match an ambiguous publish timeout to recent remote media before any retry.
 8. **Metrics.** `null` + `unavailability_reason` for anything not returned; `source` is `mock | manual_import | live` on every snapshot.
 9. **Owner auth (local).** Passphrase hash in local env + signed, httpOnly session cookie. Managed auth at deployment (decision pending deployment target).
-10. **Model routing.** Opus `claude-opus-5-5` for the lead, evidence workstream and security/race reviews; Sonnet `claude-sonnet-5-5` for studio, adapters, research and routine work. Agents are defined in `.claude/agents/` with explicit `model`.
+10. **Model routing.** Opus `claude-opus-5-5` (lead session) and Sonnet `claude-sonnet-5-5` (verified from an agent self-report, 2026-10-22). Opus for the lead, evidence workstream and security/race reviews; Sonnet `claude-sonnet-5-5` for studio, adapters, research and routine work. Agents are defined in `.claude/agents/` with explicit `model`.
 
 ## Consequences
 

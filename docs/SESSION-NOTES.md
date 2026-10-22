@@ -6,7 +6,7 @@ Working notes from the lead session, kept so a cloud continuation has the same c
 
 - Node 24.20.0, npm 11.6.2, pnpm 10.14.0, git 2.50.1, Claude Code 2.1.283.
 - Docker 28.4 installed but the daemon was not running; no FFmpeg/ffprobe; no psql; no `gh` CLI.
-- Model routing resolved for this provider: Opus = `claude-opus-5-5` (lead session), Sonnet = `claude-sonnet-5-5` (alias `sonnet`; confirm from a Sonnet agent's self-report before recording as verified).
+- Model routing resolved for this provider: Opus = `claude-opus-5-5` (lead session), Sonnet = `claude-sonnet-5-5` (alias `sonnet`; **verified 2026-10-22** from the research agent's self-report).
 
 ## Version pins checked on npm (2026-10-21)
 
@@ -40,3 +40,12 @@ Working notes from the lead session, kept so a cloud continuation has the same c
 - Research (Sonnet agent): `docs/research/instagram-capability-record.md` and `docs/research/tts-candidates.md`. First attempt was stopped before writing anything; restart it.
 
 Only the lead edits root manifests, the lockfile, and migrations.
+
+## Day 1 results (cloud session, 2026-10-22)
+
+- Linux cloud box: Node 22.22, pnpm 10.14, ffmpeg/ffprobe present, Postgres binaries via embedded-postgres (runs as a `postgres` user when the process is root).
+- Proposed decisions 1–5 above are implemented and recorded in ADR 0001.
+- `pnpm test`: 241 tests across 11 files pass on PGlite; every package typechecks; studio `next build` compiles.
+- `pnpm slice` (in-memory) runs the full MOCK pipeline including a SIMULATED owner approval with an ephemeral key. With `DATABASE_URL` it stops at `awaiting_user_approval` for the owner to approve in the studio.
+- Research agent could not reach developers.facebook.com or TTS vendor sites (proxy 403). Both research records are built from search summaries and mark most facts `unverified`/`conflict`. Do not implement live calls from them until re-verified.
+- Bug the gates caught: Postgres timestamps were not ISO-8601; fixed with an ISO timestamp column type (no migration change).
