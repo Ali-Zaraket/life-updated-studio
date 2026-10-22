@@ -1,0 +1,216 @@
+{
+  "topic": {
+    "id": "pilot-tech-android-location-choices",
+    "pillar": "technology",
+    "title": "Your phone's two location choices (Android)",
+    "question": "When an Android app asks for your location, what exactly are you choosing?",
+    "riskTier": "low",
+    "intent": {
+      "whoThisHelps": "Android users who tap through location prompts without knowing what they allow.",
+      "whatTheyLearn": "Android location access has two separate choices: when (foreground or background) and how exact (precise or approximate).",
+      "whatTheyCanDo": "Review which apps have location all the time, and give approximate location where exact location isn't needed.",
+      "whyEvidenceSupportsIt": "Google's Android developer documentation describes the permission model directly.",
+      "whatEvidenceDoesNotEstablish": "It does not say how individual apps use location once granted, does not cover iPhone, and menu names can differ by phone maker and Android version."
+    },
+    "isFixture": false,
+    "createdAt": "2026-10-22T10:36:27.000Z"
+  },
+  "sources": [
+    {
+      "id": "src-android-location-permissions",
+      "url": "https://developer.android.com/develop/sensors-and-location/location/permissions",
+      "doi": null,
+      "title": "Request location permissions",
+      "authors": [],
+      "institution": "Google (Android Developers)",
+      "sourceType": "official_documentation",
+      "publishedAt": "2026-10-16T00:00:00.000Z",
+      "retrievedAt": "2026-10-22T10:36:27.000Z",
+      "originId": "google-android-developer-docs",
+      "available": true,
+      "retractionCheckedAt": "2026-10-22T10:36:27.000Z",
+      "retracted": false,
+      "correctionNote": null,
+      "contentSha256": "b60667a0f453b380c5d158bbbf81cd240da0fe64579365210f93ecf68d54f9af"
+    },
+    {
+      "id": "src-android-background-location",
+      "url": "https://developer.android.com/develop/sensors-and-location/location/permissions/background",
+      "doi": null,
+      "title": "Request background location",
+      "authors": [],
+      "institution": "Google (Android Developers)",
+      "sourceType": "official_documentation",
+      "publishedAt": "2026-10-16T00:00:00.000Z",
+      "retrievedAt": "2026-10-22T10:36:27.000Z",
+      "originId": "google-android-developer-docs",
+      "available": true,
+      "retractionCheckedAt": "2026-10-22T10:36:27.000Z",
+      "retracted": false,
+      "correctionNote": null,
+      "contentSha256": "f251c9c76f8a67d40aceddf17b49ea7c43a0b9720934daccd59aacb6cfaf2726"
+    }
+  ],
+  "claims": [
+    {
+      "id": "c-two-characteristics",
+      "topicId": "pilot-tech-android-location-choices",
+      "text": "Android location permissions combine two characteristics: a category (foreground or background) and an accuracy (precise or approximate).",
+      "locations": [
+        "hook",
+        "narration",
+        "caption"
+      ],
+      "status": "supported",
+      "statusReason": null,
+      "riskTier": "low",
+      "timeSensitivity": "changing",
+      "freshUntil": null,
+      "lastCheckedAt": "2026-10-22T10:36:27.000Z",
+      "permittedWording": null,
+      "limitations": "Describes the permission model; exact on-screen wording varies by Android version and phone maker.",
+      "isNumeric": true,
+      "isCausal": false,
+      "isConsequential": true,
+      "singleOriginJustification": "Platform behaviour is defined by the platform owner: Android's official developer documentation is the authoritative source for how Android's own permission system works. Recheck the page before publication."
+    },
+    {
+      "id": "c-android11-settings",
+      "topicId": "pilot-tech-android-location-choices",
+      "text": "On Android 11 and higher, the permission dialog does not include the 'Allow all the time' option; users must enable background location on a settings page.",
+      "locations": [
+        "narration",
+        "caption"
+      ],
+      "status": "supported",
+      "statusReason": null,
+      "riskTier": "low",
+      "timeSensitivity": "changing",
+      "freshUntil": null,
+      "lastCheckedAt": "2026-10-22T10:36:27.000Z",
+      "permittedWording": null,
+      "limitations": "Applies to Android 11 (API level 30) and higher; Android 10 showed the option in the dialog.",
+      "isNumeric": true,
+      "isCausal": false,
+      "isConsequential": true,
+      "singleOriginJustification": "Platform behaviour is defined by the platform owner: Android's official developer documentation is the authoritative source for how Android's own permission system works. Recheck the page before publication."
+    },
+    {
+      "id": "c-approximate-applies",
+      "topicId": "pilot-tech-android-location-choices",
+      "text": "If the user grants only approximate location, the app has only approximate location, including in the background.",
+      "locations": [
+        "narration",
+        "caption"
+      ],
+      "status": "supported",
+      "statusReason": null,
+      "riskTier": "low",
+      "timeSensitivity": "changing",
+      "freshUntil": null,
+      "lastCheckedAt": "2026-10-22T10:36:27.000Z",
+      "permittedWording": null,
+      "limitations": "Concerns the location permission itself; it does not cover other ways an app might estimate location.",
+      "isNumeric": false,
+      "isCausal": false,
+      "isConsequential": true,
+      "singleOriginJustification": "Platform behaviour is defined by the platform owner: Android's official developer documentation is the authoritative source for how Android's own permission system works. Recheck the page before publication."
+    },
+    {
+      "id": "c-background-reminder",
+      "topicId": "pilot-tech-android-location-choices",
+      "text": "On Android 10 and higher, the first time an app accesses location in the background after the user grants background access, the system schedules a notification reminding the user they allowed location all the time.",
+      "locations": [
+        "narration"
+      ],
+      "status": "supported",
+      "statusReason": null,
+      "riskTier": "low",
+      "timeSensitivity": "changing",
+      "freshUntil": null,
+      "lastCheckedAt": "2026-10-22T10:36:27.000Z",
+      "permittedWording": null,
+      "limitations": "Android 10 (API level 29) and higher; the reminder is sent once, on first background use.",
+      "isNumeric": true,
+      "isCausal": false,
+      "isConsequential": true,
+      "singleOriginJustification": "Platform behaviour is defined by the platform owner: Android's official developer documentation is the authoritative source for how Android's own permission system works. Recheck the page before publication."
+    }
+  ],
+  "evidence": [
+    {
+      "id": "e1",
+      "claimId": "c-two-characteristics",
+      "sourceId": "src-android-location-permissions",
+      "stance": "supports",
+      "supportingPassage": "Each permission has a combination of the following characteristics: Category: Either foreground location or background location. Accuracy: Either precise location or approximate location.",
+      "locator": "Section: Types of location access",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-22T10:36:27.000Z"
+    },
+    {
+      "id": "e2",
+      "claimId": "c-android11-settings",
+      "sourceId": "src-android-background-location",
+      "stance": "supports",
+      "supportingPassage": "On Android 11 (API level 30) and higher, however, the system dialog doesn't include the Allow all the time option. Instead, users must enable background location on a settings page, as shown in figure 7.",
+      "locator": "Section: Request background location",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-22T10:36:27.000Z"
+    },
+    {
+      "id": "e3",
+      "claimId": "c-approximate-applies",
+      "sourceId": "src-android-location-permissions",
+      "stance": "supports",
+      "supportingPassage": "If the user grants the approximate location permission, your app only has access to approximate location, regardless of which location permissions your app declares.",
+      "locator": "Section: Approximate location",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-22T10:36:27.000Z"
+    },
+    {
+      "id": "e4",
+      "claimId": "c-approximate-applies",
+      "sourceId": "src-android-background-location",
+      "stance": "supports",
+      "supportingPassage": "if the user grants your app the ACCESS_BACKGROUND_LOCATION permission but grants only approximate location access in the foreground, your app has only approximate location access in the background as well.",
+      "locator": "Section: User can affect background location accuracy",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-22T10:36:27.000Z"
+    },
+    {
+      "id": "e5",
+      "claimId": "c-background-reminder",
+      "sourceId": "src-android-location-permissions",
+      "stance": "supports",
+      "supportingPassage": "On Android 10 (API level 29) and higher, when a feature in your app accesses device location in the background for the first time after the user grants background location access, the system schedules a notification to send to the user. This notification reminds the user that they've allowed your app to access device location all the time.",
+      "locator": "Section: Reminder of background location grant",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-22T10:36:27.000Z"
+    }
+  ],
+  "reviews": [],
+  "provenance": {
+    "retrievedAt": "2026-10-22T10:36:27.000Z",
+    "retrievedBy": "lead session (claude-opus-5-5) via HTTPS from developer.android.com",
+    "pageSha256": {
+      "src-android-location-permissions": "b60667a0f453b380c5d158bbbf81cd240da0fe64579365210f93ecf68d54f9af",
+      "src-android-background-location": "f251c9c76f8a67d40aceddf17b49ea7c43a0b9720934daccd59aacb6cfaf2726"
+    },
+    "licence": "Each page states: 'Content and code samples on this page are subject to the licenses described in the Content License' (developer.android.com/license, not fetched). Quoted passages are short excerpts with attribution; confirm the licence before quoting on screen.",
+    "pageLastUpdated": {
+      "src-android-location-permissions": "2026-10-16",
+      "src-android-background-location": "2026-10-16"
+    }
+  }
+}

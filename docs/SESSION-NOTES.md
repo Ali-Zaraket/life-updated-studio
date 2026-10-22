@@ -49,3 +49,12 @@ Only the lead edits root manifests, the lockfile, and migrations.
 - `pnpm slice` (in-memory) runs the full MOCK pipeline including a SIMULATED owner approval with an ephemeral key. With `DATABASE_URL` it stops at `awaiting_user_approval` for the owner to approve in the studio.
 - Research agent could not reach developers.facebook.com or TTS vendor sites (proxy 403). Both research records are built from search summaries and mark most facts `unverified`/`conflict`. Do not implement live calls from them until re-verified.
 - Bug the gates caught: Postgres timestamps were not ISO-8601; fixed with an ISO timestamp column type (no migration change).
+
+## Day 1, later (cloud session, 2026-10-22)
+
+- Owner decisions recorded in ADR 0002 (US English, Lebanon-first, Creator account, ElevenLabs/Cartesia auditions — Google skipped for its $30 prepayment, $100/month cap with $50 warning, localhost, Remotion free licence as an individual — verified from the licence file in the Remotion repository).
+- Remotion 4.0.537 render on 4 cores: 3-second samples ~35 s each; a 45.7 s episode ~7 min 47 s (master 412 s). ProRes 422 `standard` master 626 MB; delivery 6.9 MB; loudness -13.9 LUFS. Set `REMOTION_BROWSER_EXECUTABLE` where a browser is preinstalled; otherwise Remotion downloads its headless shell once.
+- Safe-zone insets (top 0.12, bottom 0.22, left 0.07, right 0.13) are estimates until checked on a phone.
+- Anthropic SDK 1.1.0 for drafting/verification: Opus 5.5 ($4/$20 per MTok), Sonnet 5.5 ($2/$10), refusal fallback `fallbacks: "default"` enabled.
+- Bundled Postgres has no pg_dump and the system pg_dump (16) cannot dump a v18 server, so backups are a portable JSON export with per-table hashes.
+- CI run #14 green on Linux, Windows, real-Postgres races and the studio build.

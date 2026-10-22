@@ -13,3 +13,4 @@ storage/
 !fixtures/**/*.pem
 auditions/
 backups/
+content/pilots/*/source-text/

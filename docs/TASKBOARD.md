@@ -12,21 +12,20 @@ Owner of each row edits only their directories. The lead integrates and commits.
 | Evidence | Claim ledger gate, creative rules, corrections planner, labelled fixture | content tests |
 | Reasoning | Claude drafting (Opus 5.5), independent check (Opus 5.5), claim extraction (Sonnet 5.5), budget wrapper | fake-fetch tests; `pnpm draft` |
 | Media | ffprobe spec validation, loudness, TTS adapters (ElevenLabs, Google, Cartesia), audition runner | fake-fetch tests; `pnpm audition` |
-| Render | Remotion templates, captions, master/delivery/cover | in progress (see row R1) |
+| Render | 3 Remotion templates, burned-in captions + SRT/VTT, ProRes 4K master, H.264 delivery, cover, manifest; recorded as renders/assets | render tests (gated) + fixture render; `LIFE_SLICE_RENDER=<template> pnpm slice` |
 | Instagram | Mock publisher/insights, live publisher/insights with resumable upload, reconciliation, connect helpers, token refresh | fake-fetch tests only |
 | Worker | Publish state machine with gate re-check and reconciliation, scheduler, insights, draft pipeline, live gate | worker tests |
-| Studio | Login, episodes, evidence, approve/reject/revoke, settings/spending, voice, insights, corrections, Instagram connect, jobs, experiments, audit | typecheck + build + unit tests; not clicked through |
+| Studio | Login, episodes, evidence, approve/reject/revoke, settings/spending, voice, insights, corrections, Instagram connect, jobs, experiments, audit | typecheck + build + unit tests; every page loads for the owner against Postgres (smoke test); forms not clicked through |
 | CI | Linux + Windows tests, Postgres races, studio build | GitHub Actions |
 
 ## Open
 
 | # | Task | Owner (model) | Status |
 |---|---|---|---|
-| R1 | Render pipeline: 3 Remotion templates, burned-in captions, 4K master, delivery, cover, manifest | adapters (sonnet) | doing |
-| R2 | Wire rendering into the worker/slice (replace the mock preview), record renders/assets rows | lead (opus) | todo (after R1) |
+| R3 | Check safe zones and cover crop against the current Instagram app on a phone | owner + lead | todo |
+| R4 | Storage lifecycle: ProRes masters are ~50 GB per hour of video (626 MB for 46 s) — decide archive/cleanup | owner | todo |
 | V1 | Re-verify Instagram capability record and TTS facts against official pages | research (sonnet) | blocked (network policy blocks vendor sites here) |
 | P1 | First real sourced pilot topics and scripts | evidence (opus) + owner | blocked (needs real source access + `ANTHROPIC_API_KEY` + spend confirmation) |
-| E1 | Experiments: add baseline/variable columns (migration) | lead | todo (minor) |
 
 ## Blocked on the owner
 
