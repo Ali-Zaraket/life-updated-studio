@@ -25,7 +25,8 @@ Owner of each row edits only their directories. The lead integrates and commits.
 | R3 | Check safe zones and cover crop against the current Instagram app on a phone | owner + lead | todo |
 | R4 | Storage lifecycle: ProRes masters are ~50 GB per hour of video (626 MB for 46 s) — decide archive/cleanup | owner | todo |
 | V1 | Re-verify Instagram capability record and TTS facts against official pages | research (sonnet) | blocked (network policy blocks vendor sites here) |
-| P1 | First real sourced pilot topics and scripts | evidence (opus) + owner | blocked (needs real source access + `ANTHROPIC_API_KEY` + spend confirmation) |
+| P1 | First real sourced pilot: LU-TECH-002 (Android location choices) — verified after 7 independent review rounds; see docs/review-packages/LU-TECH-002.md | lead + evidence (opus) | review (needs owner voice + approval) |
+| P2 | More pilots | lead + owner | blocked (only developer.android.com was reachable from this cloud box; other sources need the owner's machine or `pnpm draft`) |
 
 ## Blocked on the owner
 
