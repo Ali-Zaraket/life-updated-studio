@@ -328,7 +328,7 @@ function checkClaim(ctx: Ctx, c: Claim): void {
           ? `AI verification of claim ${c.id} asked for changes; apply them and get a fresh review of the revised script`
           : `latest AI verification of claim ${c.id} is ${ai.verdict}`
         : anyAi
-          ? `claim ${c.id} was AI-verified against a different version of the script; re-review this version`
+          ? `claim ${c.id} was AI-verified against a different version of the script or its evidence; re-review this version`
           : `claim ${c.id} has no independent AI verification pass`,
     );
   }
