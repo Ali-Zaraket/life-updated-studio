@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { getSettings } from '@life/db';
+import { getSettings, spendStatus } from '@life/db';
 import { requireOwner } from '@/lib/auth';
 import { getDb } from '@/lib/db';
+import { usd } from '@/lib/money';
 import { Badge, FixtureBadge, MockBadge, Notice, when } from '@/components/ui';
 
 export const dynamic = 'force-dynamic';
@@ -11,6 +12,7 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
   const { ok, err } = await searchParams;
   const db = await getDb();
   const settings = await getSettings(db);
+  const sp = await spendStatus(db, new Date());
 
   const episodes = await db.query.episodes.findMany({ orderBy: (e, { desc }) => desc(e.updatedAt) });
   const topicById = new Map((await db.query.topics.findMany()).map((t) => [t.id, t]));
@@ -29,6 +31,11 @@ export default async function Dashboard({ searchParams }: { searchParams: Promis
     <main>
       <h1>Episodes</h1>
       <Notice ok={ok} err={err} />
+      <p>
+        <Link href="/settings" className="chip">
+          {sp.capMicroUsd === null ? 'No cap: paid generation off' : `Spend ${usd(sp.monthToDateMicroUsd)} / ${usd(sp.capMicroUsd)} (live, this month)`}
+        </Link>
+      </p>
       {settings.publishingPaused ? (
         <div className="banner">PUBLISHING PAUSED: {settings.pausedReason ?? 'no reason recorded'}. <Link href="/settings">Settings</Link></div>
       ) : null}

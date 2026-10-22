@@ -11,6 +11,8 @@ export const MEDIA_TYPES: Record<string, string> = {
   '.jpeg': 'image/jpeg',
   '.png': 'image/png',
   '.webp': 'image/webp',
+  '.wav': 'audio/wav',
+  '.mp3': 'audio/mpeg',
 };
 
 export function contentTypeFor(path: string): string | null {
