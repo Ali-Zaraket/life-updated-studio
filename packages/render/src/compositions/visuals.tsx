@@ -156,13 +156,16 @@ export const TakeawayCard: React.FC<{ beat: CompositionBeat; kicker?: string; ac
 
 /** Twist question card. */
 export const TwistCard: React.FC<{ beat: CompositionBeat; kicker?: string }> = ({ beat, kicker }) => {
-  const label = kicker ?? (questionOf(beat.narration).trim().endsWith('?') ? 'Next question' : 'One more thing');
+  const isQuestion = questionOf(beat.narration).trim().endsWith('?');
+  const label = kicker ?? (isQuestion ? 'Next question' : 'One more thing');
   const frame = useCurrentFrame();
   const drift = interpolate(Math.sin(frame / 20), [-1, 1], [-14, 14]);
   return (
     <div style={{ position: 'relative', width: W, height: H }}>
       <Ring size={900} color={COLORS.panelLine} style={{ position: 'absolute', right: -200, bottom: 20 + drift }} stroke={22} />
-      <div style={{ ...baseText, position: 'absolute', right: 160, bottom: 180 + drift, fontSize: 700, fontWeight: 700, color: COLORS.accent, opacity: 0.85, lineHeight: 1 }}>?</div>
+      {isQuestion && (
+        <div style={{ ...baseText, position: 'absolute', right: 160, bottom: 180 + drift, fontSize: 700, fontWeight: 700, color: COLORS.accent, opacity: 0.85, lineHeight: 1 }}>?</div>
+      )}
       <Reveal style={{ position: 'absolute', left: 0, top: 80, width: W - 80 }}>
         <Kicker>{label}</Kicker>
         <BigText size={112}>{questionOf(beat.narration)}</BigText>
