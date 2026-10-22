@@ -7,7 +7,8 @@
  */
 import { readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
-import { checkPassages, fetchPageText } from './source-check';
+import { createHash } from 'node:crypto';
+import { checkPassages, fetchPageText, normalize } from './source-check';
 
 const dir = resolve(process.argv[2] ?? '.');
 const file = join(dir, 'packet.json');
@@ -22,8 +23,10 @@ for (const source of packet.sources) {
     const page = await fetchPageText(source.url);
     source.retrievedAt = now;
     source.available = true;
-    if (page.sha256 !== source.contentSha256) console.log(`  ${source.id}: page bytes changed since last check (passages checked below)`);
-    source.contentSha256 = page.sha256;
+    // Hash the normalised text, not the raw HTML: the same page's bytes differ between requests.
+    const textSha = createHash('sha256').update(normalize(page.text)).digest('hex');
+    if (source.contentSha256 && textSha !== source.contentSha256) console.log(`  ${source.id}: page text changed since last check (passages checked below)`);
+    source.contentSha256 = textSha;
     for (const r of checkPassages(page.text, evidence)) {
       if (r.found) checkedClaims.add(r.claimId);
       else missing.set(r.claimId, [...(missing.get(r.claimId) ?? []), r.evidenceId]);
@@ -44,6 +47,11 @@ for (const claim of packet.claims) {
   } else if (checkedClaims.has(claim.id)) {
     claim.lastCheckedAt = now;
   }
+}
+if (packet.provenance) {
+  packet.provenance.lastRecheckAt = now;
+  packet.provenance.pageSha256 = Object.fromEntries(packet.sources.map((s: { id: string; contentSha256: string }) => [s.id, s.contentSha256]));
+  packet.provenance.pageSha256Note = 'sha256 of the normalised extracted page text (stable across requests), set by pilot:recheck.';
 }
 await writeFile(file, `${JSON.stringify(packet, null, 2)}\n`);
 console.log(missing.size ? `${missing.size} claim(s) need attention; the episode stays blocked until fixed and re-reviewed.` : `All passages still present. Claims fresh until 24 h after ${now}.`);

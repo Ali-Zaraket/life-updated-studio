@@ -25,13 +25,13 @@
       "institution": "Google (Android Developers)",
       "sourceType": "official_documentation",
       "publishedAt": "2026-10-16T00:00:00.000Z",
-      "retrievedAt": "2026-10-22T11:08:28.019Z",
+      "retrievedAt": "2026-10-22T11:13:04.482Z",
       "originId": "google-android-developer-docs",
       "available": true,
       "retractionCheckedAt": "2026-10-22T10:36:27.000Z",
       "retracted": false,
       "correctionNote": null,
-      "contentSha256": "30a0667632504de9f9b6834fed18fa734505b6aa33576fc0621cb138aa551932"
+      "contentSha256": "98119e24cf7f3c8d6eb4f00360bc164a909960675ed6ae89112e50adb8490c8a"
     },
     {
       "id": "src-android-background-location",
@@ -42,13 +42,13 @@
       "institution": "Google (Android Developers)",
       "sourceType": "official_documentation",
       "publishedAt": "2026-10-16T00:00:00.000Z",
-      "retrievedAt": "2026-10-22T11:08:28.019Z",
+      "retrievedAt": "2026-10-22T11:13:04.482Z",
       "originId": "google-android-developer-docs",
       "available": true,
       "retractionCheckedAt": "2026-10-22T10:36:27.000Z",
       "retracted": false,
       "correctionNote": null,
-      "contentSha256": "1e414f280e7f408463bcc40fdcadf637e3ea1a00606b9b55e7767afa889b99ba"
+      "contentSha256": "ffca45b2a428e2aa48f5d3250ad88135d124627d1fe096001f9a5f4301a57c3c"
     }
   ],
   "claims": [
@@ -66,7 +66,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-22T11:08:28.019Z",
+      "lastCheckedAt": "2026-10-22T11:13:04.482Z",
       "permittedWording": null,
       "limitations": "Describes the permission model; exact on-screen wording varies by Android version and phone maker.",
       "isNumeric": true,
@@ -87,7 +87,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-22T11:08:28.019Z",
+      "lastCheckedAt": "2026-10-22T11:13:04.482Z",
       "permittedWording": null,
       "limitations": "Applies to Android 11 (API level 30) and higher; Android 10 showed the option in the dialog.",
       "isNumeric": true,
@@ -107,7 +107,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-22T11:08:28.019Z",
+      "lastCheckedAt": "2026-10-22T11:13:04.482Z",
       "permittedWording": null,
       "limitations": "Concerns the location permission itself; it does not cover other ways an app might estimate location.",
       "isNumeric": false,
@@ -127,7 +127,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-22T11:08:28.019Z",
+      "lastCheckedAt": "2026-10-22T11:13:04.482Z",
       "permittedWording": null,
       "limitations": "Android 10 (API level 29) and higher. The source describes one notification scheduled on the first background access after the grant; it does not say when it is shown or whether other reminders follow.",
       "isNumeric": true,
@@ -147,7 +147,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-22T11:08:28.019Z",
+      "lastCheckedAt": "2026-10-22T11:13:04.482Z",
       "permittedWording": null,
       "limitations": "Developer-facing definition; what users see in settings may be labelled differently.",
       "isNumeric": false,
@@ -167,7 +167,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-22T11:08:28.019Z",
+      "lastCheckedAt": "2026-10-22T11:13:04.482Z",
       "permittedWording": null,
       "limitations": "Applies to Android 9 and earlier.",
       "isNumeric": true,
@@ -315,20 +315,21 @@
     "retrievedAt": "2026-10-22T10:36:27.000Z",
     "retrievedBy": "lead session (claude-opus-5-5) via HTTPS from developer.android.com",
     "pageSha256": {
-      "src-android-location-permissions": "b60667a0f453b380c5d158bbbf81cd240da0fe64579365210f93ecf68d54f9af",
-      "src-android-background-location": "f251c9c76f8a67d40aceddf17b49ea7c43a0b9720934daccd59aacb6cfaf2726"
+      "src-android-location-permissions": "98119e24cf7f3c8d6eb4f00360bc164a909960675ed6ae89112e50adb8490c8a",
+      "src-android-background-location": "ffca45b2a428e2aa48f5d3250ad88135d124627d1fe096001f9a5f4301a57c3c"
     },
     "licence": "Each page states: 'Content and code samples on this page are subject to the licenses described in the Content License' (developer.android.com/license, not fetched). Quoted passages are short excerpts with attribution; confirm the licence before quoting on screen.",
     "pageLastUpdated": {
       "src-android-location-permissions": "2026-10-16",
       "src-android-background-location": "2026-10-16"
     },
-    "pageSha256Note": "contentSha256 / pageSha256 are sha256 of the raw HTML response as fetched, not of the extracted text.",
+    "pageSha256Note": "sha256 of the normalised extracted page text (stable across requests), set by pilot:recheck.",
     "numericNote": "isNumeric is set where narration states Android version numbers, so the number rule can verify them.",
     "publishedAtNote": "publishedAt holds each page's 'Last updated' date; Google does not publish a first-publication date.",
     "round2Changes": "After independent review round 1 (reviews/round-1*.json): added c-foreground-definition; revised beats 2-5, visuals and caption as suggested.",
     "round3Changes": "After independent review round 2: background definition (e7), Figure 7 caption (e8), extended e4, reminder limitation reworded, new claim c-pre10-background (e9); beat 2 cut; beats 3-5, visuals and caption revised as suggested.",
     "round4Changes": "After round 3: e9 extended to include its Android 10 sentence; e10 adds the per-app settings-page passage; hook drops 'actually'; timeline padding trimmed.",
-    "round5Changes": "After round 4: e2 and e3 locators corrected to the real section headings; c-approximate-applies no longer lists caption; e11 (context) quotes the Android 10 dialog sentence behind the c-android11-settings limitation."
+    "round5Changes": "After round 4: e2 and e3 locators corrected to the real section headings; c-approximate-applies no longer lists caption; e11 (context) quotes the Android 10 dialog sentence behind the c-android11-settings limitation.",
+    "lastRecheckAt": "2026-10-22T11:13:04.482Z"
   }
 }

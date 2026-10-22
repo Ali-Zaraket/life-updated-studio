@@ -4,8 +4,8 @@
       "startSec": 0.0,
       "endSec": 4.5,
       "role": "hook",
-      "narration": "An Android app asks for your location. You're making two choices.",
-      "visual": "Generic permission prompt (no real UI text) splits into two labelled dials: WHEN and HOW EXACT. On-screen label: 'Illustration'.",
+      "narration": "An Android app wants your location. That access has two parts.",
+      "visual": "Generic permission prompt (no real UI text) splits into two labelled panels: WHEN and HOW EXACT. On-screen label: 'Illustration'.",
       "claimIds": [
         "c-two-characteristics"
       ]
