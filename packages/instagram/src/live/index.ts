@@ -4,3 +4,4 @@ export { LiveInsightsReader, type LiveInsightsReaderOptions } from './insights';
 export { tokenRefreshPlan, refreshLongLivedToken, type TokenRefreshPlan, type RefreshedToken } from './token';
 export { redact, type TokenSource } from './http';
 export { windowForAge } from './window';
+export { CONNECT_ASSUMPTIONS, buildAuthorizeUrl, exchangeCodeForLongLivedToken, verifyAccessToken, type ConnectedIdentity } from './connect';

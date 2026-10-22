@@ -192,6 +192,44 @@ function effectiveTier(ctx: Ctx, c: Claim): RiskTier {
   return TIER_RANK[ctx.packet.topic.riskTier] > TIER_RANK[c.riskTier] ? ctx.packet.topic.riskTier : c.riskTier;
 }
 
+/**
+ * Consequential, numeric or causal claims need two independent evidence origins
+ * unless a single-origin justification is recorded (brief §3.5).
+ */
+export function requiresIndependentOrigins(c: Claim): boolean {
+  return (c.isConsequential || c.isNumeric || c.isCausal) && blank(c.singleOriginJustification);
+}
+
+export interface SupportOriginOptions {
+  /** Source ids to ignore entirely (e.g. discredited by a correction). */
+  exclude?: ReadonlySet<string>;
+  /** Source ids to count as available and unretracted regardless of their stored flags (the "before" view of a correction). */
+  assumeValid?: ReadonlySet<string>;
+}
+
+/**
+ * The distinct evidence origins validly supporting a claim: `supports` evidence
+ * with a passage and locator, citing a known, available, unretracted source.
+ * `evidence` may contain rows for other claims only if the caller filtered it; this
+ * function does not filter by claim id.
+ */
+export function supportOrigins(
+  evidence: readonly ClaimEvidence[],
+  sources: ReadonlyMap<string, Source>,
+  opts: SupportOriginOptions = {},
+): Set<string> {
+  const out = new Set<string>();
+  for (const e of evidence) {
+    if (e.stance !== 'supports' || blank(e.supportingPassage) || blank(e.locator)) continue;
+    if (opts.exclude?.has(e.sourceId)) continue;
+    const s = sources.get(e.sourceId);
+    if (!s) continue;
+    const valid = opts.assumeValid?.has(s.id) || (s.available && !s.retracted);
+    if (valid) out.add(s.originId);
+  }
+  return out;
+}
+
 function checkClaim(ctx: Ctx, c: Claim): void {
   const { issues, sources, now } = ctx;
   const tier = effectiveTier(ctx, c);
@@ -206,7 +244,6 @@ function checkClaim(ctx: Ctx, c: Claim): void {
 
   // --- Evidence integrity -------------------------------------------------
   const evidence = ctx.evidenceByClaim.get(c.id) ?? [];
-  const validSupportOrigins = new Set<string>();
   let supportCount = 0;
   for (const e of evidence) {
     if (blank(e.supportingPassage) || blank(e.locator)) {
@@ -223,17 +260,15 @@ function checkClaim(ctx: Ctx, c: Claim): void {
     if (s.retractionCheckedAt === null && TIER_RANK[tier] >= TIER_RANK.elevated) {
       issues.add('retraction_unchecked', c.id, `source ${s.id} was never checked for retraction; claim ${c.id} is ${tier} risk`);
     }
-    if (e.stance === 'supports') {
-      supportCount++;
-      if (s.available && !s.retracted && !blank(e.supportingPassage) && !blank(e.locator)) validSupportOrigins.add(s.originId);
-    }
+    if (e.stance === 'supports') supportCount++;
   }
   if (supportCount === 0) {
     issues.add('claim_without_support', c.id, `claim ${c.id} has no supporting evidence`);
   }
 
   // --- Origin independence -----------------------------------------------
-  if ((c.isConsequential || c.isNumeric || c.isCausal) && validSupportOrigins.size < 2 && blank(c.singleOriginJustification)) {
+  const validSupportOrigins = supportOrigins(evidence, sources);
+  if (requiresIndependentOrigins(c) && validSupportOrigins.size < 2) {
     const kinds = [c.isConsequential && 'consequential', c.isNumeric && 'numeric', c.isCausal && 'causal'].filter(Boolean).join('/');
     issues.add(
       'insufficient_independent_origins',
