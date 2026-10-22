@@ -142,6 +142,7 @@ async function stepOnce(deps: PublishDeps, job: PublishJobRow): Promise<Step> {
         const { containerId } = await publisher.createReelContainer({
           accountId: job.accountId,
           videoUrl: deps.storage.mockPublicUrl(pkg.deliveryMedia.uri),
+          videoFilePath: deps.storage.resolve(pkg.deliveryMedia.uri),
           coverUrl: deps.storage.mockPublicUrl(pkg.cover.uri),
           caption: pkg.caption,
           shareToFeed: pkg.shareToFeed,

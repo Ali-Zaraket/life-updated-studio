@@ -32,6 +32,12 @@ export interface CreateReelContainerInput {
   accountId: string;
   /** Publicly fetchable URL that stays valid for the whole processing window. */
   videoUrl: string;
+  /**
+   * Local delivery file. When set, a live adapter may upload the bytes directly
+   * (resumable upload) instead of asking Instagram to fetch `videoUrl`, which a
+   * localhost studio cannot serve publicly.
+   */
+  videoFilePath?: string | null;
   coverUrl: string | null;
   caption: string;
   shareToFeed: boolean;
