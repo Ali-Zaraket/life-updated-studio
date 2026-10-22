@@ -487,9 +487,9 @@ describe('mock vs live labelling, severity and pause', () => {
 describe('planSha256', () => {
   const trigger: CorrectionTrigger = { kind: 'origin', originId: ORIGIN_A };
 
-  it('is the canonical hash of the plan body', () => {
+  it('is the canonical hash of the plan body, excluding generatedAt', () => {
     const p = plan(trigger);
-    const { planSha256, ...body } = p;
+    const { planSha256, generatedAt: _at, ...body } = p;
     expect(planSha256).toBe(hashCanonical(body));
     expect(planSha256).toMatch(/^[0-9a-f]{64}$/);
   });
@@ -504,9 +504,10 @@ describe('planSha256', () => {
     expect(plan(trigger).planSha256).toBe(a.planSha256);
   });
 
-  it('changes with now and with any input content', () => {
+  it('ignores when it was computed but changes with any input content', () => {
     const a = plan(trigger);
-    expect(plan(trigger, inputs(), new Date(NOW.getTime() + HOUR)).planSha256).not.toBe(a.planSha256);
+    // A preview and a later re-plan of unchanged data must match (the owner reviews, then confirms).
+    expect(plan(trigger, inputs(), new Date(NOW.getTime() + HOUR)).planSha256).toBe(a.planSha256);
     const inp = inputs();
     inp.claims.find((c) => c.id === X)!.text = '[FIXTURE] changed text';
     expect(plan(trigger, inp).planSha256).not.toBe(a.planSha256);

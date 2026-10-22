@@ -691,7 +691,9 @@ export function planCorrection(trigger: CorrectionTrigger, inputs: CorrectionInp
     warnings: sorted(warnings),
     summary: summarise(trigger, affectedClaims, episodeResults, severity, maxTier, pauseReasons),
   };
-  return { ...body, planSha256: hashCanonical(body) };
+  // The hash covers what the plan does, not when it was computed, so a preview and a later re-plan of the same data match.
+  const { generatedAt: _at, ...hashed } = body;
+  return { ...body, planSha256: hashCanonical(hashed) };
 }
 
 const REASON_ORDER: readonly ClaimImpactReason[] = [

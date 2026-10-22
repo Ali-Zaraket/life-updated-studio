@@ -76,7 +76,7 @@ export class LiveInstagramPublisher implements InstagramPublisher {
     let fileSize = 0;
     const filePath = input.videoFilePath ?? null;
     if (filePath) {
-      const st = await stat(filePath).catch(() => null);
+      const st = await stat(/*turbopackIgnore: true*/ filePath).catch(() => null);
       if (!st || !st.isFile()) throw new PublisherError('invalid_request', 'videoFilePath is not a readable file');
       if (st.size <= 0) throw new PublisherError('invalid_request', 'video file is empty');
       if (st.size > this.maxUploadBytes) {

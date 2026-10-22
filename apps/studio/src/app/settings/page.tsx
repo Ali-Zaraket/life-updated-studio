@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getSettings, spendStatus } from '@life/db';
 import { requireOwner } from '@/lib/auth';
 import { getDb } from '@/lib/db';
@@ -21,6 +22,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     <main>
       <h1>Settings</h1>
       <Notice ok={ok} err={err} />
+      <p><Link href="/settings/instagram">Instagram connection</Link></p>
       <section className="card stack">
         <h3>Publishing {s.publishingPaused ? <Badge kind="bad">PAUSED</Badge> : <Badge kind="good">ACTIVE</Badge>}</h3>
         {s.publishingPaused ? (

@@ -19,6 +19,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
               <Link href="/">Dashboard</Link>
               <Link href="/insights">Insights</Link>
               <Link href="/voice">Voice</Link>
+              <Link href="/corrections">Corrections</Link>
+              <Link href="/jobs">Jobs</Link>
+              <Link href="/experiments">Experiments</Link>
               <Link href="/settings">Settings</Link>
               <Link href="/audit">Audit log</Link>
             </nav>
