@@ -333,6 +333,7 @@
     "lastRecheckAt": "2026-10-22T11:13:04.482Z",
     "round6Changes": "Hash binding excludes lastCheckedAt; live recheck confirmed all passages; page hash now over normalised text.",
     "round7Changes": "Hook narration changed to 'An Android app wants your location. That access has two parts.' (round-6 review); hook visual says panels.",
-    "reviewStatus": "Round 7 (claude-opus-5-5, independent evidence agent): all six claims pass, bound to the current script and ledger. AI verification only, not qualified human review."
+    "reviewStatus": "Round 8 (claude-opus-5-5, independent evidence agent): all six claims pass, bound to the current script, on-screen text and ledger. AI verification only, not qualified human review.",
+    "round8Changes": "Reviewed on-screen text added to the mechanism and takeaway beats (onScreenText)."
   }
 }

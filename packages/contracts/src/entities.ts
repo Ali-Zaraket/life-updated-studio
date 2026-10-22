@@ -65,7 +65,7 @@ export const ClaimStatus = z.enum(['supported', 'supported_with_limits', 'unreso
 export type ClaimStatus = z.infer<typeof ClaimStatus>;
 export const PUBLISHABLE_CLAIM_STATUSES: readonly ClaimStatus[] = ['supported', 'supported_with_limits'];
 
-export const ClaimLocation = z.enum(['hook', 'narration', 'visual', 'caption', 'analogy', 'ending', 'cover']);
+export const ClaimLocation = z.enum(['hook', 'narration', 'visual', 'on_screen_text', 'caption', 'analogy', 'ending', 'cover']);
 export const TimeSensitivity = z.enum(['changing', 'stable']);
 
 export const Claim = z.object({

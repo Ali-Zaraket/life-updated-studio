@@ -1,12 +1,12 @@
 # Review package — LU-TECH-002 “Your phone's two location choices” (Android)
 
-**Status:** `verified` — evidence and creative gates pass, and an independent AI check (round 7, `claude-opus-5-5`) passed all six claims against this exact script and evidence. **Not approved and not publishable yet:** it needs your narrator voice, a final render, a source recheck within 24 h of publishing, and your approval in the studio.
+**Status:** `verified` — evidence and creative gates pass, and an independent AI check (round 8, `claude-opus-5-5`) passed all six claims against this exact script and evidence. **Not approved and not publishable yet:** it needs your narrator voice, a final render, a source recheck within 24 h of publishing, and your approval in the studio.
 
 Format: everyday mystery · Pillar: technology · Risk: low · Length: ~49 s of speech (127 words at ~155 wpm) · Fixture: no — real sources.
 
 ## Script
 
-| Time | Beat | Narration | Visual | Claims |
+| Time | Beat | Narration | Visual (direction, not shown) | Claims |
 |---|---|---|---|---|
 | 0.0–4.5 s | hook | An Android app wants your location. That access has two parts. | Generic permission prompt (no real UI text) splits into two labelled panels: WHEN and HOW EXACT. On-screen label: 'Illustration'. | c-two-characteristics |
 | 4.5–25.6 s | mechanism | First: when. Foreground: the app is on screen, or running with an ongoing notification. Background: any other time. On Android 11 and newer, background access isn't in the pop-up; it's a separate option in settings. Second: how exact, precise or approximate. Grant approximate, and the app only gets approximate location, even in the background. | Diagram: WHEN dial (app on screen / running with ongoing notification = foreground; any other time = background, with a settings-page icon). HOW EXACT dial (precise pin vs. wide circle). On-screen label: 'Illustration'. | c-two-characteristics, c-foreground-definition, c-android11-settings, c-approximate-applies |
@@ -100,7 +100,7 @@ Both sources come from one origin (Google's Android documentation). Each claim r
 
 ## How it was checked
 
-Seven independent review rounds (each a fresh reviewer that did not write the script; notes in `content/pilots/LU-TECH-002/reviews/`):
+Eight independent review rounds (each a fresh reviewer that did not write the script; notes in `content/pilots/LU-TECH-002/reviews/`):
 
 | Round | Outcome | Main findings fixed |
 |---|---|---|
@@ -110,7 +110,8 @@ Seven independent review rounds (each a fresh reviewer that did not write the sc
 | 4 | 4 pass, 2 changes | Two evidence locators pointed to the wrong section |
 | 5 | all pass | — (then the review binding was extended to evidence, voiding it by design) |
 | 6 | 5 pass, 1 change | Hook overstated "two choices" for older Android versions |
-| 7 | **all pass** | — |
+| 7 | all pass | — (then reviewed on-screen text was added after a preview showed garbled diagram labels) |
+| 8 | **all pass** | — on-screen text checked line by line |
 
 Gate improvements that came out of this: AI reviews are now bound to the exact script **and** evidence (`subjectSha256`), `pass_with_changes` blocks until re-reviewed, and source rechecks (`pnpm pilot:recheck`) refresh freshness without voiding reviews.
 
@@ -127,3 +128,8 @@ Gate improvements that came out of this: AI reviews are now bound to the exact s
 - Claims' `locations` don't list `visual`; matters only for corrections sweeps.
 - The Android Developers content licence was not fetched; the script paraphrases and only shows the on-screen label "Allow all the time".
 - This is AI verification, not qualified human review (not required for a low-risk technical topic).
+
+## On-screen text (reviewed)
+
+- Mechanism: When: foreground or background · Foreground: on screen, or running with ongoing notification · Android 11+: background is a separate settings option · How exact: precise or approximate · Approximate stays approximate, even in background
+- Takeaway: Check each app: allowed all the time? · Pick approximate where offered and enough
