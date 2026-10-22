@@ -14,7 +14,6 @@
     "db:start": "tsx packages/db/scripts/local-postgres.ts",
     "db:generate": "pnpm --filter @life/db generate",
     "db:migrate": "tsx packages/db/scripts/migrate.ts",
-    "db:seed": "tsx apps/worker/src/seed.ts",
     "slice": "tsx apps/worker/src/slice.ts",
     "worker": "tsx apps/worker/src/main.ts",
     "studio": "pnpm --filter @life/studio dev"

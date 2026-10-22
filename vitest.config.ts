@@ -8,6 +8,7 @@ export default defineConfig({
       'packages/*/src/**/*.test.ts',
       'packages/*/test/**/*.test.ts',
       'apps/worker/src/**/*.test.ts',
+      'apps/worker/test/**/*.test.ts',
       'tests/**/*.test.ts',
     ],
     exclude: ['**/node_modules/**', process.env.LIVE_SMOKE === '1' ? '' : 'tests/live/**'].filter(Boolean),
