@@ -13,12 +13,12 @@ const Ring: React.FC<{ size: number; color: string; style?: React.CSSProperties;
 );
 
 /** Hook question card. */
-export const HookCard: React.FC<{ beat: CompositionBeat; kicker?: string }> = ({ beat, kicker = 'The question' }) => (
+export const HookCard: React.FC<{ beat: CompositionBeat; kicker?: string }> = ({ beat, kicker }) => (
   <div style={{ position: 'relative', width: W, height: H }}>
     <Ring size={1100} color={COLORS.panelLine} style={{ position: 'absolute', right: -420, top: 500 }} stroke={22} />
     <Ring size={620} color={COLORS.accent} style={{ position: 'absolute', right: -200, top: 760, opacity: 0.5 }} />
     <Reveal style={{ position: 'absolute', left: 0, top: 160, width: W - 120 }}>
-      <Kicker>{kicker}</Kicker>
+      <Kicker>{kicker ?? (questionOf(beat.narration).trim().endsWith('?') ? 'The question' : 'Start here')}</Kicker>
       <BigText size={140}>{questionOf(beat.narration)}</BigText>
     </Reveal>
   </div>
