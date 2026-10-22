@@ -1,0 +1,10 @@
+{
+  "name": "@life/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc --noEmit -p tsconfig.json", "generate": "drizzle-kit generate" },
+  "dependencies": { "@life/contracts": "workspace:*", "drizzle-orm": "0.45.4", "@electric-sql/pglite": "0.5.11", "pg": "8.23.1" },
+  "devDependencies": { "@types/pg": "8.23.1", "drizzle-kit": "0.31.11", "embedded-postgres": "18.4.0-beta.17" }
+}

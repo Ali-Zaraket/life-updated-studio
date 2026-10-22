@@ -1,0 +1,13 @@
+node_modules/
+.next/
+.data/
+dist/
+coverage/
+*.log
+.env
+.env.local
+.env.*.local
+secrets/
+storage/
+*.pem
+!fixtures/**/*.pem
