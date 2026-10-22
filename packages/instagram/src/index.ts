@@ -14,6 +14,10 @@ import {
   type UnavailabilityReason,
 } from '@life/contracts';
 
+import { windowForAge } from './live/window';
+
+export * from './live/index';
+
 export const MOCK_API_VERSION = 'mock-v0';
 const MOCK_HOST = 'https://mock-instagram.invalid/reel/';
 
@@ -297,12 +301,7 @@ const METRICS: Readonly<Record<string, MetricDef>> = {
 
 const WINDOW_FACTOR: Record<'1h' | '24h' | '72h' | '7d', number> = { '1h': 0.15, '24h': 0.6, '72h': 0.85, '7d': 1 };
 
-export function mockWindowForAge(ageSec: number): '1h' | '24h' | '72h' | '7d' {
-  if (ageSec < 24 * HOUR) return '1h';
-  if (ageSec < 72 * HOUR) return '24h';
-  if (ageSec < 7 * 24 * HOUR) return '72h';
-  return '7d';
-}
+export const mockWindowForAge = windowForAge;
 
 export class MockInsightsReader implements InsightsReader {
   readonly mode = 'mock' as const;
