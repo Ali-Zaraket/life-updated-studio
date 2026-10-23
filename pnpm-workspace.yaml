@@ -6,6 +6,3 @@ packages:
 onlyBuiltDependencies:
   - esbuild
   - sharp
-  - '@embedded-postgres/windows-x64'
-  - '@embedded-postgres/linux-x64'
-  - '@embedded-postgres/darwin-arm64'

@@ -19,7 +19,7 @@ if (!url) throw new Error('DATABASE_URL is not set');
 const mode = process.env.INSTAGRAM_MODE ?? 'mock';
 if (mode !== 'mock' && mode !== 'live') throw new Error(`INSTAGRAM_MODE must be mock or live, got ${mode}`);
 
-const keysPath = process.env.WORKER_APPROVAL_PUBLIC_KEYS_PATH ?? 'secrets/approval-public-keys.json';
+const keysPath = process.env.WORKER_APPROVAL_PUBLIC_KEYS_PATH ?? 'secrets/public/approval-public-keys.json';
 const trustedKeys = JSON.parse(await readFile(resolve(keysPath), 'utf8')) as Record<string, string>;
 for (const pem of Object.values(trustedKeys)) {
   if (pem.includes('PRIVATE KEY')) throw new Error(`${keysPath} contains a private key; the worker must hold public keys only`);

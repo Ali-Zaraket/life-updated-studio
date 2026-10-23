@@ -41,7 +41,7 @@ export async function openPgliteDb(dataDir?: string): Promise<{ db: Db; close: (
   return { db: db as unknown as Db, close: () => client.close() };
 }
 
-/** Real Postgres (embedded-postgres locally, managed Postgres in deployment). Does not migrate. */
+/** Real Postgres (Docker Compose locally, managed Postgres in deployment). Does not migrate. */
 export async function openPostgresDb(connectionString: string): Promise<{ db: Db; close: () => Promise<void> }> {
   const pg = await import('pg');
   const { drizzle } = await import('drizzle-orm/node-postgres');

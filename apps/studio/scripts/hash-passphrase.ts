@@ -1,4 +1,5 @@
 // Usage: pnpm --filter @life/studio hash-passphrase   (reads the passphrase from stdin, no echo on a TTY)
+// Prints the line to paste into .env.local.
 import { hashPassphrase } from '../src/lib/passphrase';
 
 async function readHidden(prompt: string): Promise<string> {
@@ -42,4 +43,6 @@ if (pass.length < 12) {
   console.error('Refusing: passphrase must be at least 12 characters.');
   process.exit(1);
 }
-console.log(hashPassphrase(pass));
+// Printed as the whole .env.local line, single-quoted: the hash contains `$`, which Docker Compose
+// would otherwise treat as a variable. Node's env-file parser reads single quotes literally too.
+console.log(`STUDIO_PASSPHRASE_HASH='${hashPassphrase(pass)}'`);

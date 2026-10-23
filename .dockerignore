@@ -1,0 +1,17 @@
+# Never send secrets, local data or build output into the image.
+.env
+.env.local
+.env.*.local
+secrets/
+storage/
+auditions/
+backups/
+.data/
+content/pilots/*/source-text/
+**/node_modules/
+**/.next/
+**/dist/
+coverage/
+*.log
+*.pem
+.git/

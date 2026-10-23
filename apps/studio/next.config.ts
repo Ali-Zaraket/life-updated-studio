@@ -8,7 +8,7 @@ if (existsSync(rootEnv)) process.loadEnvFile(rootEnv);
 
 const config: NextConfig = {
   transpilePackages: ['@life/contracts', '@life/db', '@life/content', '@life/media', '@life/instagram'],
-  serverExternalPackages: ['pg', '@electric-sql/pglite', 'embedded-postgres'],
+  serverExternalPackages: ['pg', '@electric-sql/pglite'],
   poweredByHeader: false,
   async headers() {
     return [

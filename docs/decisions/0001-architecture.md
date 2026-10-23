@@ -7,7 +7,7 @@
 
 1. **TypeScript pnpm monorepo** with the brief's layout: `apps/studio` (Next.js 16), `apps/worker`, `packages/{contracts,db,content,media,instagram}`. Node ≥ 22.12. Pins are recorded in `docs/SESSION-NOTES.md`; TypeScript stays on 5.9 for tooling compatibility.
 2. **Contracts first.** `packages/contracts` (zod 4) defines every shared shape: workflow states and transitions, episode/claim/evidence entities, release package, signed approval, publish job, metric snapshot, cost and audit events, and the adapter interfaces. Workstreams code against these; changes go through the lead.
-3. **Database.** PostgreSQL in deployment and local dev (`embedded-postgres`, no Docker needed); PGlite in-process for tests. One Drizzle schema serves both. Guards that must hold regardless of application bugs live in the database:
+3. **Database.** PostgreSQL in deployment and local dev (Docker Compose `db` service, Postgres 17, UTF-8; replaced embedded-postgres on 2026-10-23 after its Windows initdb crashed and defaulted to WIN1252); PGlite in-process for tests. One Drizzle schema serves both. Guards that must hold regardless of application bugs live in the database:
    - `episode_versions`, `release_packages`, `audit_events`: immutable (UPDATE/DELETE raise).
    - `approvals`: no DELETE; UPDATE only sets the revocation columns once.
    - `approvals.approver_kind = 'owner'` CHECK plus FK to the single-row `owners` table.

@@ -17,7 +17,7 @@ Working notes from the lead session, kept so a cloud continuation has the same c
 | drizzle-orm / drizzle-kit | 0.45.4 / 0.31.11 | Apache-2.0 / MIT | |
 | @electric-sql/pglite | 0.5.11 | Apache-2.0 | In-process Postgres for deterministic tests |
 | pg | 8.23.1 | MIT | Runtime driver for real Postgres |
-| embedded-postgres | 18.4.0-beta.17 | MIT | Local dev Postgres without Docker (dev only) |
+| postgres (Docker image) | 17-alpine | PostgreSQL licence | Local database via Docker Compose (replaced embedded-postgres) |
 | vitest | 5.0.5 | MIT | Node ^22.12 / ^24 |
 | tsx | 4.23.15 | MIT | |
 | next / react / react-dom | 16.4.2 / 19.3.1 / 19.3.1 | MIT | |
@@ -25,7 +25,7 @@ Working notes from the lead session, kept so a cloud continuation has the same c
 
 ## Proposed decisions (not yet implemented)
 
-1. **Database:** real Postgres in deployment and local dev (`embedded-postgres` or Docker); PGlite in-memory for CI tests so tests need no daemon. Drizzle schema shared by both drivers.
+1. **Database:** real Postgres in deployment and local dev (Docker Compose); PGlite in-memory for CI tests so tests need no daemon. Drizzle schema shared by both drivers.
 2. **Job queue:** a small Postgres-backed lease queue (`FOR UPDATE SKIP LOCKED`, lease expiry, bounded retries with backoff) inside `packages/db`, because it runs identically on PGlite in tests. Revisit pg-boss if needs grow. Publish jobs keep their own domain state for reconciliation.
 3. **Approvals cannot be minted by agents:** the studio signs each approval with an Ed25519 private key that only the studio process holds; the worker holds only the public key and verifies the signature plus the exact package binding (episode version hash, delivery media hash, cover hash, caption hash, disclosure, account, publish window) immediately before publishing. DB triggers make episode versions immutable and allow approvals to change only by revocation.
 4. **Reconciliation key:** each caption carries the episode identifier (e.g. `LU-TECH-001`), which doubles as the series ID and the marker used to reconcile an ambiguous publish timeout against recent remote media.

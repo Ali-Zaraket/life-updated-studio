@@ -17,7 +17,8 @@ Owner of each row edits only their directories. The lead integrates and commits.
 | Worker | Publish state machine with gate re-check and reconciliation, scheduler, insights, draft pipeline, live gate | worker tests |
 | Studio | Login, episodes, evidence, approve/reject/revoke, settings/spending, voice, insights, corrections, Instagram connect, jobs, experiments, audit | typecheck + build + unit tests; browser click-through against Postgres (login, pause/resume, correction run + close, experiment, logout: 17/17 pass; Approve deliberately not clicked) |
 | Security review | 3 high, 8 medium, 7 low findings fixed (publish mode binding, no republish after a media ID, upload of the hashed bytes, reconciliation, SSRF, billed-failure costs, restore, voice binding, rechecks, OAuth cookie, account swap) | worker/db/contracts/reasoning tests; real-Postgres race tests |
-| CI | Linux + Windows tests, Postgres races, studio build | GitHub Actions |
+| Docker | One image (Node 22, ffmpeg, Remotion browser); Compose runs Postgres 17, migrations, studio, worker and a `tools` service; worker sees only the public key | local stack + 17/17 browser click-through against it; CI `docker` job builds the real image and renders inside it |
+| CI | Linux + Windows tests, Postgres races, studio build, Docker stack | GitHub Actions |
 
 ## Open
 
