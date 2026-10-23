@@ -1,0 +1,83 @@
+{
+  "beats": [
+    {
+      "startSec": 0.0,
+      "endSec": 4.5,
+      "role": "hook",
+      "narration": "An Android app wants your location. That access has two parts.",
+      "visual": "Generic permission prompt (no real UI text) splits into two labelled panels: WHEN and HOW EXACT. On-screen label: 'Illustration'.",
+      "claimIds": [
+        "c-two-characteristics"
+      ]
+    },
+    {
+      "startSec": 4.5,
+      "endSec": 25.6,
+      "role": "mechanism",
+      "narration": "First: when. Foreground: the app is on screen, or running with an ongoing notification. Background: any other time. On Android 11 and newer, background access isn't in the pop-up; it's a separate option in settings. Second: how exact, precise or approximate. Grant approximate, and the app only gets approximate location, even in the background.",
+      "visual": "Diagram: WHEN dial (app on screen / running with ongoing notification = foreground; any other time = background, with a settings-page icon). HOW EXACT dial (precise pin vs. wide circle). On-screen label: 'Illustration'.",
+      "claimIds": [
+        "c-two-characteristics",
+        "c-foreground-definition",
+        "c-android11-settings",
+        "c-approximate-applies"
+      ],
+      "onScreenText": [
+        "When: foreground or background",
+        "Foreground: on screen, or running with ongoing notification",
+        "Android 11+: background is a separate settings option",
+        "How exact: precise or approximate",
+        "Approximate stays approximate, even in background"
+      ]
+    },
+    {
+      "startSec": 25.6,
+      "endSec": 35.9,
+      "role": "takeaway",
+      "narration": "So in each app's location permission settings, check whether it's allowed all the time, and pick approximate where it's offered and your exact spot isn't needed.",
+      "visual": "Checklist card (text graphic, not a phone screen): 1) 'Allow all the time'? 2) approximate where offered and enough.",
+      "claimIds": [
+        "c-android11-settings",
+        "c-approximate-applies"
+      ],
+      "onScreenText": [
+        "Check each app: allowed all the time?",
+        "Pick approximate where offered and enough"
+      ]
+    },
+    {
+      "startSec": 35.9,
+      "endSec": 50.0,
+      "role": "twist",
+      "narration": "And on Android 10 and newer, after you allow an app all the time, Android schedules a reminder the first time it uses location in the background. A good moment to check it still needs it.",
+      "visual": "Stylised card with on-screen label 'Illustration \u2014 not Android's actual notification'; must not look like a real screenshot.",
+      "claimIds": [
+        "c-background-reminder"
+      ]
+    }
+  ],
+  "caption": "Android location access has two parts: when (foreground or background) and how exact (precise or approximate).\nLU-TECH-002\n\nSources:\n- Android Developers (Google), \"Request location permissions\", developer.android.com/develop/sensors-and-location/location/permissions (page updated 16 Oct 2026, retrieved 22 Oct 2026)\n- Android Developers (Google), \"Request background location\", developer.android.com/develop/sensors-and-location/location/permissions/background (page updated 16 Oct 2026, retrieved 22 Oct 2026)\nLimits: Android only. Background rules apply to Android 10 and newer (on earlier versions, foreground access includes background; the settings-page step is Android 11+). Version means your Android version, not your phone maker's software version. Menu names can differ by phone and language. This covers the location permission, not other ways an app might estimate where you are.",
+  "sourceList": [
+    "Android Developers (Google), Request location permissions, developer.android.com/develop/sensors-and-location/location/permissions, retrieved 2026-10-22",
+    "Android Developers (Google), Request background location, developer.android.com/develop/sensors-and-location/location/permissions/background, retrieved 2026-10-22"
+  ],
+  "claimIds": [
+    "c-two-characteristics",
+    "c-foreground-definition",
+    "c-android11-settings",
+    "c-approximate-applies",
+    "c-background-reminder",
+    "c-pre10-background"
+  ],
+  "link": {
+    "parentQuestion": null,
+    "resolvedQuestion": "When an Android app asks for your location, what exactly are you choosing?",
+    "nextQuestion": "Can an app work out roughly where you are without the location permission?",
+    "relatedEpisodeId": null,
+    "relationshipReason": "Second mechanism: inference from other signals. Future episode; needs its own evidence.",
+    "endingReferencesRelated": false
+  },
+  "format": "everyday_mystery",
+  "code": "LU-TECH-002",
+  "author": "lead session (claude-opus-5-5), written in Claude Code (no paid API call)"
+}

@@ -1,0 +1,80 @@
+[
+  {
+    "id": "rev-ai-r8-LU-TECH-002-c-two-characteristics",
+    "claimId": "c-two-characteristics",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 8)",
+    "verdict": "pass",
+    "notes": "Only change since round 7 is new onScreenText (git log -2 -p: commit a0eace9 adds lines to mechanism and takeaway beats; narration, visual, caption untouched). On-screen lines for this claim: \"When: foreground or background\" and \"How exact: precise or approximate\". Both restate e1 (category: foreground or background; accuracy: precise or approximate) and read correctly without narration. Hook and caption unchanged and still within e1. Checked against the source-text snapshots only (no live fetch this round): each cited passage appears word for word, once, in the normalised snapshot text. All on-screen lines are within the 60-character limit (longest 59).",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "990cf7d3e07977b59d09f4695e5fc42c21e0b273ac9e14daff607f5ba72c9a5e",
+    "createdAt": "2026-10-22T11:28:13.000Z"
+  },
+  {
+    "id": "rev-ai-r8-LU-TECH-002-c-foreground-definition",
+    "claimId": "c-foreground-definition",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 8)",
+    "verdict": "pass",
+    "notes": "On-screen \"Foreground: on screen, or running with ongoing notification\" (59 chars). Read alone it is within e6: a visible activity, or a running foreground service, which shows a persistent notification. \"Ongoing\" is a fair lay word for e6's \"persistent\", and the line does not say that any notification makes an app foreground. The screen leaves out the background definition (\"any other time\", e7), but the narration says it, and leaving it out misstates nothing. Narration unchanged since round 7. Checked against the source-text snapshots only (no live fetch this round): each cited passage appears word for word, once, in the normalised snapshot text. All on-screen lines are within the 60-character limit (longest 59).",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "990cf7d3e07977b59d09f4695e5fc42c21e0b273ac9e14daff607f5ba72c9a5e",
+    "createdAt": "2026-10-22T11:28:13.000Z"
+  },
+  {
+    "id": "rev-ai-r8-LU-TECH-002-c-android11-settings",
+    "claimId": "c-android11-settings",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 8)",
+    "verdict": "pass",
+    "notes": "On-screen \"Android 11+: background is a separate settings option\" (53 chars). Within e2 (the Android 11+ dialog has no Allow all the time option; users enable background location on a settings page) and e8 (the settings page option grants background access). Because the line comes right after \"When: foreground or background\", \"background\" reads as background location access. \"Separate\" implies separate from the pop-up, which matches e2. Takeaway on-screen \"Check each app: allowed all the time?\" is within e8 (option label) and e10 (per-app location permission options on a settings page). Pre-Android-10 phones have no such option, but the caption limit (c-pre10-background) covers that, and the line is a question, not an assertion. Narration unchanged. Checked against the source-text snapshots only (no live fetch this round): each cited passage appears word for word, once, in the normalised snapshot text. All on-screen lines are within the 60-character limit (longest 59).",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "990cf7d3e07977b59d09f4695e5fc42c21e0b273ac9e14daff607f5ba72c9a5e",
+    "createdAt": "2026-10-22T11:28:13.000Z"
+  },
+  {
+    "id": "rev-ai-r8-LU-TECH-002-c-approximate-applies",
+    "claimId": "c-approximate-applies",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 8)",
+    "verdict": "pass",
+    "notes": "On-screen \"Approximate stays approximate, even in background\" (49 chars). Within e3 (an approximate grant gives only approximate location, regardless of declared permissions) and e4 (with background access granted but only approximate in the foreground, background is approximate too). Coming right after \"How exact: precise or approximate\", the subject reads as the approximate grant, and the line overstates nothing. Takeaway on-screen \"Pick approximate where offered and enough\" (41 chars) is advice following from e3/e4. \"Where offered\" keeps the hedge (no source says which versions offer the choice). \"Enough\" is terse but not inaccurate; a wording tweak would be stylistic only and is optional (see notes file). The claim limitation (permission only, not other inference) is in the caption. Checked against the source-text snapshots only (no live fetch this round): each cited passage appears word for word, once, in the normalised snapshot text. All on-screen lines are within the 60-character limit (longest 59).",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "990cf7d3e07977b59d09f4695e5fc42c21e0b273ac9e14daff607f5ba72c9a5e",
+    "createdAt": "2026-10-22T11:28:13.000Z"
+  },
+  {
+    "id": "rev-ai-r8-LU-TECH-002-c-background-reminder",
+    "claimId": "c-background-reminder",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 8)",
+    "verdict": "pass",
+    "notes": "No on-screen text on the twist beat. Twist narration and visual unchanged since round 7 and still within e5 (\"schedules\" a notification on first background access after the grant, Android 10+, nothing on timing or repeats). The visual label 'Illustration — not Android's actual notification' is a disclosure, not a claim. The promise is resolved before the twist, no caveat is withheld, there is no engagement appeal, and endingReferencesRelated is false. Checked against the source-text snapshots only (no live fetch this round): each cited passage appears word for word, once, in the normalised snapshot text. All on-screen lines are within the 60-character limit (longest 59).",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "990cf7d3e07977b59d09f4695e5fc42c21e0b273ac9e14daff607f5ba72c9a5e",
+    "createdAt": "2026-10-22T11:28:13.000Z"
+  },
+  {
+    "id": "rev-ai-r8-LU-TECH-002-c-pre10-background",
+    "claimId": "c-pre10-background",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 8)",
+    "verdict": "pass",
+    "notes": "Caption-only claim. Caption unchanged since round 7 and within e9 (on earlier versions, foreground access automatically includes background). This claim is the caveat behind the takeaway's \"allowed all the time?\" line: pre-Android-10 has no separate background choice, and the caption keeps that limit visible. Checked against the source-text snapshots only (no live fetch this round): each cited passage appears word for word, once, in the normalised snapshot text. All on-screen lines are within the 60-character limit (longest 59).",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "990cf7d3e07977b59d09f4695e5fc42c21e0b273ac9e14daff607f5ba72c9a5e",
+    "createdAt": "2026-10-22T11:28:13.000Z"
+  }
+]

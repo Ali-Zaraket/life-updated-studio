@@ -1,0 +1,80 @@
+[
+  {
+    "id": "rev-ai-r7-LU-TECH-002-c-two-characteristics",
+    "claimId": "c-two-characteristics",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 7)",
+    "verdict": "pass",
+    "notes": "e1 is word for word, exactly once in the snapshot and the live page; locator 'Section: Types of location access' is correct. The round-6 required change has been made: the hook now says \"An Android app wants your location. That access has two parts.\", which matches e1 (each permission combines a category and an accuracy) and no longer asserts that every user makes two choices. It remains true on Android 9 and earlier, where the permission still has a category (foreground access includes background, e9). The hook visual now says \"two labelled panels\" rather than \"dials\", so it no longer implies the viewer controls both. Mechanism lines \"First: when ...\" and \"Second: how exact, precise or approximate\" and the caption's first line stay within e1. Checked against source-text snapshots and my own live English fetch (fetchPageText, ?hl=en) at about 11:14Z on 2026-10-22: the normalised extracted text of each page is identical to its snapshot (8485 and 4438 chars), its sha256 equals the packet contentSha256 and provenance.pageSha256, and both pages still say \"Last updated 2026-10-16 UTC\".",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "7717f0245fc4bb94dbe669a0b409a8bc524145c5570ca704491d3ab0a2785444",
+    "createdAt": "2026-10-22T11:14:29.000Z"
+  },
+  {
+    "id": "rev-ai-r7-LU-TECH-002-c-foreground-definition",
+    "claimId": "c-foreground-definition",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 7)",
+    "verdict": "pass",
+    "notes": "e6 and e7 are word for word, once each, in the snapshot and live page; locators 'Section: Foreground location' and 'Section: Background location' are correct. \"Foreground: the app is on screen, or running with an ongoing notification\" is a faithful plain-language reading of e6 (visible activity; foreground service with a persistent notification). \"Background: any other time\" stays within e7. The WHEN-dial visual repeats the same wording. Unchanged since round 6. Checked against source-text snapshots and my own live English fetch (fetchPageText, ?hl=en) at about 11:14Z on 2026-10-22: the normalised extracted text of each page is identical to its snapshot (8485 and 4438 chars), its sha256 equals the packet contentSha256 and provenance.pageSha256, and both pages still say \"Last updated 2026-10-16 UTC\".",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "7717f0245fc4bb94dbe669a0b409a8bc524145c5570ca704491d3ab0a2785444",
+    "createdAt": "2026-10-22T11:14:29.000Z"
+  },
+  {
+    "id": "rev-ai-r7-LU-TECH-002-c-android11-settings",
+    "claimId": "c-android11-settings",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 7)",
+    "verdict": "pass",
+    "notes": "e2, e8 and e10 (plus e11 as context) are word for word, once each, in the snapshot and live page; locators are correct (e2 and e11 under 'Permission dialog contents depend on target SDK version', e8 is the Figure 7 caption, e10 under 'App targets Android 10 or lower'). \"On Android 11 and newer, background access isn't in the pop-up; it's a separate option in settings\" stays within e2 and e8. The takeaway \"in each app's location permission settings, check whether it's allowed all the time\" stays within e10 (per-app location permission options on a settings page) and e8 (\"Allow all the time\"). The caption limit \"the settings-page step is Android 11+\" and the claim limitation (Android 10 showed the option in the dialog, e11) are accurate. Unchanged since round 6. Checked against source-text snapshots and my own live English fetch (fetchPageText, ?hl=en) at about 11:14Z on 2026-10-22: the normalised extracted text of each page is identical to its snapshot (8485 and 4438 chars), its sha256 equals the packet contentSha256 and provenance.pageSha256, and both pages still say \"Last updated 2026-10-16 UTC\".",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "7717f0245fc4bb94dbe669a0b409a8bc524145c5570ca704491d3ab0a2785444",
+    "createdAt": "2026-10-22T11:14:29.000Z"
+  },
+  {
+    "id": "rev-ai-r7-LU-TECH-002-c-approximate-applies",
+    "claimId": "c-approximate-applies",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 7)",
+    "verdict": "pass",
+    "notes": "e3 and e4 are word for word, once each, in the snapshot and live page; locators 'Section: Accuracy (paragraph after the Approximate and Precise definitions)' and 'Section: User can affect background location accuracy' are correct. \"Grant approximate, and the app only gets approximate location, even in the background\" stays within e3 and e4. The takeaway \"pick approximate where it's offered and your exact spot isn't needed\" is hedged, so it does not assert that every version offers the choice (the packet has no source saying which versions do). The caption's last limit covers non-permission location estimation. Unchanged since round 6. Checked against source-text snapshots and my own live English fetch (fetchPageText, ?hl=en) at about 11:14Z on 2026-10-22: the normalised extracted text of each page is identical to its snapshot (8485 and 4438 chars), its sha256 equals the packet contentSha256 and provenance.pageSha256, and both pages still say \"Last updated 2026-10-16 UTC\".",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "7717f0245fc4bb94dbe669a0b409a8bc524145c5570ca704491d3ab0a2785444",
+    "createdAt": "2026-10-22T11:14:29.000Z"
+  },
+  {
+    "id": "rev-ai-r7-LU-TECH-002-c-background-reminder",
+    "claimId": "c-background-reminder",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 7)",
+    "verdict": "pass",
+    "notes": "e5 is word for word, once, in the snapshot and live page; locator 'Section: Reminder of background location grant' is correct. \"On Android 10 and newer, after you allow an app all the time, Android schedules a reminder the first time it uses location in the background\" stays within e5: it says \"schedules\", and says nothing about when the reminder is shown or about repeats, matching the claim limitation. \"A good moment to check it still needs it\" is advice, not a factual claim. The visual is labelled 'Illustration - not Android's actual notification'. The episode's promise is resolved before this beat, no caveat is withheld, there is no engagement appeal, and the ending does not point to another Reel (endingReferencesRelated: false). Unchanged since round 6. Checked against source-text snapshots and my own live English fetch (fetchPageText, ?hl=en) at about 11:14Z on 2026-10-22: the normalised extracted text of each page is identical to its snapshot (8485 and 4438 chars), its sha256 equals the packet contentSha256 and provenance.pageSha256, and both pages still say \"Last updated 2026-10-16 UTC\".",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "7717f0245fc4bb94dbe669a0b409a8bc524145c5570ca704491d3ab0a2785444",
+    "createdAt": "2026-10-22T11:14:29.000Z"
+  },
+  {
+    "id": "rev-ai-r7-LU-TECH-002-c-pre10-background",
+    "claimId": "c-pre10-background",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 7)",
+    "verdict": "pass",
+    "notes": "e9 is word for word, once, in the snapshot and live page. The caption line \"on earlier versions, foreground access includes background\" stays within e9, and \"Background rules apply to Android 10 and newer\" matches its first sentence (the separate background permission exists from Android 10). The locator 'Section: Background location (after the Android 10 manifest requirement)' finds the passage. Optional, not affecting the verdict: since e9 now includes the manifest sentence, \"(paragraph with the Android 10 manifest requirement)\" would be more exact. Unchanged since round 6. Checked against source-text snapshots and my own live English fetch (fetchPageText, ?hl=en) at about 11:14Z on 2026-10-22: the normalised extracted text of each page is identical to its snapshot (8485 and 4438 chars), its sha256 equals the packet contentSha256 and provenance.pageSha256, and both pages still say \"Last updated 2026-10-16 UTC\".",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "7717f0245fc4bb94dbe669a0b409a8bc524145c5570ca704491d3ab0a2785444",
+    "createdAt": "2026-10-22T11:14:29.000Z"
+  }
+]

@@ -1,0 +1,80 @@
+[
+  {
+    "id": "rev-ai-r6-LU-TECH-002-c-two-characteristics",
+    "claimId": "c-two-characteristics",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 6)",
+    "verdict": "pass_with_changes",
+    "notes": "e1 is word for word (once each in the snapshot and live page; locator 'Section: Types of location access' is correct), and it supports the claim text and the caption's first line (\"two parts\"). The hook goes further than that. It says \"You're making two choices\". e1 describes two characteristics of a permission, not two choices the user makes, and this packet shows the user does not make both choices on every version. e9 says that before Android 10 foreground access automatically includes background access, so there is no separate \"when\" choice. The packet has no source saying which Android versions let the user choose approximate or precise; the script itself admits this in the takeaway (\"pick approximate where it's offered\"). An unconditional hook contradicts that hedge. Required change (hook narration, 11 words, fits the 4.5 s slot): \"An Android app wants your location. That access has two parts.\" Alternative: keep the current hook, but only after adding an official source and a version-qualified claim saying when the user-facing accuracy choice exists, plus a caption limit. Rounds 1-5 accepted this hook because beat 2 qualifies it. Beat 2 only qualifies the Android 11+ pop-up; it does not cover the accuracy choice or Android 9 and earlier. Checked against source-text snapshots and a live English fetch at about 11:10Z on 2026-10-22: the extracted page text is identical to the snapshot after whitespace normalisation.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "8708014f4b1d9bea9ea14f558d8eb6ad3eeeebc09631fe30ebb9f63f5822d472",
+    "createdAt": "2026-10-22T11:11:04.000Z"
+  },
+  {
+    "id": "rev-ai-r6-LU-TECH-002-c-foreground-definition",
+    "claimId": "c-foreground-definition",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 6)",
+    "verdict": "pass",
+    "notes": "e6 (Section: Foreground location) and e7 (Section: Background location) are word for word, once each. \"the app is on screen, or running with an ongoing notification\" is an accurate plain-language version of \"an activity ... is visible\" / \"foreground service ... persistent notification\". \"Background: any other time\" matches e7. The visual repeats the narration and is labelled 'Illustration'. Checked against source-text snapshots and a live English fetch at about 11:10Z on 2026-10-22: the extracted page text is identical to the snapshot after whitespace normalisation.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "8708014f4b1d9bea9ea14f558d8eb6ad3eeeebc09631fe30ebb9f63f5822d472",
+    "createdAt": "2026-10-22T11:11:04.000Z"
+  },
+  {
+    "id": "rev-ai-r6-LU-TECH-002-c-android11-settings",
+    "claimId": "c-android11-settings",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 6)",
+    "verdict": "pass",
+    "notes": "e2 and e11 (Section: Permission dialog contents depend on target SDK version), e8 (Figure 7 caption) and e10 (Section: App targets Android 10 or lower) are word for word, once each. \"On Android 11 and newer, background access isn't in the pop-up; it's a separate option in settings\" stays within e2/e8. The takeaway \"in each app's location permission settings, check whether it's allowed all the time\" is grounded in e10 and e8. The limitation (Android 10 showed the option in the dialog) is backed by e11. The caption line \"the settings-page step is Android 11+\" is accurate. Checked against source-text snapshots and a live English fetch at about 11:10Z on 2026-10-22: the extracted page text is identical to the snapshot after whitespace normalisation.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "8708014f4b1d9bea9ea14f558d8eb6ad3eeeebc09631fe30ebb9f63f5822d472",
+    "createdAt": "2026-10-22T11:11:04.000Z"
+  },
+  {
+    "id": "rev-ai-r6-LU-TECH-002-c-approximate-applies",
+    "claimId": "c-approximate-applies",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 6)",
+    "verdict": "pass",
+    "notes": "e3 (Section: Accuracy, paragraph after the Approximate and Precise definitions) and e4 (Section: User can affect background location accuracy) are word for word, once each. \"Grant approximate, and the app only gets approximate location, even in the background\" stays within e3/e4. The takeaway's \"pick approximate where it's offered\" is properly hedged. The caption's scope line (\"not other ways an app might estimate where you are\") matches the limitation. Checked against source-text snapshots and a live English fetch at about 11:10Z on 2026-10-22: the extracted page text is identical to the snapshot after whitespace normalisation.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "8708014f4b1d9bea9ea14f558d8eb6ad3eeeebc09631fe30ebb9f63f5822d472",
+    "createdAt": "2026-10-22T11:11:04.000Z"
+  },
+  {
+    "id": "rev-ai-r6-LU-TECH-002-c-background-reminder",
+    "claimId": "c-background-reminder",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 6)",
+    "verdict": "pass",
+    "notes": "e5 (Section: Reminder of background location grant) is word for word, once. The twist (\"on Android 10 and newer, after you allow an app all the time, Android schedules a reminder the first time it uses location in the background\") stays within e5. It does not say when the notification appears or whether it repeats. The visual is labelled 'Illustration - not Android's actual notification'. The episode's promise is answered before the twist, nothing is withheld, and there is no engagement appeal. Checked against source-text snapshots and a live English fetch at about 11:10Z on 2026-10-22: the extracted page text is identical to the snapshot after whitespace normalisation.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "8708014f4b1d9bea9ea14f558d8eb6ad3eeeebc09631fe30ebb9f63f5822d472",
+    "createdAt": "2026-10-22T11:11:04.000Z"
+  },
+  {
+    "id": "rev-ai-r6-LU-TECH-002-c-pre10-background",
+    "claimId": "c-pre10-background",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 6)",
+    "verdict": "pass",
+    "notes": "e9 is word for word, once. The section (Background location) is correct. Optional: the parenthetical '(after the Android 10 manifest requirement)' would be more exact as '(paragraph with the Android 10 manifest requirement)', because the passage now includes that sentence. This does not affect accuracy. The caption's \"on earlier versions, foreground access includes background\" stays within e9. Checked against source-text snapshots and a live English fetch at about 11:10Z on 2026-10-22: the extracted page text is identical to the snapshot after whitespace normalisation.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "8708014f4b1d9bea9ea14f558d8eb6ad3eeeebc09631fe30ebb9f63f5822d472",
+    "createdAt": "2026-10-22T11:11:04.000Z"
+  }
+]

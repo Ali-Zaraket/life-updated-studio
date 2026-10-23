@@ -11,3 +11,6 @@ secrets/
 storage/
 *.pem
 !fixtures/**/*.pem
+auditions/
+backups/
+content/pilots/*/source-text/

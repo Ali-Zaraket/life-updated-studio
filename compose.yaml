@@ -1,0 +1,92 @@
+# LIFE: UPDATED. studio on your machine.
+#   docker compose up -d --build        database, migrations, studio (http://localhost:3100) and worker
+#   docker compose run --rm tools pnpm slice    one-off commands (see docs/RUNBOOK.md)
+# Every port binds to 127.0.0.1 only: nothing is reachable from other machines.
+
+x-app: &app
+  build: .
+  image: life-updated-studio:local
+  env_file:
+    - path: .env.local
+      required: false
+  environment:
+    # Inside Compose the database is the `db` service, whatever .env.local says.
+    DATABASE_URL: postgres://life:${LIFE_PG_PASSWORD:-life-local-dev}@db:5432/life
+  depends_on:
+    db:
+      condition: service_healthy
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: life
+      POSTGRES_PASSWORD: ${LIFE_PG_PASSWORD:-life-local-dev}
+      POSTGRES_DB: life
+      # UTF-8 so Arabic text and emoji store correctly on every OS.
+      POSTGRES_INITDB_ARGS: --encoding=UTF8 --no-locale
+    ports:
+      - "127.0.0.1:54329:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U life -d life"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  migrate:
+    <<: *app
+    command: ["pnpm", "db:migrate"]
+    restart: "no"
+
+  studio:
+    <<: *app
+    command: ["pnpm", "--filter", "@life/studio", "start", "--hostname", "0.0.0.0"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports:
+      - "127.0.0.1:3100:3100"
+    # Healthy only once the login page answers, so `docker compose up --wait` means ready.
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3100/login').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+      start_period: 5s
+    volumes:
+      - ./storage:/app/storage
+      - ./auditions:/app/auditions
+      - ./backups:/app/backups
+      # Only the studio holds the private approval key.
+      - ./secrets:/app/secrets:ro
+    restart: unless-stopped
+
+  worker:
+    <<: *app
+    command: ["pnpm", "worker"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - ./storage:/app/storage
+      # The worker gets the public key folder and nothing else from secrets/.
+      - ./secrets/public:/app/secrets/public:ro
+    restart: unless-stopped
+
+  # One-off commands: setup, sample episode, pilot loading, auditions, drafts, backups.
+  tools:
+    <<: *app
+    profiles: ["tools"]
+    command: ["pnpm", "--help"]
+    volumes:
+      - ./storage:/app/storage
+      - ./auditions:/app/auditions
+      - ./backups:/app/backups
+      - ./secrets:/app/secrets
+      - ./content:/app/content
+
+volumes:
+  pgdata:

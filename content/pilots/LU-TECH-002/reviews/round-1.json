@@ -1,0 +1,50 @@
+[
+  {
+    "id": "rev-ai-LU-TECH-002-c-two-characteristics",
+    "claimId": "c-two-characteristics",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, Claude Code)",
+    "verdict": "pass_with_changes",
+    "notes": "Evidence e1 appears verbatim (whitespace-normalised) in source-text/request-location-permissions.txt, section 'Types of location access'. The claim as worded is supported. Script problems: (1) Beat 3 glosses foreground as 'roughly while you're using the app'. The source defines foreground as 'An activity that belongs to your app is visible' OR 'Your app is running a foreground service' with a persistent notification, and says 'Your app retains access when it's placed in the background, such as when the user presses the Home button ... or turns their device's display off.' That definition is not in any ledger claim (an uncited checkable claim), and 'roughly while you're using the app' hides the foreground-service exception, which matters to the viewer. Add a ledger claim (e.g. c-foreground-definition, evidence: the two-situation passage) and use: 'In the foreground: while the app is on screen, or while it shows an ongoing notification. Or in the background: any other time.' (2) The same source says 'On earlier versions of Android [below 10], when your app receives foreground location access, it automatically receives background location access as well.' So 'when' is not a separate choice on Android 9 and lower; the hook's 'two choices' needs a version qualifier somewhere in the episode or caption (suggested caption limit: 'Foreground/background rules apply to Android 10 and newer; on older versions foreground access includes background.'). (3) Beat 2 visual 'Thumb taps Allow' shows a button label the evidence does not document for the current dialog; use an unlabelled button or the documented label only. (4) Ledger nit: isNumeric=true for a claim with no number; check whether version numbers are meant to count.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "createdAt": "2026-10-22T10:40:48.000Z"
+  },
+  {
+    "id": "rev-ai-LU-TECH-002-c-android11-settings",
+    "claimId": "c-android11-settings",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, Claude Code)",
+    "verdict": "pass_with_changes",
+    "notes": "Evidence e2 appears verbatim in source-text/request-background-location.txt ('Permission dialog contents depend on target SDK version'). The version qualifier (Android 11 / API 30 and higher; Android 10 showed 'Allow all the time' in the dialog) is correct. Target-SDK check: for apps targeting Android 10 or lower the source says the dialog 'includes an option to navigate to your app's location permission options on a settings page' - still a settings-page grant, so the claim holds for both target cases, but the pop-up may offer a shortcut to that page. Script changes: Beat 3 'the pop-up can't grant background access; that's a separate switch on a settings page' -> 'the pop-up doesn't offer background access; that's a separate option on a settings page' (the source says the dialog 'doesn't include the Allow all the time option' and figure 7 is 'an option called Allow all the time', not a switch). Beat 4 takeaway is not actionable as written ('check which apps have background access' without saying how); suggested: 'So check which apps are set to Allow all the time in their location permission settings, and pick approximate wherever your exact spot isn't needed.' The source supports 'Allow all the time' only as the example label of that settings option (localised; may vary) - the caption already notes menu names vary. Add to caption limits that Android version is not the phone maker's own software version number.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "createdAt": "2026-10-22T10:40:48.000Z"
+  },
+  {
+    "id": "rev-ai-LU-TECH-002-c-approximate-applies",
+    "claimId": "c-approximate-applies",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, Claude Code)",
+    "verdict": "pass_with_changes",
+    "notes": "Evidence e3 (request-location-permissions.txt, 'Accuracy') and e4 (request-background-location.txt, 'User can affect background location accuracy') both appear verbatim. The claim is supported and correctly limited to the permission. Script changes: (1) Beat 3 'Grant approximate, and that's all the app gets, even in the background' can be misread as 'the app gets nothing else'; suggested: 'Grant approximate, and the app only gets approximate location, even in the background.' (2) Beat 4 'choose approximate' presumes the user is offered that choice. Neither source snapshot states on which Android versions the user can pick approximate in the dialog (outside the packet, my understanding is Android 12 / API 31 and newer, and only when the app requests precise location) - this is not evidenced here. Either add an official source and a version-qualified claim, or hedge: 'choose approximate where your phone offers it.' Do not add a version number to narration without evidence. (3) Optional fact for the visual: the source gives approximate as 'within about 3 square kilometers' and precise as 'usually within about 50 meters' (from LocationManagerService/FusedLocationProvider); if the 'wide circle vs pin' graphic implies scale, either cite these as a new claim or keep the graphic unscaled and labelled illustration.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "createdAt": "2026-10-22T10:40:48.000Z"
+  },
+  {
+    "id": "rev-ai-LU-TECH-002-c-background-reminder",
+    "claimId": "c-background-reminder",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, Claude Code)",
+    "verdict": "pass_with_changes",
+    "notes": "Evidence e5 appears verbatim in request-location-permissions.txt ('Reminder of background location grant'). Version qualifier Android 10 / API 29 and higher is correct. Script changes for Beat 5: (1) 'Android sends a reminder' -> the source says the system 'schedules a notification to send to the user' after first background access following the grant; it does not say it is immediate. Suggested: 'And on Android 10 and newer, after you allow location all the time, the first time the app uses it in the background, Android schedules a reminder notification.' (2) 'That's your moment to decide again' implies the notification itself offers a decision; the source only says it 'reminds the user that they've allowed your app to access device location all the time'. Suggested: 'It's a good moment to check whether that app still needs it.' (The user can change it on the settings page per c-android11-settings.) (3) Visual: the notification wording is invented; figure 8's real text is not in the snapshot. '(illustrative wording)' must appear ON SCREEN, e.g. 'Illustration - not Android's actual notification', and the card should not replicate system UI styling closely enough to pass as a screenshot. Twist logic: it is a relevant consequence that follows from the evidence, the main promise is resolved in beats 3-4 first, nothing essential is withheld, and the ending does not point to an unpublished Reel (endingReferencesRelated=false) - acceptable.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "createdAt": "2026-10-22T10:40:48.000Z"
+  }
+]
