@@ -57,14 +57,15 @@ One-off commands run in the `tools` container: `docker compose run --rm tools pn
 
 Notes:
 - If a recheck says a source is `UNAVAILABLE` because your connection dropped, it marks those claims `unresolved` in `packet.json`. Undo that with `git checkout content/pilots/LU-TECH-002/packet.json` and run the recheck again. A passage that is really gone from the page needs a script fix and a fresh review.
-- All ports bind to `127.0.0.1` only (studio `3100`, Postgres `54329`); nothing is reachable from other machines.
+- All ports bind to `127.0.0.1` only (studio `3100`, Postgres `55432`); nothing is reachable from other machines.
 - Lines saying `.env.local not found` in container logs are expected: Compose passes your settings to the containers directly.
 - The database lives in the Docker volume `pgdata`. `docker compose down` keeps it; `docker compose down -v` **deletes it** (take a backup first).
-- If port 3100 or 54329 is already in use, stop whatever uses it, or change the left-hand number under `ports:` in `compose.yaml`.
+- If port 3100 or 55432 is already in use, stop whatever uses it, or change the left-hand number under `ports:` in `compose.yaml` (and the port in `DATABASE_URL` in `.env.local` if you run pnpm outside Docker).
+- On Windows, `ports are not available ... forbidden by its access permissions` means Windows has reserved that port (Hyper-V/WSL reserve ranges, sometimes different after a reboot). `netsh interface ipv4 show excludedportrange protocol=tcp` lists the ranges; pick a port outside all of them. That is why Postgres uses 55432 rather than 54329.
 
 ### Running without Docker (developers)
 
-Node 22+, pnpm 10.14 and ffmpeg on your machine; Postgres still from Docker: `pnpm install`, `pnpm db:start` (starts only the `db` container on `127.0.0.1:54329`), `pnpm db:migrate`, `pnpm studio`, `pnpm worker`. `.env.local` is read from the project root, and `DATABASE_URL` from `.env.example` already points at that port.
+Node 22+, pnpm 10.14 and ffmpeg on your machine; Postgres still from Docker: `pnpm install`, `pnpm db:start` (starts only the `db` container on `127.0.0.1:55432`), `pnpm db:migrate`, `pnpm studio`, `pnpm worker`. `.env.local` is read from the project root, and `DATABASE_URL` from `.env.example` already points at that port.
 
 ## Controls
 

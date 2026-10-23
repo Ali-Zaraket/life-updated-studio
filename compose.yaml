@@ -4,7 +4,9 @@
 # Every port binds to 127.0.0.1 only: nothing is reachable from other machines.
 
 x-app: &app
-  build: .
+  # Only migrate (and tools, for `run` on a fresh clone) carry `build:`. When several services
+  # build the same image tag in parallel, Docker Desktop's image store fails with
+  # 'image "life-updated-studio:local": already exists'. Studio and worker reuse the image.
   image: life-updated-studio:local
   env_file:
     - path: .env.local
@@ -25,8 +27,9 @@ services:
       POSTGRES_DB: life
       # UTF-8 so Arabic text and emoji store correctly on every OS.
       POSTGRES_INITDB_ARGS: --encoding=UTF8 --no-locale
+    # 55432, not 54329: Windows (Hyper-V/WSL) often reserves 54312–54411, which makes the bind fail.
     ports:
-      - "127.0.0.1:54329:5432"
+      - "127.0.0.1:55432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -38,6 +41,7 @@ services:
 
   migrate:
     <<: *app
+    build: .
     command: ["pnpm", "db:migrate"]
     restart: "no"
 
@@ -79,6 +83,7 @@ services:
   # One-off commands: setup, sample episode, pilot loading, auditions, drafts, backups.
   tools:
     <<: *app
+    build: .
     profiles: ["tools"]
     command: ["pnpm", "--help"]
     volumes:
