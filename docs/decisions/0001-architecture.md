@@ -26,4 +26,4 @@
 
 - Tests need no daemon or network; the full guard set is exercised on PGlite.
 - A compromised agent or worker cannot publish without the studio key; key custody becomes the main operational secret (documented in the runbook later).
-- Remotion is not adopted until the owner's licence eligibility is confirmed.
+- Remotion is adopted (free licence: the owner is an individual; verified from the licence file in the Remotion repository, see ADR 0002).
