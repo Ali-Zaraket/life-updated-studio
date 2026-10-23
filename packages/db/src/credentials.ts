@@ -2,7 +2,7 @@ import { createCipheriv, createDecipheriv, randomBytes, timingSafeEqual } from '
 import { and, eq, gt, isNull } from 'drizzle-orm';
 import type { Actor } from '@life/contracts';
 import type { Db } from './client';
-import { DomainError, audit } from './repo';
+import { DomainError, audit, revokeApprovalInTx } from './repo';
 import * as t from './schema';
 
 /**
@@ -24,7 +24,7 @@ export function sealingKeyFromEnv(env: NodeJS.ProcessEnv = process.env): Sealing
 
 export function sealSecret(plaintext: string, k: SealingKey): string {
   const iv = randomBytes(12);
-  const cipher = createCipheriv('aes-256-gcm', k.key, iv);
+  const cipher = createCipheriv('aes-256-gcm', k.key, iv, { authTagLength: 16 });
   cipher.setAAD(Buffer.from(k.keyId));
   const ct = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
   const b = (x: Buffer) => x.toString('base64url');
@@ -35,7 +35,7 @@ export function openSecret(sealed: string, k: SealingKey): string {
   const [v, keyId, iv, tag, ct] = sealed.split('.');
   if (v !== 'v1' || !keyId || !iv || !tag || ct === undefined) throw new DomainError('sealed_invalid', 'malformed sealed secret');
   if (keyId !== k.keyId) throw new DomainError('key_mismatch', `secret sealed with key ${keyId}`);
-  const decipher = createDecipheriv('aes-256-gcm', k.key, Buffer.from(iv, 'base64url'));
+  const decipher = createDecipheriv('aes-256-gcm', k.key, Buffer.from(iv, 'base64url'), { authTagLength: 16 });
   decipher.setAAD(Buffer.from(keyId));
   decipher.setAuthTag(Buffer.from(tag, 'base64url'));
   try {
@@ -73,6 +73,11 @@ export async function saveInstagramCredential(db: Db, input: InstagramCredential
     updatedAt: now.toISOString(),
   };
   await db.transaction(async (tx) => {
+    // Approvals bind the studio account, not the Instagram user, so the user behind it must never change silently.
+    const [existing] = await tx.select({ igUserId: t.instagramCredentials.igUserId }).from(t.instagramCredentials).where(eq(t.instagramCredentials.accountId, input.accountId)).for('update');
+    if (existing && existing.igUserId !== input.igUserId) {
+      throw new DomainError('account_changed', 'a different Instagram account is already connected here; disconnect it first (that revokes its approvals)');
+    }
     await tx.insert(t.instagramCredentials).values(row).onConflictDoUpdate({ target: t.instagramCredentials.accountId, set: row });
     // Never the token: only what changed.
     await audit(tx, { actor: input.actor, action: 'instagram.credential_saved', entityType: 'instagram_account', entityId: input.accountId, details: { igUserId: input.igUserId, scopes: input.scopes, expiresAt: row.expiresAt }, now });
@@ -108,6 +113,18 @@ export async function deleteInstagramCredential(db: Db, accountId: string, actor
   if (actor.kind !== 'owner') throw new DomainError('owner_only', 'only the owner can disconnect Instagram');
   await db.transaction(async (tx) => {
     await tx.delete(t.instagramCredentials).where(eq(t.instagramCredentials.accountId, accountId));
+    // Whatever connects next may be a different Instagram user; no earlier approval may publish there.
+    const live = await tx
+      .select({ id: t.approvals.id, content: t.releasePackages.content })
+      .from(t.approvals)
+      .innerJoin(t.releasePackages, eq(t.releasePackages.id, t.approvals.releasePackageId))
+      .where(isNull(t.approvals.revokedAt));
+    const now = new Date();
+    for (const a of live) {
+      if ((a.content as { accountId?: string }).accountId === accountId) {
+        await revokeApprovalInTx(tx, { approvalId: a.id, reason: 'Instagram account disconnected', actor, now });
+      }
+    }
     await audit(tx, { actor, action: 'instagram.disconnected', entityType: 'instagram_account', entityId: accountId });
   });
 }

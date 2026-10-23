@@ -9,7 +9,18 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request): Promise<Response> {
   const owner = await currentOwner();
-  if (!owner) return NextResponse.redirect(new URL('/login', request.url));
+  if (!owner) {
+    // The session cookie is SameSite=Strict, so the cross-site redirect back from Instagram arrives without it.
+    // Re-request once from our own page (same-site, so the cookie is sent) before treating the owner as signed out.
+    const url = new URL(request.url);
+    if (url.searchParams.get('_same_site') === '1') return NextResponse.redirect(new URL('/login', request.url));
+    url.searchParams.set('_same_site', '1');
+    const target = `${url.pathname}${url.search}`.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    return new Response(`<!doctype html><meta http-equiv="refresh" content="0;url=${target}"><p>Returning to the studio…</p>`, {
+      status: 200,
+      headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer', 'Content-Security-Policy': "default-src 'none'" },
+    });
+  }
   const back = (kind: 'ok' | 'err', msg: string) => NextResponse.redirect(new URL(`/settings/instagram?${kind}=${encodeURIComponent(msg)}`, request.url));
 
   const q = new URL(request.url).searchParams;

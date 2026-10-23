@@ -10,7 +10,13 @@ const HEADERS = { 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'private
 export async function GET(req: Request, ctx: { params: Promise<{ path: string[] }> }): Promise<Response> {
   if (!(await currentOwner())) return new Response('Unauthorized', { status: 401, headers: HEADERS });
   const { path } = await ctx.params;
-  const found = await resolveInStorage(path.map((s) => decodeURIComponent(s)));
+  let segments: string[];
+  try {
+    segments = path.map((s) => decodeURIComponent(s));
+  } catch {
+    return new Response('Bad path', { status: 400, headers: HEADERS });
+  }
+  const found = await resolveInStorage(segments);
   if (!found) return new Response('Not found', { status: 404, headers: HEADERS });
 
   const base = { ...HEADERS, 'Content-Type': found.contentType, 'Accept-Ranges': 'bytes' };

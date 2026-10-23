@@ -44,14 +44,28 @@ pnpm worker          # window 3: schedules approved packages, publishes (MOCK by
 - **Spending:** Settings → Spending. Monthly cap (owner decision: $100, warning at $50). No cap = every paid call refused. Anyone can press the stop; only you can lift it.
 - **Revoke:** episode page → Revoke (reason required). Jobs not yet sent to Instagram are cancelled.
 - **Material edit:** any new script version revokes approvals for older packages automatically.
+- **Sign out:** clears the session cookie in this browser. It does not invalidate a session cookie copied elsewhere; sessions expire after 12 hours. To end every session at once, change `STUDIO_SESSION_SECRET` and restart the studio.
 
 ## Going live on Instagram (when you are ready)
 
 1. Follow `docs/research/instagram-capability-record.md` §11 to create the Meta app and generate a long-lived token.
 2. Re-verify the capability record's `unverified` items against Meta's pages (a session that can reach developers.facebook.com).
 3. Studio → Settings → Instagram → paste the token (stored encrypted).
-4. In `.env.local`: `INSTAGRAM_MODE=live`, `INSTAGRAM_CAPABILITIES_VERIFIED=yes`, `LIVE_PUBLISHING_AUTHORIZED=yes`. The worker refuses to start in live mode if any of these, the key or the connection is missing.
-5. Approve one package with a narrow window and watch **Jobs**. The token refreshes weekly; alerts at 14 and 7 days.
+4. In `.env.local`: `INSTAGRAM_MODE=live`, `INSTAGRAM_CAPABILITIES_VERIFIED=yes`, `LIVE_PUBLISHING_AUTHORIZED=yes`, and set `INSTAGRAM_ACCOUNT_ID` to a new value (e.g. `instagram-main`), different from the one used for mock runs. The worker refuses to start in live mode if any of these, the key or the connection is missing.
+   - Each publish job remembers the mode it was created for. A job created in mock mode never runs on the live publisher (and the reverse); the gate rejects it with `adapter_mode_mismatch`. Approvals made for the mock account do not carry over: approve again for the live account.
+5. **Known blocker — cover image.** Instagram only takes a custom cover from a public https URL. This localhost setup has none, so the gate refuses live publishing with `cover_unsupported` rather than post a cover you did not approve. Before the first live post, decide (owner): host covers at a public URL, or render the cover as the video's first frame so the approved cover and Instagram's frame-0 cover are the same image.
+6. Approve one package with a narrow window and watch **Jobs**. The token refreshes weekly; alerts at 14 and 7 days.
+
+### What the worker does when a publish is unclear
+
+- A timeout during publish is never retried blind. The worker first looks for a post on the account carrying the episode code (every package caption must contain it). It retries only after two "not found" reads at least 3 minutes apart, and never if the container reports `PUBLISHED`.
+- Once Instagram has returned a media ID, the job is never retried. If that post cannot be confirmed, the job fails with a reason and the episode waits for you to check the account.
+- The worker uploads a private copy of the delivery file whose hash matches your approval. If the stored file changed after approval, nothing is uploaded.
+
+### Instagram account changes
+
+- Reconnecting the same Instagram user just refreshes the token. Connecting a different Instagram user to the same studio account is refused; disconnect first.
+- Disconnecting revokes every approval for that account.
 
 ## Backup and restore
 
@@ -60,6 +74,8 @@ pnpm db:backup                     # backups/life-<time>.json: every table + per
 pnpm db:restore backups/<file>     # into an EMPTY, migrated DATABASE_URL; verifies hashes first
 ```
 Copy the `storage/` folder alongside the backup; the restore reports any media file that is missing or changed. Backups contain your data and the encrypted Instagram token (useless without `INSTAGRAM_TOKEN_KEY`). Keep them private.
+
+A restore revokes every approval it brings back (a backup may predate a revocation) and sends any job that was mid-publish to reconciliation. Approve again after restoring.
 
 ## Tests
 
