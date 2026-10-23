@@ -9,8 +9,15 @@ RUN apt-get update \
       libxcomposite1 libxdamage1 libatk-bridge2.0-0 libpango-1.0-0 libcairo2 libcups2 \
  && rm -rf /var/lib/apt/lists/*
 
-RUN corepack enable && corepack prepare pnpm@10.14.0 --activate
-ENV NEXT_TELEMETRY_DISABLED=1
+# Downloads retry with long timeouts so a slow or flaky connection does not fail the build.
+# (Everything above this line is kept unchanged so existing build caches stay valid.)
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    npm_config_fetch_retries=6 \
+    npm_config_fetch_retry_mintimeout=20000 \
+    npm_config_fetch_retry_maxtimeout=180000 \
+    npm_config_fetch_timeout=600000
+# pnpm through npm, which retries; corepack gives up on the first network error.
+RUN npm install -g pnpm@10.14.0
 
 WORKDIR /app
 RUN chown node:node /app
@@ -27,11 +34,14 @@ COPY --chown=node:node packages/media/package.json packages/media/
 COPY --chown=node:node packages/instagram/package.json packages/instagram/
 COPY --chown=node:node packages/reasoning/package.json packages/reasoning/
 COPY --chown=node:node packages/render/package.json packages/render/
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --network-concurrency 4
 
 # Remotion's headless browser, downloaded once at build time. Remotion keeps it under the
 # nearest package.json's node_modules/.remotion, so fetch it from /app where renders run.
-RUN node -e "require(require.resolve('@remotion/renderer', { paths: ['packages/render'] })).ensureBrowser().then(() => console.log('remotion browser ready'))"
+RUN for attempt in 1 2 3 4; do \
+      node -e "require(require.resolve('@remotion/renderer', { paths: ['packages/render'] })).ensureBrowser().then(() => console.log('remotion browser ready'))" && exit 0; \
+      echo "browser download failed (attempt $attempt), retrying in 20s"; sleep 20; \
+    done; exit 1
 
 COPY --chown=node:node . .
 RUN pnpm --filter @life/studio build

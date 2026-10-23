@@ -108,7 +108,19 @@ jobs:
         run: |
           docker compose run --rm -T tools ffmpeg -hide_banner -version
           docker compose run --rm -T tools pnpm slice
-          docker compose run --rm -T tools pnpm pilot:load content/pilots/LU-TECH-002
+          # The pilot's changing claims must be rechecked within 24 h of publication, so with the
+          # committed packet the loader may rightly answer "blocked" for that reason. Anything else fails.
+          set +e
+          docker compose run --rm -T tools pnpm pilot:load content/pilots/LU-TECH-002 > pilot.log 2>&1
+          code=$?
+          set -e
+          cat pilot.log
+          if [ "$code" -ne 0 ]; then
+            grep -q 'LU-TECH-002: blocked' pilot.log || { echo "pilot load failed"; exit 1; }
+            if grep -E '^\s+- ' pilot.log | grep -v 'changing_claim_not_rechecked'; then
+              echo "pilot blocked for a reason other than an overdue recheck"; exit 1
+            fi
+          fi
       - name: Real Remotion render inside the image
         run: docker compose run --rm -T -e RENDER_TESTS=1 tools pnpm vitest run packages/render/test/render.test.ts
       - name: Logs on failure

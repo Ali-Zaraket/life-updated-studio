@@ -20,6 +20,7 @@ docker compose run --rm tools pnpm --filter @life/studio hash-passphrase
 docker compose run --rm tools pnpm --filter @life/studio approval-key
 ```
 
+- **The first `docker compose build` downloads about 1 GB** (base image, ffmpeg, Node packages, the video renderer's browser). On a slow connection that can take 30–60 minutes. Downloads retry on their own; if the build still stops with a network error, run `docker compose build` again: finished steps are cached, so it resumes where it stopped. Later builds take a minute or two.
 - `hash-passphrase` asks for your studio password (12+ characters, hidden as you type) and prints a line starting `STUDIO_PASSPHRASE_HASH='scrypt$`. Replace the empty `STUDIO_PASSPHRASE_HASH=` line in `.env.local` with it, **including the single quotes** (the hash contains `$`, which Docker would otherwise read as a variable).
 - `approval-key` writes `secrets/approval-ed25519.pem` (the studio's signing key) and `secrets/public/approval-public-keys.json` (the worker's copy, public key only). It refuses to overwrite existing keys.
 - In `.env.local` also set `STUDIO_SESSION_SECRET=` to 32+ random characters. To generate one: `docker compose run --rm tools node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`.
@@ -43,7 +44,8 @@ One-off commands run in the `tools` container: `docker compose run --rm tools pn
 | Task | Command / place |
 |---|---|
 | Sample episode end to end | `docker compose run --rm tools pnpm slice` (stops for your approval), approve in the studio; the worker publishes it to the MOCK account |
-| Load the reviewed pilot | `docker compose run --rm tools pnpm pilot:load content/pilots/LU-TECH-002` |
+| Recheck a pilot's sources (needed within 24 h of publishing, for claims marked "changing") | `docker compose run --rm tools pnpm pilot:recheck content/pilots/LU-TECH-002` — re-fetches each source and confirms every quoted passage is still there |
+| Load the reviewed pilot | `docker compose run --rm tools pnpm pilot:load content/pilots/LU-TECH-002` (run the recheck first; otherwise it reports `blocked: changing_claim_not_rechecked`) |
 | Draft + check a script with Claude | `docker compose run --rm tools pnpm draft --topic <id> --code LU-TECH-002` (dry run) → add `--confirm-spend` |
 | Voice auditions | `docker compose run --rm tools pnpm audition` (dry run) → add `--confirm-spend` → studio **Voice** page |
 | Render a template | `docker compose run --rm tools pnpm --filter @life/render render:fixture` |
@@ -54,6 +56,7 @@ One-off commands run in the `tools` container: `docker compose run --rm tools pn
 | Experiments | studio → **Experiments** |
 
 Notes:
+- If a recheck says a source is `UNAVAILABLE` because your connection dropped, it marks those claims `unresolved` in `packet.json`. Undo that with `git checkout content/pilots/LU-TECH-002/packet.json` and run the recheck again. A passage that is really gone from the page needs a script fix and a fresh review.
 - All ports bind to `127.0.0.1` only (studio `3100`, Postgres `54329`); nothing is reachable from other machines.
 - Lines saying `.env.local not found` in container logs are expected: Compose passes your settings to the containers directly.
 - The database lives in the Docker volume `pgdata`. `docker compose down` keeps it; `docker compose down -v` **deletes it** (take a backup first).
