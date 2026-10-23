@@ -8,6 +8,7 @@ import {
   enqueueJob,
   eq,
   failJob,
+  getEpisode,
   getEpisodeVersion,
   getPublishJob,
   isNull,
@@ -15,6 +16,7 @@ import {
   loadEvidencePacket,
   storeInsights,
   tables as t,
+  transitionEpisode,
   transitionPublishJob,
   type Db,
 } from '@life/db';
@@ -33,7 +35,11 @@ export function evidenceCheckFor(db: Db): PublishDeps['evidenceCheck'] {
  * Turns each live owner approval into one publish job, queued for the start of
  * its approved window. The approval itself authorizes this; no further prompt.
  */
-export async function scheduleApproved(db: Db, adapterMode: 'mock' | 'live', now: Date): Promise<string[]> {
+function enqueuePublish(db: Db, publishJobId: string, runAt: Date, maxAttempts: number) {
+  return enqueueJob(db, { id: `job_${randomUUID()}`, kind: 'publish', payload: { publishJobId }, runAt, maxAttempts, idempotencyKey: `publish:${publishJobId}` });
+}
+
+export async function scheduleApproved(db: Db, adapterMode: 'mock' | 'live', now: Date, log?: (msg: string) => void): Promise<string[]> {
   const rows = await db
     .select({ approval: t.approvals, episodeState: t.episodes.state })
     .from(t.approvals)
@@ -42,12 +48,20 @@ export async function scheduleApproved(db: Db, adapterMode: 'mock' | 'live', now
     .where(and(isNull(t.approvals.revokedAt), eq(t.episodes.state, 'approved')));
   const created: string[] = [];
   for (const { approval } of rows) {
-    const { payload } = SignedApproval.parse(approval.signedApproval);
-    const scheduledFor = new Date(Math.max(now.getTime(), Date.parse(payload.publishWindow.notBefore)));
-    const job = await createPublishJob(db, { approvalId: approval.id, adapterMode, scheduledFor, actor, now });
-    await enqueueJob(db, { id: `job_${randomUUID()}`, kind: 'publish', payload: { publishJobId: job.id }, runAt: scheduledFor, maxAttempts: job.maxAttempts, idempotencyKey: `publish:${job.id}` });
-    created.push(job.id);
+    // One bad row must not stop every other approval from being scheduled.
+    try {
+      const { payload } = SignedApproval.parse(approval.signedApproval);
+      const scheduledFor = new Date(Math.max(now.getTime(), Date.parse(payload.publishWindow.notBefore)));
+      const job = await createPublishJob(db, { approvalId: approval.id, adapterMode, scheduledFor, actor, now });
+      await enqueuePublish(db, job.id, scheduledFor, job.maxAttempts);
+      created.push(job.id);
+    } catch (err) {
+      log?.(`schedule approval ${approval.id} skipped: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
+  // A crash between creating a job and enqueueing it would strand the job; the idempotency key makes this a no-op otherwise.
+  const queued = await db.select().from(t.publishJobs).where(eq(t.publishJobs.state, 'queued'));
+  for (const pj of queued) await enqueuePublish(db, pj.id, new Date(pj.scheduledFor), pj.maxAttempts);
   return created;
 }
 
@@ -59,7 +73,7 @@ export interface TickDeps extends PublishDeps {
 
 export async function workerTick(deps: TickDeps): Promise<void> {
   const now = deps.now();
-  await scheduleApproved(deps.db, deps.publisher.mode, now);
+  await scheduleApproved(deps.db, deps.publisher.mode, now, deps.log);
   const leased = await leaseJobs(deps.db, { workerId: deps.workerId, kinds: ['publish', 'insights'], limit: 5, leaseMs: 15 * 60_000, now });
   for (const job of leased) {
     const payload = job.payload as Record<string, string>;
@@ -73,6 +87,10 @@ export async function workerTick(deps: TickDeps): Promise<void> {
             const pj = await getPublishJob(deps.db, payload.publishJobId!);
             if (pj.state === 'retry_wait') {
               await transitionPublishJob(deps.db, { id: pj.id, from: 'retry_wait', to: 'failed', reason: `retries exhausted: ${outcome.reason}`, actor, now: deps.now() });
+              const ep = await getEpisode(deps.db, pj.episodeId);
+              if (ep.state === 'scheduled' || ep.state === 'publishing') {
+                await transitionEpisode(deps.db, { episodeId: ep.id, to: 'failed', reason: `publish failed: retries exhausted`, actor, now: deps.now() });
+              }
             }
           }
           continue;

@@ -30,7 +30,8 @@ export const PUBLISH_TRANSITIONS: Readonly<Record<PublishJobState, readonly Publ
   // A publish call that times out may have succeeded remotely: reconcile, never blind-retry.
   publishing: ['confirming', 'needs_reconciliation', 'retry_wait', 'failed'],
   confirming: ['published', 'needs_reconciliation'],
-  needs_reconciliation: ['published', 'retry_wait', 'failed'],
+  // The self-loop records a first "not found" read; a retry needs a second, later one.
+  needs_reconciliation: ['needs_reconciliation', 'published', 'retry_wait', 'failed'],
   // Retries re-run the gate (approval, pause, evidence freshness, quota) from the start.
   retry_wait: ['gate_check', 'cancelled', 'failed'],
   published: [],

@@ -153,11 +153,59 @@ describe('publishing', () => {
     const ctx = await approvedPackage();
     const deps = makeDeps(ctx, { publishBehavior: ['timeout_before_success', 'ok'] });
     await workerTick(deps);
-    expect((await onlyJob()).stateReason).toMatch(/not published remotely/);
+    // One "not found" read is not enough: the media list can lag a publish.
+    expect(await onlyJob()).toMatchObject({ state: 'needs_reconciliation', stateReason: expect.stringMatching(/not found at/) });
+    advance(4 * 60_000);
+    await workerTick(deps);
+    expect((await onlyJob()).stateReason).toMatch(/not published remotely \(two reads\)/);
     advance(60 * 60_000);
     await workerTick(deps);
     expect((await onlyJob()).state).toBe('published');
     expect(deps.publisher.publishCount()).toBe(1);
+  });
+
+  it('fails a job created for live when the running publisher is a mock (never labels a mock post live)', async () => {
+    const ctx = await approvedPackage();
+    const deps = makeDeps(ctx);
+    await scheduleApproved(db, 'live', clock);
+    const job = await onlyJob();
+    const outcome = await runPublishJob(deps, job.id);
+    expect(outcome).toMatchObject({ kind: 'failed', reason: expect.stringMatching(/adapter_mode_mismatch/) });
+    expect(deps.publisher.publishCount()).toBe(0);
+    expect(await db.select().from(t.instagramMedia)).toHaveLength(0);
+  });
+
+  it('never retries once Instagram returned a media ID, even if the caption does not match', async () => {
+    const ctx = await approvedPackage();
+    const deps = makeDeps(ctx);
+    await scheduleApproved(db, 'mock', clock);
+    const job = await onlyJob();
+    const { containerId } = await deps.publisher.createReelContainer({ accountId: ACCOUNT, videoUrl: 'x', coverUrl: null, caption: 'edited elsewhere', shareToFeed: true });
+    await deps.publisher.getContainerStatus(containerId);
+    await deps.publisher.getContainerStatus(containerId);
+    const { remoteMediaId } = await deps.publisher.publishContainer(ACCOUNT, containerId);
+    let state = job.state as Parameters<typeof transitionPublishJob>[1]['from'];
+    for (const to of ['gate_check', 'creating_container', 'processing', 'publishing', 'confirming'] as const) {
+      const patch = to === 'processing' ? { containerId, containerCreatedAt: clock.toISOString() } : to === 'confirming' ? { remoteMediaId } : undefined;
+      await transitionPublishJob(db, { id: job.id, from: state, to, actor: sys, now: clock, patch });
+      state = to;
+    }
+    const outcome = await runPublishJob(deps, job.id);
+    expect(outcome).toMatchObject({ kind: 'failed', reason: expect.stringMatching(/not retried/) });
+    expect(deps.publisher.publishCount()).toBe(1);
+  });
+
+  it('refuses to upload when the delivery file changed after the gate check', async () => {
+    const ctx = await approvedPackage();
+    const deps = makeDeps(ctx);
+    await scheduleApproved(db, 'mock', clock);
+    const job = await onlyJob();
+    await transitionPublishJob(db, { id: job.id, from: 'queued', to: 'gate_check', actor: sys, now: clock });
+    await transitionPublishJob(db, { id: job.id, from: 'gate_check', to: 'creating_container', actor: sys, now: clock });
+    await writeFile(ctx.storage.resolve(ctx.pkg.deliveryMedia.uri), 'swapped bytes');
+    const outcome = await runPublishJob(deps, job.id);
+    expect(outcome).toMatchObject({ kind: 'failed', reason: expect.stringMatching(/changed after the gate check/) });
+    expect(deps.publisher.publishCount()).toBe(0);
   });
 
   it('recovers after a crash mid-publish without a second publish', async () => {

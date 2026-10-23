@@ -77,6 +77,9 @@ describe('publish gate', () => {
       evidence: { ok: true, blockers: [] },
       trustedKeys: { 'studio-2026-10': studio.publicKey },
       platformLabelSupported: false,
+      coverBindable: true,
+      jobMode: 'mock',
+      publisherMode: 'mock',
       now: NOW,
     };
   });
@@ -88,6 +91,23 @@ describe('publish gate', () => {
 
   it('passes a valid, owner-signed approval for the exact package', () => {
     expect(evaluatePublishGate(base)).toEqual({ ok: true, approvalId: 'appr-1' });
+  });
+
+  it('rejects a job created for one mode run by a publisher in the other', () => {
+    expect(rejections({ ...base, jobMode: 'mock', publisherMode: 'live' })).toEqual(['adapter_mode_mismatch']);
+    expect(rejections({ ...base, jobMode: 'live', publisherMode: 'mock' })).toEqual(['adapter_mode_mismatch']);
+  });
+
+  it('rejects when the approved cover cannot be attached', () => {
+    expect(rejections({ ...base, coverBindable: false })).toEqual(['cover_unsupported']);
+  });
+
+  it('rejects a caption without the episode code as a whole token (reconciliation needs it)', () => {
+    for (const caption of ['No code here', 'Prefix LU-TECH-0012 suffix', 'xLU-TECH-001']) {
+      const p = makePackage({ caption });
+      const r = rejections({ ...base, pkg: p, approval: approve(p, studio.privateKey), observed: base.observed });
+      expect(r).toEqual(['caption_missing_episode_code']);
+    }
   });
 
   it('rejects a changed caption (new package, old approval)', () => {

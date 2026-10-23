@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { and, desc, eq, gte, inArray, isNull, max } from 'drizzle-orm';
 import {
+  captionCarriesEpisodeCode,
   CANCELLABLE_PUBLISH_STATES,
   EpisodeVersionContent,
   ReleasePackageContent,
@@ -299,6 +300,9 @@ export async function getEpisodeLink(db: Conn, episodeId: string): Promise<Episo
 export async function createReleasePackage(db: Db, input: { content: ReleasePackageContent; actor: Actor; now?: Date }): Promise<ReleasePackage> {
   const now = input.now ?? new Date();
   const content = ReleasePackageContent.parse(input.content);
+  if (!captionCarriesEpisodeCode(content.caption, content.episodeCode)) {
+    throw new DomainError('caption_missing_episode_code', `caption must contain ${content.episodeCode} so an ambiguous publish can be reconciled`);
+  }
   const pkg: ReleasePackage = { ...content, id: newId('pkg'), packageSha256: releasePackageHash(content), createdAt: iso(now) };
   await db.transaction(async (tx) => {
     const ep = await getEpisode(tx, content.episodeId);
@@ -475,14 +479,17 @@ export async function transitionPublishJob(
 ): Promise<PublishJobRow> {
   if (!canTransitionPublishJob(input.from, input.to)) throw new DomainError('invalid_transition', `publish ${input.from} → ${input.to}`);
   const now = input.now ?? new Date();
-  const [row] = await db
-    .update(t.publishJobs)
-    .set({ ...input.patch, state: input.to, stateReason: input.reason ?? null, updatedAt: iso(now) })
-    .where(and(eq(t.publishJobs.id, input.id), eq(t.publishJobs.state, input.from)))
-    .returning();
-  if (!row) throw new DomainError('conflict', `publish job ${input.id} is no longer ${input.from}`);
-  await audit(db, { actor: input.actor, action: 'publish_job.transition', entityType: 'publish_job', entityId: input.id, details: { from: input.from, to: input.to, reason: input.reason ?? null }, now });
-  return row;
+  // State change and its audit row land together or not at all (a savepoint when already in a transaction).
+  return db.transaction(async (tx) => {
+    const [row] = await tx
+      .update(t.publishJobs)
+      .set({ ...input.patch, state: input.to, stateReason: input.reason ?? null, updatedAt: iso(now) })
+      .where(and(eq(t.publishJobs.id, input.id), eq(t.publishJobs.state, input.from)))
+      .returning();
+    if (!row) throw new DomainError('conflict', `publish job ${input.id} is no longer ${input.from}`);
+    await audit(tx, { actor: input.actor, action: 'publish_job.transition', entityType: 'publish_job', entityId: input.id, details: { from: input.from, to: input.to, reason: input.reason ?? null }, now });
+    return row;
+  });
 }
 
 export async function recordInstagramMedia(

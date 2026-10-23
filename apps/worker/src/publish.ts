@@ -1,5 +1,9 @@
+import { copyFile, mkdir, mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { basename, join } from 'node:path';
 import {
   PublisherError,
+  captionCarriesEpisodeCode,
   SignedApproval,
   evaluatePublishGate,
   type Actor,
@@ -39,6 +43,15 @@ export interface PublishDeps {
   sleep?: (ms: number) => Promise<void>;
   pollIntervalMs?: number;
   processingDeadlineMs?: number;
+  /**
+   * Public https URL Instagram can fetch for a stored object (live covers need one).
+   * Absent in live mode means the approved cover cannot be attached, and the gate refuses.
+   */
+  publicUrl?: (uri: string) => string;
+  /** Worker-private directory for upload snapshots. Default: <tmpdir>/life-worker. */
+  snapshotDir?: string;
+  /** Minimum gap between the two "not found" reconciliation reads before a retry. Default 3 min. */
+  reconcileConfirmGapMs?: number;
 }
 
 export type PublishOutcome =
@@ -51,6 +64,9 @@ const actor: Actor = { kind: 'system', component: 'worker.publish' };
 const TERMINAL: ReadonlySet<PublishJobState> = new Set(['published', 'failed', 'cancelled']);
 /** Gate rejections that should wait rather than fail: they can clear without a new approval. */
 const WAITABLE = new Set(['publishing_paused', 'spending_stopped']);
+const NOT_FOUND_MARK = 'reconcile: not found at ';
+/** States after which the remote publish call may already have happened. */
+const POST_PUBLISH: ReadonlySet<PublishJobState> = new Set(['publishing', 'confirming', 'needs_reconciliation']);
 
 /**
  * Drives one publish job from its stored state to a terminal state or a
@@ -116,6 +132,10 @@ async function onPublisherError(deps: PublishDeps, job: PublishJobRow, err: unkn
 
 async function stepOnce(deps: PublishDeps, job: PublishJobRow): Promise<Step> {
   const { db, publisher } = deps;
+  if (job.adapterMode !== publisher.mode && POST_PUBLISH.has(job.state as PublishJobState)) {
+    // Asking the wrong account whether it published would give a wrong answer; leave it for a matching worker.
+    throw new Error(`adapter mode mismatch: job ${job.id} is ${job.adapterMode}, publisher is ${publisher.mode}`);
+  }
   switch (job.state as PublishJobState) {
     case 'queued':
     case 'retry_wait':
@@ -138,18 +158,27 @@ async function stepOnce(deps: PublishDeps, job: PublishJobRow): Promise<Step> {
     case 'creating_container': {
       // Resuming here after a crash may orphan an unpublished container; those expire harmlessly.
       const pkg = await getReleasePackage(db, job.releasePackageId);
+      // Upload a private snapshot whose hash we checked, so the bytes sent are the bytes approved
+      // even if the stored file changes between the gate and the upload.
+      const snapshot = await snapshotDelivery(deps, job.id, deps.storage.resolve(pkg.deliveryMedia.uri)).catch(() => null);
+      if (!snapshot) return failJob(deps, job, 'delivery media could not be read for upload');
       try {
+        if (snapshot.sha256 !== pkg.deliveryMedia.sha256) {
+          return failJob(deps, job, 'delivery media changed after the gate check; upload refused');
+        }
         const { containerId } = await publisher.createReelContainer({
           accountId: job.accountId,
-          videoUrl: deps.storage.mockPublicUrl(pkg.deliveryMedia.uri),
-          videoFilePath: deps.storage.resolve(pkg.deliveryMedia.uri),
-          coverUrl: deps.storage.mockPublicUrl(pkg.cover.uri),
+          videoUrl: mediaUrl(deps, pkg.deliveryMedia.uri),
+          videoFilePath: snapshot.path,
+          coverUrl: mediaUrl(deps, pkg.cover.uri),
           caption: pkg.caption,
           shareToFeed: pkg.shareToFeed,
         });
         return { job: await move(deps, job, 'processing', null, { containerId, containerCreatedAt: deps.now().toISOString() }) };
       } catch (err) {
         return onPublisherError(deps, job, err, 'create container');
+      } finally {
+        await rm(snapshot.dir, { recursive: true, force: true });
       }
     }
 
@@ -187,7 +216,7 @@ async function stepOnce(deps: PublishDeps, job: PublishJobRow): Promise<Step> {
     case 'confirming': {
       const pkg = await getReleasePackage(db, job.releasePackageId);
       const media = await publisher.getMedia(job.remoteMediaId!);
-      if (!media.caption?.includes(pkg.episodeCode)) {
+      if (!captionCarriesEpisodeCode(media.caption, pkg.episodeCode)) {
         return { job: await move(deps, job, 'needs_reconciliation', 'remote caption does not carry the episode code') };
       }
       return finishPublished(deps, job, media.remoteMediaId, media.permalink, media.timestamp);
@@ -195,13 +224,38 @@ async function stepOnce(deps: PublishDeps, job: PublishJobRow): Promise<Step> {
 
     case 'needs_reconciliation': {
       const pkg = await getReleasePackage(db, job.releasePackageId);
+      if (job.remoteMediaId) {
+        // Instagram returned a media ID, so the post exists. Never retry: confirm it or hand it to the owner.
+        const media = await publisher.getMedia(job.remoteMediaId);
+        if (captionCarriesEpisodeCode(media.caption, pkg.episodeCode)) {
+          return finishPublished(deps, job, media.remoteMediaId, media.permalink, media.timestamp);
+        }
+        return failJob(deps, job, `remote media ${job.remoteMediaId} exists but its caption lacks ${pkg.episodeCode}; owner must check the account (not retried)`);
+      }
       const since = new Date(Date.parse(job.containerCreatedAt ?? job.createdAt) - 60_000);
       const result = await reconcileAmbiguousPublish({ publisher, accountId: job.accountId, episodeCode: pkg.episodeCode, since });
       if (result.outcome === 'found') return finishPublished(deps, job, result.media.remoteMediaId, result.media.permalink, result.media.timestamp);
       if (result.outcome === 'multiple') {
         return failJob(deps, job, `reconciliation found ${result.candidates.length} remote media with ${pkg.episodeCode}; owner must resolve`);
       }
-      return retryJob(deps, job, 'reconciled: not published remotely; safe to retry', null);
+      if (job.containerId) {
+        const { status } = await publisher.getContainerStatus(job.containerId);
+        if (status === 'PUBLISHED') {
+          return failJob(deps, job, `container ${job.containerId} reports PUBLISHED but no media with ${pkg.episodeCode} was found; owner must check the account (not retried)`);
+        }
+      }
+      // The media list can lag a publish. Retry only after two "not found" reads far enough apart.
+      const gapMs = deps.reconcileConfirmGapMs ?? 3 * 60_000;
+      const firstAt = job.stateReason?.startsWith(NOT_FOUND_MARK) ? Date.parse(job.stateReason.slice(NOT_FOUND_MARK.length)) : NaN;
+      const now = deps.now().getTime();
+      if (Number.isNaN(firstAt)) {
+        await move(deps, job, 'needs_reconciliation', `${NOT_FOUND_MARK}${deps.now().toISOString()}`);
+        return { outcome: { kind: 'retry', reason: 'reconcile: not found once; checking again before any retry', retryAfterMs: gapMs } };
+      }
+      if (now - firstAt < gapMs) {
+        return { outcome: { kind: 'retry', reason: 'reconcile: waiting before the confirming read', retryAfterMs: gapMs - (now - firstAt) } };
+      }
+      return retryJob(deps, job, 'reconciled: not published remotely (two reads); safe to retry', null);
     }
 
     default:
@@ -225,7 +279,8 @@ async function finishPublished(deps: PublishDeps, job: PublishJobRow, remoteMedi
       remoteMediaId,
       permalink,
       publishedAt: new Date(timestamp),
-      source: job.adapterMode as 'mock' | 'live',
+      // The publisher that actually confirmed the media decides the label, not the job's intent.
+      source: deps.publisher.mode,
     });
     return row;
   });
@@ -259,8 +314,30 @@ async function checkGate(deps: PublishDeps, job: PublishJobRow) {
     evidence,
     trustedKeys: deps.trustedKeys,
     platformLabelSupported: deps.publisher.supportsPlatformAiLabel,
+    coverBindable: deps.publisher.mode === 'mock' || deps.publicUrl !== undefined,
+    jobMode: job.adapterMode as 'mock' | 'live',
+    publisherMode: deps.publisher.mode,
     now,
   });
+}
+
+function mediaUrl(deps: PublishDeps, uri: string): string {
+  if (deps.publicUrl) return deps.publicUrl(uri);
+  return deps.storage.mockPublicUrl(uri);
+}
+
+async function snapshotDelivery(deps: PublishDeps, jobId: string, source: string): Promise<{ dir: string; path: string; sha256: string }> {
+  const root = deps.snapshotDir ?? join(tmpdir(), 'life-worker');
+  await mkdir(root, { recursive: true, mode: 0o700 });
+  const dir = await mkdtemp(join(root, `${jobId.replace(/[^A-Za-z0-9_-]/g, '_')}-`));
+  const path = join(dir, basename(source));
+  try {
+    await copyFile(source, path);
+    return { dir, path, sha256: await sha256File(path) };
+  } catch (err) {
+    await rm(dir, { recursive: true, force: true });
+    throw err;
+  }
 }
 
 /** Strips anything token-shaped before it reaches the database or logs. */

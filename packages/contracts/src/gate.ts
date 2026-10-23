@@ -17,8 +17,11 @@ export type GateRejection =
   | 'delivery_media_mismatch'
   | 'cover_mismatch'
   | 'caption_mismatch'
+  | 'caption_missing_episode_code'
   | 'disclosure_mismatch'
   | 'disclosure_unsupported'
+  | 'cover_unsupported'
+  | 'adapter_mode_mismatch'
   | 'account_mismatch'
   | 'approval_revoked'
   | 'approval_expired'
@@ -51,6 +54,11 @@ export interface PublishGateInput {
   trustedKeys: TrustedApprovalKeys;
   /** Whether the active publisher can apply a required platform AI label. */
   platformLabelSupported: boolean;
+  /** Whether the approved cover image will actually be the one used (live needs a public cover URL). */
+  coverBindable: boolean;
+  /** The mode the publish job was created for, and the mode of the publisher about to run it. */
+  jobMode: 'mock' | 'live';
+  publisherMode: 'mock' | 'live';
   now: Date;
 }
 
@@ -74,6 +82,10 @@ export function evaluatePublishGate(input: PublishGateInput): PublishGateResult 
   if (input.settings.spendingStopped) reject('spending_stopped');
   if (!input.evidence.ok) reject('evidence_blocked', ...input.evidence.blockers.slice(0, 1));
   if (input.revoked) reject('approval_revoked');
+  if (input.jobMode !== input.publisherMode) {
+    reject('adapter_mode_mismatch', `job was created for ${input.jobMode} but the publisher is ${input.publisherMode}`);
+  }
+  if (!input.coverBindable) reject('cover_unsupported', 'the approved cover cannot be attached by this publisher (no public cover URL)');
 
   const sig = verifyApprovalSignature(input.approval, input.trustedKeys);
   if (!sig.ok) {
@@ -109,6 +121,8 @@ export function evaluatePublishGate(input: PublishGateInput): PublishGateResult 
   }
   if (payload.coverSha256 !== pkg.cover.sha256 || payload.coverSha256 !== input.observed.coverSha256) reject('cover_mismatch');
   if (payload.captionSha256 !== hashCanonical(pkg.caption)) reject('caption_mismatch');
+  // Reconciliation finds an ambiguous publish by this code; without it a retry could post twice.
+  if (!captionCarriesEpisodeCode(pkg.caption, pkg.episodeCode)) reject('caption_missing_episode_code');
   if (payload.disclosureSha256 !== hashCanonical(pkg.disclosure)) reject('disclosure_mismatch');
   if (pkg.disclosure.platformLabelRequired && !(pkg.disclosure.platformLabelMethod === 'api' && input.platformLabelSupported)) {
     reject('disclosure_unsupported', 'platform AI label required but cannot be applied through this publisher');
@@ -124,4 +138,11 @@ export function evaluatePublishGate(input: PublishGateInput): PublishGateResult 
   return rejections.size === 0
     ? { ok: true, approvalId: payload.approvalId }
     : { ok: false, rejections: [...rejections], details };
+}
+
+/** True when the caption contains the episode code as a whole token (reconciliation relies on this). */
+export function captionCarriesEpisodeCode(caption: string | null | undefined, episodeCode: string): boolean {
+  if (!caption) return false;
+  const escaped = episodeCode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(?<![A-Za-z0-9_-])${escaped}(?![A-Za-z0-9_-])`).test(caption);
 }
