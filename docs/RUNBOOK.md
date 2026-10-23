@@ -20,6 +20,7 @@ docker compose run --rm tools pnpm --filter @life/studio hash-passphrase
 docker compose run --rm tools pnpm --filter @life/studio approval-key
 ```
 
+- **The first `docker compose build` downloads about 1 GB** (base image, ffmpeg, Node packages, the video renderer's browser). On a slow connection that can take 30–60 minutes. Downloads retry on their own; if the build still stops with a network error, run `docker compose build` again: finished steps are cached, so it resumes where it stopped. Later builds take a minute or two.
 - `hash-passphrase` asks for your studio password (12+ characters, hidden as you type) and prints a line starting `STUDIO_PASSPHRASE_HASH='scrypt$`. Replace the empty `STUDIO_PASSPHRASE_HASH=` line in `.env.local` with it, **including the single quotes** (the hash contains `$`, which Docker would otherwise read as a variable).
 - `approval-key` writes `secrets/approval-ed25519.pem` (the studio's signing key) and `secrets/public/approval-public-keys.json` (the worker's copy, public key only). It refuses to overwrite existing keys.
 - In `.env.local` also set `STUDIO_SESSION_SECRET=` to 32+ random characters. To generate one: `docker compose run --rm tools node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"`.
