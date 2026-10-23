@@ -49,6 +49,13 @@ services:
         condition: service_completed_successfully
     ports:
       - "127.0.0.1:3100:3100"
+    # Healthy only once the login page answers, so `docker compose up --wait` means ready.
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3100/login').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+      start_period: 5s
     volumes:
       - ./storage:/app/storage
       - ./auditions:/app/auditions

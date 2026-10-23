@@ -30,13 +30,13 @@ docker compose run --rm tools pnpm --filter @life/studio approval-key
 ## Daily use
 
 ```sh
-docker compose up -d                # database, migrations, studio and worker in the background
-                                    # studio: http://localhost:3100
+docker compose up -d --wait         # database, migrations, studio and worker in the background;
+                                    # returns once the studio answers at http://localhost:3100
 docker compose logs -f worker       # watch the worker (Ctrl+C stops watching, not the worker)
 docker compose stop                 # stop everything; your data stays
 ```
 
-After pulling new code: `docker compose up -d --build` (migrations run automatically on start).
+After pulling new code: `docker compose up -d --build --wait` (migrations run automatically on start).
 
 One-off commands run in the `tools` container: `docker compose run --rm tools pnpm <command>`.
 
