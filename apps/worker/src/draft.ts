@@ -49,7 +49,7 @@ export async function draftAndVerifyEpisode(deps: DraftDeps, i: { topicId: strin
         units: r.usage.inputTokens + r.usage.outputTokens + r.usage.cacheReadTokens + r.usage.cacheWriteTokens,
         unitType: 'tokens',
         amountMicroUsd: r.costMicroUsd,
-        estimated: false,
+        estimated: r.estimated ?? false,
         source: r.source,
         episodeId: episodeId || null,
         now: deps.now(),

@@ -41,6 +41,11 @@ export async function loadPilot(db: Db, dir: string, now = new Date()): Promise<
   const reviews = (
     await Promise.all(reviewFiles.map(async (f) => z.array(ReviewRecord).parse(JSON.parse(await readFile(join(dir, 'reviews', f), 'utf8')))))
   ).flat();
+  // A file can claim anything. Qualified human review is recorded only through the owner, never loaded from disk.
+  const human = [...packet.reviews, ...reviews].filter((r) => r.reviewerKind === 'qualified_human');
+  if (human.length) {
+    return { episodeId: '', state: 'not_loaded', blockers: [`refusing ${human.length} qualified_human review(s) from files; the owner records qualified review in the studio`] };
+  }
   const actor: Actor = { kind: 'system', component: 'pilot-loader' };
   await saveEvidencePacket(db, { ...packet, reviews: [...packet.reviews, ...reviews] });
 

@@ -61,16 +61,30 @@ export interface ReasoningResult<T> {
 
 export type ReasoningErrorKind = 'auth' | 'rate_limited' | 'overloaded' | 'invalid_request' | 'refused' | 'truncated' | 'unparseable' | 'transient' | 'budget';
 
+/** What a call cost, for the spending ledger. `estimated` when the real usage is unknown. */
+export interface ReasoningCharge {
+  model: string;
+  usage: ReasoningUsage;
+  costMicroUsd: number;
+  source: 'mock' | 'live';
+  estimated?: boolean;
+}
+
 export class ReasoningError extends Error {
   override readonly name = 'ReasoningError';
   constructor(
     readonly kind: ReasoningErrorKind,
     message: string,
     readonly retryAfterSec: number | null = null,
+    /** Set when the API answered (and billed) but the answer was unusable. */
+    readonly charge: ReasoningCharge | null = null,
   ) {
     super(message);
   }
 }
+
+/** Errors the API rejects before generating anything, so nothing was billed. */
+const UNBILLED: ReadonlySet<ReasoningErrorKind> = new Set(['auth', 'invalid_request', 'rate_limited', 'budget']);
 
 export interface ReasoningClient {
   readonly mode: 'mock' | 'live';
@@ -88,7 +102,7 @@ export class AnthropicReasoningClient implements ReasoningClient {
   private readonly client: Anthropic;
 
   constructor(opts: { apiKey?: string; client?: Anthropic; fetch?: typeof fetch; maxRetries?: number } = {}) {
-    this.client = opts.client ?? new Anthropic({ apiKey: opts.apiKey, fetch: opts.fetch, maxRetries: opts.maxRetries ?? 2 });
+    this.client = opts.client ?? new Anthropic({ apiKey: opts.apiKey, fetch: opts.fetch, maxRetries: opts.maxRetries ?? 0 });
   }
 
   async run<T>(task: ReasoningTask<T>): Promise<ReasoningResult<T>> {
@@ -107,11 +121,6 @@ export class AnthropicReasoningClient implements ReasoningClient {
     } catch (e) {
       throw mapError(e);
     }
-    if (response.stop_reason === 'refusal') {
-      throw new ReasoningError('refused', `${task.name}: declined (${response.stop_details?.category ?? 'no category'})`);
-    }
-    if (response.stop_reason === 'max_tokens') throw new ReasoningError('truncated', `${task.name}: hit max_tokens (${task.maxTokens})`);
-    if (response.parsed_output == null) throw new ReasoningError('unparseable', `${task.name}: response did not match the schema`);
     const u = response.usage;
     const usage: ReasoningUsage = {
       inputTokens: u.input_tokens,
@@ -119,6 +128,12 @@ export class AnthropicReasoningClient implements ReasoningClient {
       cacheReadTokens: u.cache_read_input_tokens ?? 0,
       cacheWriteTokens: u.cache_creation_input_tokens ?? 0,
     };
+    const charge: ReasoningCharge = { model: response.model, usage, costMicroUsd: costMicroUsd(response.model, usage), source: 'live' };
+    if (response.stop_reason === 'refusal') {
+      throw new ReasoningError('refused', `${task.name}: declined (${response.stop_details?.category ?? 'no category'})`, null, charge);
+    }
+    if (response.stop_reason === 'max_tokens') throw new ReasoningError('truncated', `${task.name}: hit max_tokens (${task.maxTokens})`, null, charge);
+    if (response.parsed_output == null) throw new ReasoningError('unparseable', `${task.name}: response did not match the schema`, null, charge);
     return {
       output: response.parsed_output as T,
       model: response.model,
@@ -153,20 +168,33 @@ function mapError(e: unknown): ReasoningError {
 export interface BudgetHooks {
   /** Usually authorizeSpend from @life/db. Must refuse when no cap is set. */
   authorize(estimateMicroUsd: number, task: { name: string; model: string }): Promise<{ ok: true; warning: string | null } | { ok: false; message: string }>;
-  /** Usually recordCost from @life/db, source 'live' with estimated=false. */
-  record(result: ReasoningResult<unknown>, task: { name: string }): Promise<void>;
+  /** Usually recordCost from @life/db. Called for failed-but-billed calls too (estimated when usage is unknown). */
+  record(charge: ReasoningCharge, task: { name: string }): Promise<void>;
   log?: (line: string) => void;
 }
 
 /** The only way the pipeline should call a paid model: check the cap first, record the actual cost after. */
 export async function runWithBudget<T>(client: ReasoningClient, task: ReasoningTask<T>, hooks: BudgetHooks): Promise<ReasoningResult<T>> {
+  const estimate = estimateMaxCostMicroUsd(task.tier, task.system.length + task.user.length, task.maxTokens);
   if (client.mode === 'live') {
-    const estimate = estimateMaxCostMicroUsd(task.tier, task.system.length + task.user.length, task.maxTokens);
     const decision = await hooks.authorize(estimate, { name: task.name, model: MODELS[task.tier] });
     if (!decision.ok) throw new ReasoningError('budget', `${task.name}: ${decision.message}`);
     if (decision.warning) hooks.log?.(`WARNING: ${decision.warning}`);
   }
-  const result = await client.run(task);
+  let result: ReasoningResult<T>;
+  try {
+    result = await client.run(task);
+  } catch (err) {
+    // A failed call can still be billed (refusal, truncation, a dropped connection mid-generation).
+    // Record the real usage when known, otherwise the worst-case estimate, so the cap stays honest.
+    if (client.mode === 'live' && !(err instanceof ReasoningError && UNBILLED.has(err.kind))) {
+      const charge = err instanceof ReasoningError && err.charge
+        ? err.charge
+        : { model: MODELS[task.tier], usage: { inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, cacheWriteTokens: 0 }, costMicroUsd: estimate, source: 'live' as const, estimated: true };
+      await hooks.record(charge, task);
+    }
+    throw err;
+  }
   await hooks.record(result, task);
   return result;
 }

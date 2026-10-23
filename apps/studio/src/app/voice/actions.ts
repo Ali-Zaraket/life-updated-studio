@@ -28,6 +28,11 @@ export async function chooseNarratorAction(fd: FormData): Promise<void> {
       version = clip.profileVersion;
       const found = await db.query.voiceProfiles.findFirst({ where: (v, { and, eq }) => and(eq(v.id, id), eq(v.version, version)) });
       if (!found) throw new UserError('The voice profile recorded for this clip is not in the database. Re-run the audition against this database.');
+      // The manifest is a file on disk, so do not trust its profile pointer alone: the profile must describe this clip's voice.
+      const p = found.profile as { provider?: unknown; voiceId?: unknown };
+      if (p.provider !== clip.provider || p.voiceId !== clip.voiceId) {
+        throw new UserError('The voice profile recorded for this clip is for a different provider or voice. Nothing was approved.');
+      }
     } else {
       id = `${clip.provider}:${clip.voiceId}`;
       const existing = await db.query.voiceProfiles.findMany({ where: (v, { eq }) => eq(v.id, id) });

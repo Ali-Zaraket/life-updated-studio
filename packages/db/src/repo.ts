@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { and, desc, eq, gte, inArray, isNull, max } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, isNull, max, sql } from 'drizzle-orm';
 import {
   captionCarriesEpisodeCode,
   CANCELLABLE_PUBLISH_STATES,
@@ -129,8 +129,32 @@ export async function saveEvidencePacket(
 ): Promise<void> {
   await db.transaction(async (tx) => {
     await tx.insert(t.topics).values(p.topic).onConflictDoNothing();
-    if (p.sources.length) await tx.insert(t.sources).values(p.sources).onConflictDoNothing();
-    if (p.claims.length) await tx.insert(t.claims).values(p.claims).onConflictDoNothing();
+    // Rechecks change availability, retraction and claim status; those must reach the gate, so they update in place.
+    // Identity fields (URL, origin, claim text) are left as first stored.
+    if (p.sources.length) {
+      await tx.insert(t.sources).values(p.sources).onConflictDoUpdate({
+        target: t.sources.id,
+        set: {
+          available: sql`excluded.available`,
+          retracted: sql`excluded.retracted`,
+          retractionCheckedAt: sql`excluded.retraction_checked_at`,
+          correctionNote: sql`excluded.correction_note`,
+          contentSha256: sql`excluded.content_sha256`,
+          retrievedAt: sql`excluded.retrieved_at`,
+        },
+      });
+    }
+    if (p.claims.length) {
+      await tx.insert(t.claims).values(p.claims).onConflictDoUpdate({
+        target: t.claims.id,
+        set: {
+          status: sql`excluded.status`,
+          statusReason: sql`excluded.status_reason`,
+          lastCheckedAt: sql`excluded.last_checked_at`,
+          freshUntil: sql`excluded.fresh_until`,
+        },
+      });
+    }
     if (p.evidence.length) await tx.insert(t.claimEvidence).values(p.evidence).onConflictDoNothing();
     if (p.reviews.length) await tx.insert(t.reviewRecords).values(p.reviews).onConflictDoNothing();
   });
@@ -395,8 +419,13 @@ export async function revokeInTx(tx: Tx, approvalId: string, reason: string, act
 
 /** Revocation before dispatch. Jobs that already reached the remote API are not cancelled here. */
 export async function revokeApproval(db: Db, input: { approvalId: string; reason: string; actor: Actor; now?: Date }): Promise<void> {
+  await db.transaction((tx) => revokeApprovalInTx(tx, input));
+}
+
+/** Revokes one approval and settles its episode and cancellable jobs, inside the caller's transaction. */
+export async function revokeApprovalInTx(tx: Tx, input: { approvalId: string; reason: string; actor: Actor; now?: Date }): Promise<void> {
   const now = input.now ?? new Date();
-  await db.transaction(async (tx) => {
+  {
     const [row] = await tx.select().from(t.approvals).where(eq(t.approvals.id, input.approvalId)).for('update');
     if (!row) throw new DomainError('not_found', `approval ${input.approvalId}`);
     if (row.revokedAt) return;
@@ -413,7 +442,7 @@ export async function revokeApproval(db: Db, input: { approvalId: string; reason
         .where(and(eq(t.publishJobs.approvalId, row.id), inArray(t.publishJobs.state, ['creating_container', 'processing', 'publishing', 'confirming', 'needs_reconciliation'])));
       if (inFlight.length === 0) await applyTransition(tx, ep, 'failed', input.actor, `approval revoked during publishing retries: ${input.reason}`, now);
     }
-  });
+  }
 }
 
 export async function getApproval(db: Conn, id: string) {

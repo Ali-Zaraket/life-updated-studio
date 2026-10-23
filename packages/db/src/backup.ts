@@ -1,9 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { eq, sql } from 'drizzle-orm';
+import { eq, inArray, isNull, sql } from 'drizzle-orm';
 import { hashCanonical } from '@life/contracts';
 import { migrationsFolder, type Db } from './client';
-import { DomainError } from './repo';
+import { DomainError, revokeApprovalInTx } from './repo';
 import * as t from './schema';
 
 /**
@@ -111,6 +111,20 @@ export async function restoreBackup(db: Db, b: Backup): Promise<Record<string, n
         }
       }
     }
+    // A backup can predate a revocation, so nothing restored may publish on an old approval:
+    // revoke every approval (the owner approves again), and send any job that may have
+    // reached Instagram through reconciliation instead of resuming it.
+    const actor = { kind: 'system', component: 'db.restore' } as const;
+    const now = new Date();
+    const live = await tx.select({ id: t.approvals.id }).from(t.approvals).where(isNull(t.approvals.revokedAt));
+    for (const { id } of live) await revokeApprovalInTx(tx, { approvalId: id, reason: 'restored from backup; approve again', actor, now });
+    const inFlight = await tx
+      .update(t.publishJobs)
+      .set({ state: 'needs_reconciliation', stateReason: 'restored from backup mid-publish; reconcile before anything else', updatedAt: now.toISOString() })
+      .where(inArray(t.publishJobs.state, ['creating_container', 'processing', 'publishing', 'confirming']))
+      .returning({ id: t.publishJobs.id });
+    counts.revokedApprovals = live.length;
+    counts.jobsToReconcile = inFlight.length;
     return counts;
   });
 }

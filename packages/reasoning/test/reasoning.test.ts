@@ -117,6 +117,24 @@ describe('budget wrapper', () => {
     expect(seen.actual).toBe(14_400);
   });
 
+  it('records the cost of billed failures: real usage for a refusal, the estimate when usage is unknown', async () => {
+    const charges: { cost: number; estimated: boolean }[] = [];
+    const hooks = {
+      authorize: async () => ({ ok: true as const, warning: null }),
+      record: async (r: { costMicroUsd: number; estimated?: boolean }) => void charges.push({ cost: r.costMicroUsd, estimated: r.estimated ?? false }),
+    };
+    const refusal = fakeFetch(200, apiResponse({ stop_reason: 'refusal', stop_details: { type: 'refusal', category: null, explanation: null }, content: [] }));
+    await expect(runWithBudget(client(refusal), draftScriptTask({ packet, format: 'update', episodeCode: 'X' }), hooks)).rejects.toMatchObject({ kind: 'refused' });
+    const trunc = fakeFetch(200, apiResponse({ stop_reason: 'max_tokens', content: [{ type: 'text', text: '{"beats": [' }] }));
+    await expect(runWithBudget(client(trunc), draftScriptTask({ packet, format: 'update', episodeCode: 'X' }), hooks)).rejects.toMatchObject({ kind: 'unparseable' });
+    const auth = fakeFetch(401, { type: 'error', error: { type: 'authentication_error', message: 'bad key' } });
+    await expect(runWithBudget(client(auth), draftScriptTask({ packet, format: 'update', episodeCode: 'X' }), hooks)).rejects.toMatchObject({ kind: 'auth' });
+    expect(charges).toHaveLength(2);
+    expect(charges[0]).toEqual({ cost: 14_400, estimated: false });
+    expect(charges[1]!.estimated).toBe(true);
+    expect(charges[1]!.cost).toBeGreaterThanOrEqual(16_000 * 20);
+  });
+
   it('mock runs skip authorization and cost nothing', async () => {
     const mock = new MockReasoningClient({ draft_script: draft });
     let authorized = false;

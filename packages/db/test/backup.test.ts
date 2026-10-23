@@ -32,6 +32,25 @@ describe('backup and restore', () => {
     }
   });
 
+  it('never restores a live approval: the owner must approve again after a restore', async () => {
+    const keys = studioKeys();
+    const { pkg, episodeId } = await episodeAwaitingApproval(db);
+    // Approved at backup time; the owner may have revoked it after the backup was taken.
+    await recordApproval(db, { signed: signFor(pkg, keys.privateKey), trustedKeys: keys.trusted });
+    const backup = await exportBackup(db);
+    const target = await openPgliteDb();
+    try {
+      const counts = await restoreBackup(target.db, JSON.parse(JSON.stringify(backup)));
+      expect(counts.revokedApprovals).toBe(1);
+      const approvals = await target.db.select().from(t.approvals);
+      expect(approvals.every((a) => a.revokedAt !== null)).toBe(true);
+      const [ep] = await target.db.select().from(t.episodes).where(eq(t.episodes.id, episodeId));
+      expect(ep!.state).toBe('awaiting_user_approval');
+    } finally {
+      await target.close();
+    }
+  });
+
   it('detects a tampered backup', async () => {
     await episodeAwaitingApproval(db);
     const backup = await exportBackup(db);
