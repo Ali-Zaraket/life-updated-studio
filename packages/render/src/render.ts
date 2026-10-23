@@ -6,13 +6,14 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { bundle } from '@remotion/bundler';
-import { renderMedia, renderStill, selectComposition } from '@remotion/renderer';
+import { renderMedia, selectComposition } from '@remotion/renderer';
 import { VERSION as REMOTION_VERSION } from 'remotion';
 import type { ScriptBeat } from '@life/contracts';
 import {
   DELIVERY_SPEC,
   MASTER_SPEC,
   checkLoudness,
+  extractFirstFrame,
   measureLoudness,
   probeMedia,
   sha256File,
@@ -25,7 +26,6 @@ import { RenderError, type RenderStage } from './errors';
 import { cuesSha256, inputsSha256, type FontRecord, type RenderManifest } from './manifest';
 import { FRAME } from './safe-zones';
 import type { EpisodeProps } from './props';
-import { COVER_COMPOSITION_ID } from './compositions/Root';
 
 const execFileAsync = promisify(execFile);
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -317,21 +317,10 @@ export async function renderEpisode(input: RenderEpisodeInput): Promise<RenderRe
   await rm(silentActual, { force: true });
 
   // --- cover -------------------------------------------------------------------
+  // The cover is the delivery's first frame (owner decision): Instagram is told to use frame 0,
+  // so the image the owner approves is the one that appears on the grid.
   const tCover = Date.now();
-  await stage('cover', async () => {
-    const coverComp = await selectComposition({ ...baseRenderOpts, id: COVER_COMPOSITION_ID });
-    await renderStill({
-      composition: coverComp,
-      serveUrl,
-      inputProps: baseRenderOpts.inputProps,
-      browserExecutable,
-      output: paths.cover,
-      imageFormat: 'jpeg',
-      jpegQuality: 92,
-      scale: 0.5,
-      frame: 0,
-    });
-  });
+  await stage('cover', () => extractFirstFrame(paths.delivery, paths.cover));
   const coverMs = Date.now() - tCover;
 
   // --- subtitles ---------------------------------------------------------------

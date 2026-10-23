@@ -27,7 +27,7 @@ import {
 import { MockInsightsReader, MockInstagramPublisher, type MockPublisherScript } from '@life/instagram';
 import { sha256File } from '@life/media';
 import { approvedFixture } from './fixtures';
-import { LocalStorage, collectInsights, evidenceCheckFor, runPublishJob, scheduleApproved, workerTick, type TickDeps } from '../src/index';
+import { LocalStorage, collectInsights, coverBindable, evidenceCheckFor, runPublishJob, scheduleApproved, workerTick, type TickDeps } from '../src/index';
 
 const OWNER = 'owner';
 const ACCOUNT = 'mock-account';
@@ -193,6 +193,14 @@ describe('publishing', () => {
     const outcome = await runPublishJob(deps, job.id);
     expect(outcome).toMatchObject({ kind: 'failed', reason: expect.stringMatching(/not retried/) });
     expect(deps.publisher.publishCount()).toBe(1);
+  });
+
+  it('lets a live post use its approved cover only when it is the first frame or publicly hosted', () => {
+    expect(coverBindable('live', { coverSource: 'first_frame' }, false)).toBe(true);
+    expect(coverBindable('live', { coverSource: 'separate_image' }, false)).toBe(false);
+    expect(coverBindable('live', {}, false)).toBe(false);
+    expect(coverBindable('live', {}, true)).toBe(true);
+    expect(coverBindable('mock', {}, false)).toBe(true);
   });
 
   it('refuses to upload when the delivery file changed after the gate check', async () => {

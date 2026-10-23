@@ -369,12 +369,20 @@ export async function renderMockPreview(i: {
   );
   await execFileAsync('ffmpeg', args, { maxBuffer: 16 * 1024 * 1024, timeout: 180_000 });
 
+  await extractFirstFrame(videoPath, coverPath);
+  return { videoPath, coverPath };
+}
+
+/**
+ * Writes the video's first frame as a JPEG at the video's own size. This is the cover
+ * Instagram shows when told to use frame 0 (thumb_offset 0), so the owner approves that image.
+ */
+export async function extractFirstFrame(videoPath: string, outPath: string): Promise<void> {
   await execFileAsync(
     'ffmpeg',
-    ['-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i', 'testsrc2=size=1080x1920:rate=30', '-frames:v', '1', '-q:v', '2', coverPath],
+    ['-hide_banner', '-loglevel', 'error', '-y', '-i', videoPath, '-frames:v', '1', '-q:v', '2', '-update', '1', outPath],
     { maxBuffer: 16 * 1024 * 1024, timeout: 60_000 },
   );
-  return { videoPath, coverPath };
 }
 
 // ---------------------------------------------------------------------------

@@ -185,6 +185,7 @@ export default async function EpisodePage({ params, searchParams }: { params: Pr
             </div>
             <div>
               <h3>Cover</h3>
+              {pkg.coverSource === 'first_frame' ? <p className="muted">This is the video&apos;s first frame. Instagram is told to use that frame, so this is the cover that appears.</p> : null}
               {coverHref ? /* eslint-disable-next-line @next/next/no-img-element */ <img className="cover" src={coverHref} alt="Cover" /> : <p className="muted">Not previewable: <span className="mono">{pkg.cover.uri}</span></p>}
             </div>
           </div>

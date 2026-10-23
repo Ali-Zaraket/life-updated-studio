@@ -12,6 +12,7 @@ import {
   checkLoudness,
   measureLoudness,
   probeMedia,
+  extractFirstFrame,
   renderMockPreview,
   sha256File,
   validateAgainstSpec,
@@ -160,6 +161,10 @@ describe.skipIf(!hasFfmpeg)('ffmpeg-backed', () => {
     const c = await probeMedia(coverPath);
     expect(c.video).toMatchObject({ width: 1080, height: 1920 });
     expect((await stat(coverPath)).size).toBeGreaterThan(0);
+    // The cover is the video's first frame, byte for byte the same extraction.
+    const again = join(out, 'frame0-check.jpg');
+    await extractFirstFrame(videoPath, again);
+    expect(await sha256File(again)).toBe(await sha256File(coverPath));
   });
 
   it('uses a supplied audio file', async () => {

@@ -33,6 +33,11 @@ export const ReleasePackageContent = z.object({
   accountId: Id,
   deliveryMedia: MediaRef,
   cover: MediaRef,
+  /**
+   * 'first_frame': the cover image is the delivery video's first frame, and Instagram is told
+   * to use that frame, so the approved cover is exactly what appears. Absent = a separate image.
+   */
+  coverSource: z.enum(['first_frame', 'separate_image']).optional(),
   caption: z.string().min(1).max(2200),
   disclosure: Disclosure,
   shareToFeed: z.boolean(),

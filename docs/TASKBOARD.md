@@ -24,7 +24,7 @@ Owner of each row edits only their directories. The lead integrates and commits.
 | # | Task | Owner (model) | Status |
 |---|---|---|---|
 | R3 | Check safe zones and cover crop against the current Instagram app on a phone | owner + lead | todo |
-| R5 | Live cover: Instagram needs a public cover URL; localhost has none, so the gate refuses live posts (`cover_unsupported`). Host covers publicly, or render the cover as frame 0 | owner decision, then lead | blocked (owner) |
+| R5 | Live cover: owner chose the video's first frame; render extracts frame 0, live sends `thumb_offset=0` | lead | done |
 | R4 | Storage lifecycle: ProRes masters are ~50 GB per hour of video (626 MB for 46 s) — decide archive/cleanup | owner | todo |
 | V1 | Re-verify Instagram capability record and TTS facts against official pages | research (sonnet) | blocked (network policy blocks vendor sites here) |
 | P1 | First real sourced pilot: LU-TECH-002 (Android location choices) — verified after 8 independent review rounds (on-screen text included); preview rendered; see docs/review-packages/LU-TECH-002.md | lead + evidence (opus) | review (needs owner voice + approval) |
@@ -37,5 +37,4 @@ Owner of each row edits only their directories. The lead integrates and commits.
 - Claude API key for drafting (`ANTHROPIC_API_KEY`) if you want automated drafts.
 - Instagram: confirm Creator account, create the Meta app (capability record §11), paste the token in the studio.
 - Live publishing switch (`LIVE_PUBLISHING_AUTHORIZED=yes`) after the capability record is verified; use a new `INSTAGRAM_ACCOUNT_ID` for live (runbook).
-- Cover for live posts (R5): public hosting or frame-0 cover.
 - Click through the studio once on your machine and report anything broken.

@@ -209,6 +209,7 @@ export async function runVerticalSlice(o: SliceOptions): Promise<SliceResult> {
       accountId: o.accountId,
       deliveryMedia: await fileRef(deliveryUri, 'video/mp4'),
       cover: await fileRef(coverUri, 'image/jpeg'),
+      coverSource: 'first_frame',
       caption,
       disclosure: {
         aiGeneratedVisuals: false,

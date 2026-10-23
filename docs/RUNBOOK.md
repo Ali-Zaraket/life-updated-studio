@@ -53,7 +53,7 @@ pnpm worker          # window 3: schedules approved packages, publishes (MOCK by
 3. Studio → Settings → Instagram → paste the token (stored encrypted).
 4. In `.env.local`: `INSTAGRAM_MODE=live`, `INSTAGRAM_CAPABILITIES_VERIFIED=yes`, `LIVE_PUBLISHING_AUTHORIZED=yes`, and set `INSTAGRAM_ACCOUNT_ID` to a new value (e.g. `instagram-main`), different from the one used for mock runs. The worker refuses to start in live mode if any of these, the key or the connection is missing.
    - Each publish job remembers the mode it was created for. A job created in mock mode never runs on the live publisher (and the reverse); the gate rejects it with `adapter_mode_mismatch`. Approvals made for the mock account do not carry over: approve again for the live account.
-5. **Known blocker — cover image.** Instagram only takes a custom cover from a public https URL. This localhost setup has none, so the gate refuses live publishing with `cover_unsupported` rather than post a cover you did not approve. Before the first live post, decide (owner): host covers at a public URL, or render the cover as the video's first frame so the approved cover and Instagram's frame-0 cover are the same image.
+5. **Cover:** the cover is the video's first frame (owner decision). The render extracts it from the delivery file, and Instagram is told to use frame 0, so the cover on the episode page is the one that appears. A package with a separately designed cover would be refused in live mode (`cover_unsupported`), because localhost cannot host it publicly.
 6. Approve one package with a narrow window and watch **Jobs**. The token refreshes weekly; alerts at 14 and 7 days.
 
 ### What the worker does when a publish is unclear

@@ -170,7 +170,8 @@ async function stepOnce(deps: PublishDeps, job: PublishJobRow): Promise<Step> {
           accountId: job.accountId,
           videoUrl: mediaUrl(deps, pkg.deliveryMedia.uri),
           videoFilePath: snapshot.path,
-          coverUrl: mediaUrl(deps, pkg.cover.uri),
+          // A first-frame cover is applied by Instagram from the video itself (thumb_offset 0).
+          coverUrl: pkg.coverSource === 'first_frame' ? null : mediaUrl(deps, pkg.cover.uri),
           caption: pkg.caption,
           shareToFeed: pkg.shareToFeed,
         });
@@ -314,11 +315,19 @@ async function checkGate(deps: PublishDeps, job: PublishJobRow) {
     evidence,
     trustedKeys: deps.trustedKeys,
     platformLabelSupported: deps.publisher.supportsPlatformAiLabel,
-    coverBindable: deps.publisher.mode === 'mock' || deps.publicUrl !== undefined,
+    coverBindable: coverBindable(deps.publisher.mode, pkg, deps.publicUrl !== undefined),
     jobMode: job.adapterMode as 'mock' | 'live',
     publisherMode: deps.publisher.mode,
     now,
   });
+}
+
+/**
+ * Whether the approved cover will be the one shown. Live Instagram takes a separate cover only
+ * from a public URL; a first-frame cover is applied from the uploaded video itself.
+ */
+export function coverBindable(mode: 'mock' | 'live', pkg: { coverSource?: 'first_frame' | 'separate_image' }, hasPublicUrl: boolean): boolean {
+  return mode === 'mock' || pkg.coverSource === 'first_frame' || hasPublicUrl;
 }
 
 function mediaUrl(deps: PublishDeps, uri: string): string {
