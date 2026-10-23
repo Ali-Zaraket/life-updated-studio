@@ -218,9 +218,11 @@ function parseDb(s: string): number {
 }
 
 export async function measureLoudness(path: string): Promise<{ integratedLufs: number; truePeakDbtp: number }> {
+  // framelog=verbose keeps per-frame lines out of stderr; `quiet` would too, but ffmpeg 5.1
+  // (Debian bookworm, our Docker image) rejects it.
   const { stderr } = await execFileAsync(
     'ffmpeg',
-    ['-hide_banner', '-nostats', '-i', path, '-vn', '-af', 'ebur128=peak=true:framelog=quiet', '-f', 'null', '-'],
+    ['-hide_banner', '-nostats', '-i', path, '-vn', '-af', 'ebur128=peak=true:framelog=verbose', '-f', 'null', '-'],
     { maxBuffer: 64 * 1024 * 1024 },
   );
   const summary = stderr.slice(stderr.lastIndexOf('Summary:'));
