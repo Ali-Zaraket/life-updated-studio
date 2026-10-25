@@ -69,6 +69,11 @@ export interface ProduceOptions {
   code: string;
   accountId: string;
   confirmSpend: boolean;
+  /**
+   * The owner accepts narration longer than the script's planned length. Beats scale with the audio and the reviewed
+   * text is unchanged; the owner judges the result before approving.
+   */
+  acceptLonger?: boolean;
 }
 
 export interface ProduceResult {
@@ -219,11 +224,14 @@ export async function producePilot(deps: ProduceDeps, o: ProduceOptions): Promis
   }
 
   if (narration.durationSec > plannedSec) {
-    return {
-      state: 'needs_retime',
-      message: `the narration runs ${narration.durationSec.toFixed(1)} s, longer than the script's planned ${plannedSec} s. The audio is kept (no new charge next time); the script needs re-timing and a fresh review before rendering.`,
-      costMicroUsd,
-    };
+    if (!o.acceptLonger) {
+      return {
+        state: 'needs_retime',
+        message: `the narration runs ${narration.durationSec.toFixed(1)} s, longer than the script's planned ${plannedSec} s. The audio is kept (no new charge next time). Re-run with --accept-longer to render at this length (beats scale with the audio; the reviewed text is unchanged), or re-time the script.`,
+        costMicroUsd,
+      };
+    }
+    log(`Narration runs ${narration.durationSec.toFixed(1)} s, over the planned ${plannedSec} s: rendering at that length (accepted by the owner)`);
   }
 
   // 4. Full render, written straight into storage (the master is hundreds of MB).

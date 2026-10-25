@@ -2,6 +2,7 @@
  *   pnpm pilot:produce LU-TECH-002                   dry run: narrator, cost estimate and what would be made. Calls nothing.
  *   pnpm pilot:produce LU-TECH-002 --confirm-spend   narrates with the approved voice (inside the spending cap), renders,
  *                                                    and creates the release package. Stops at awaiting_user_approval.
+ *   ... --accept-longer                              render even if the narration runs past the script's planned length.
  */
 import { resolve } from 'node:path';
 import { openPostgresDb } from '@life/db';
@@ -28,7 +29,12 @@ const { db, close } = await openPostgresDb(url);
 try {
   const r = await producePilot(
     { db, storage: new LocalStorage(resolve(process.env.LIFE_STORAGE_DIR ?? 'storage')), tts, render: renderEpisode, now: () => new Date(), log: (line) => console.log(`  ${line}`) },
-    { code, accountId: process.env.INSTAGRAM_ACCOUNT_ID ?? 'mock-account', confirmSpend: process.argv.includes('--confirm-spend') },
+    {
+      code,
+      accountId: process.env.INSTAGRAM_ACCOUNT_ID ?? 'mock-account',
+      confirmSpend: process.argv.includes('--confirm-spend'),
+      acceptLonger: process.argv.includes('--accept-longer'),
+    },
   );
   console.log(`\n${code}: ${r.state} — ${r.message}`);
   if (r.state !== 'dry_run' && r.state !== 'awaiting_user_approval') process.exitCode = 1;

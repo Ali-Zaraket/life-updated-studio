@@ -193,6 +193,15 @@ describe('pilot production (fake TTS and render)', () => {
       expect(calls).toEqual([]);
       expect(tts.calls).toBe(1);
       expect((await getEpisode(s.db, s.episodeId)).state).toBe('verified');
+
+      // The owner accepts the length: the kept audio is reused and rendered, with no second call.
+      const accepted = await producePilot(
+        { db: s.db, storage: s.storage, tts: () => tts, render, now: () => NOW, log: () => {} },
+        { code: CODE, accountId: 'mock-account', confirmSpend: true, acceptLonger: true },
+      );
+      expect(accepted.state).toBe('awaiting_user_approval');
+      expect(calls[0]!.narration.durationSec).toBe(55);
+      expect(tts.calls).toBe(1);
     } finally {
       await s.close();
       await rm(s.root, { recursive: true, force: true });
