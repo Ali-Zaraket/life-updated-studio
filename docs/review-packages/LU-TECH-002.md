@@ -117,7 +117,7 @@ Gate improvements that came out of this: AI reviews are now bound to the exact s
 
 ## Before this can be published (your steps)
 
-1. Choose the narrator (`pnpm audition`, studio → Voice). Then the final render uses that voice; re-time against the real audio if it runs over 50 s.
+1. Choose the narrator (`pnpm audition`, studio → Voice). Then `pnpm pilot:produce LU-TECH-002` (dry run) and `--confirm-spend` narrate in that voice, render, and create the release package; it stops for re-timing if the audio runs over 50 s. The package marks the narration as synthetic and the platform AI label as required, applied by you in the Instagram app (the API field is unverified, capability record §10), so API publishing holds with `disclosure_unsupported` until that changes.
 2. `pnpm pilot:load content/pilots/LU-TECH-002` on your machine, then open the episode in the studio, watch the preview, read the evidence.
 3. Within 24 h of publishing: `pnpm pilot:recheck content/pilots/LU-TECH-002` (all passages must still be on the live pages).
 4. Approve in the studio with a publish window. Publishing stays MOCK until Instagram is connected and live publishing is authorised.
