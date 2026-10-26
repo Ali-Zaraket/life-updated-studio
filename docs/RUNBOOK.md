@@ -46,6 +46,7 @@ One-off commands run in the `tools` container: `docker compose run --rm tools pn
 | Sample episode end to end | `docker compose run --rm tools pnpm slice` (stops for your approval), approve in the studio; the worker publishes it to the MOCK account |
 | Recheck a pilot's sources (needed within 24 h of publishing, for claims marked "changing") | `docker compose run --rm tools pnpm pilot:recheck content/pilots/LU-TECH-002` — re-fetches each source and confirms every quoted passage is still there |
 | Load the reviewed pilot | `docker compose run --rm tools pnpm pilot:load content/pilots/LU-TECH-002` (run the recheck first; otherwise it reports `blocked: changing_claim_not_rechecked`) |
+| Produce the pilot: narration in the approved voice, final render, release package | `docker compose run --rm tools pnpm pilot:produce LU-TECH-002` (dry run: narrator, cost, plan) → add `--confirm-spend` (one paid TTS call inside the cap; the audio is kept, so a failed render never pays twice; the 4K render takes several minutes) → approve in the studio |
 | Draft + check a script with Claude | `docker compose run --rm tools pnpm draft --topic <id> --code LU-TECH-002` (dry run) → add `--confirm-spend` |
 | Voice auditions | `docker compose run --rm tools pnpm audition` (dry run) → add `--confirm-spend` → studio **Voice** page |
 | Render a template | `docker compose run --rm tools pnpm --filter @life/render render:fixture` |

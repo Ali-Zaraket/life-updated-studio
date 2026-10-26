@@ -28,7 +28,7 @@ Owner of each row edits only their directories. The lead integrates and commits.
 | R5 | Live cover: owner chose the video's first frame; render extracts frame 0, live sends `thumb_offset=0` | lead | done |
 | R4 | Storage lifecycle: ProRes masters are ~50 GB per hour of video (626 MB for 46 s) — decide archive/cleanup | owner | todo |
 | V1 | Re-verify Instagram capability record and TTS facts against official pages | research (sonnet) | blocked (network policy blocks vendor sites here) |
-| P1 | First real sourced pilot: LU-TECH-002 (Android location choices) — verified after 8 independent review rounds (on-screen text included); preview rendered; see docs/review-packages/LU-TECH-002.md | lead + evidence (opus) | review (needs owner voice + approval) |
+| P1 | First real sourced pilot: LU-TECH-002 (Android location choices) — verified after 8 independent review rounds (on-screen text included); preview rendered; see docs/review-packages/LU-TECH-002.md. Narrator chosen 2026-10-24 (ElevenLabs default voice "Chris"); `pnpm pilot:produce` makes the final render and release package | lead + evidence (opus) | review (needs owner production run + approval) |
 | P2 | More pilots | lead + owner | blocked (only developer.android.com was reachable from this cloud box; other sources need the owner's machine or `pnpm draft`) |
 
 ## Blocked on the owner

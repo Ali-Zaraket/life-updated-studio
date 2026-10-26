@@ -24,7 +24,8 @@
     "draft": "tsx --env-file-if-exists=.env.local apps/worker/src/draft-cli.ts",
     "pilot:load": "tsx --env-file-if-exists=.env.local apps/worker/src/pilot-cli.ts",
     "pilot:subject": "tsx apps/worker/src/pilot-subject.ts",
-    "pilot:recheck": "tsx apps/worker/src/pilot-recheck.ts"
+    "pilot:recheck": "tsx apps/worker/src/pilot-recheck.ts",
+    "pilot:produce": "tsx --env-file-if-exists=.env.local apps/worker/src/pilot-produce-cli.ts"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",
