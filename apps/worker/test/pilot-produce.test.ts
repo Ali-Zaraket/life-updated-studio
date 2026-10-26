@@ -168,6 +168,27 @@ describe('pilot production (fake TTS and render)', () => {
     }
   });
 
+  it('narrate-only records the narration once and renders, packages and transitions nothing', async () => {
+    const s = await setup();
+    try {
+      const tts = new FakeTts(55);
+      const { render, calls } = fakeRender();
+      const go = () => producePilot({ db: s.db, storage: s.storage, tts: () => tts, render, now: () => NOW, log: () => {} }, { code: CODE, accountId: 'mock-account', confirmSpend: true, narrateOnly: true });
+      const r = await go();
+      expect(r.state).toBe('narrated');
+      expect(r.message).toMatch(/narration is in storage\/episodes\/LU-TECH-002\/v1\/narration\//);
+      expect((await go()).costMicroUsd).toBe(0);
+      expect(tts.calls).toBe(1);
+      expect(calls).toEqual([]);
+      expect(await s.db.select().from(t.releasePackages)).toEqual([]);
+      expect(await s.db.select().from(t.costEvents)).toHaveLength(1);
+      expect((await getEpisode(s.db, s.episodeId)).state).toBe('verified');
+    } finally {
+      await s.close();
+      await rm(s.root, { recursive: true, force: true });
+    }
+  });
+
   it('stale evidence blocks before any spend', async () => {
     const s = await setup();
     try {

@@ -74,10 +74,15 @@ export interface ProduceOptions {
    * text is unchanged; the owner judges the result before approving.
    */
   acceptLonger?: boolean;
+  /**
+   * Record (or reuse) the narration and stop: for episodes whose picture is made elsewhere (e.g. the Blender
+   * scenes). No render, no release package, no state change.
+   */
+  narrateOnly?: boolean;
 }
 
 export interface ProduceResult {
-  state: 'refused' | 'dry_run' | 'needs_retime' | 'render_failed' | 'awaiting_user_approval';
+  state: 'refused' | 'dry_run' | 'narrated' | 'needs_retime' | 'render_failed' | 'awaiting_user_approval';
   message: string;
   /** Live cost recorded by this run (estimated, micro-USD). */
   costMicroUsd: number;
@@ -182,7 +187,9 @@ export async function producePilot(deps: ProduceDeps, o: ProduceOptions): Promis
       const s = await spendStatus(db, now);
       log(`One ${provider} call, estimated ${usd(estimate)} (UNVERIFIED price). This month: ${usd(s.monthToDateMicroUsd)} of ${s.capMicroUsd === null ? 'no cap (paid calls disabled)' : usd(s.capMicroUsd)}`);
     }
-    log(`Then: ${template} render (4K master, 1080×1920 delivery, first-frame cover, captions) and a release package for the owner's approval`);
+    log(o.narrateOnly
+      ? 'Narration only: nothing is rendered or packaged'
+      : `Then: ${template} render (4K master, 1080×1920 delivery, first-frame cover, captions) and a release package for the owner's approval`);
     return { state: 'dry_run', message: 'DRY RUN: nothing was called or written. Add --confirm-spend to run.', costMicroUsd: 0 };
   }
 
@@ -221,6 +228,14 @@ export async function producePilot(deps: ProduceDeps, o: ProduceOptions): Promis
     };
     await writeFile(`${narrationPath}.json`, `${JSON.stringify(narration, null, 2)}\n`);
     log(`Narration recorded: ${narration.durationSec.toFixed(1)} s, ~${usd(costMicroUsd)}`);
+  }
+
+  if (o.narrateOnly) {
+    return {
+      state: 'narrated',
+      message: `narration is in storage/${narrationRel} (${narration.durationSec.toFixed(1)} s, script planned for ${plannedSec} s); nothing was rendered or packaged`,
+      costMicroUsd,
+    };
   }
 
   if (narration.durationSec > plannedSec) {
