@@ -13,7 +13,7 @@
       "whatEvidenceDoesNotEstablish": "It does not show that anyone else reads this data, does not cover other apps that use location, and menu names can differ by version and language."
     },
     "isFixture": false,
-    "createdAt": "2026-10-26T11:28:26.536Z"
+    "createdAt": "2026-10-26T11:40:31.061Z"
   },
   "sources": [
     {
@@ -25,10 +25,10 @@
       "institution": "Apple",
       "sourceType": "official_documentation",
       "publishedAt": null,
-      "retrievedAt": "2026-10-26T11:28:27.059Z",
+      "retrievedAt": "2026-10-26T11:40:31.516Z",
       "originId": "apple-official-docs",
       "available": true,
-      "retractionCheckedAt": "2026-10-26T11:28:26.536Z",
+      "retractionCheckedAt": "2026-10-26T11:40:31.061Z",
       "retracted": false,
       "correctionNote": null,
       "contentSha256": "7f2e0ff34b8dfa4d90f3a0557a16fdc62171d3f6bae867fc56a514a03797dcee"
@@ -42,10 +42,10 @@
       "institution": "Apple",
       "sourceType": "official_documentation",
       "publishedAt": "2026-02-01T00:00:00.000Z",
-      "retrievedAt": "2026-10-26T11:28:27.059Z",
+      "retrievedAt": "2026-10-26T11:40:31.516Z",
       "originId": "apple-official-docs",
       "available": true,
-      "retractionCheckedAt": "2026-10-26T11:28:26.536Z",
+      "retractionCheckedAt": "2026-10-26T11:40:31.061Z",
       "retracted": false,
       "correctionNote": null,
       "contentSha256": "2945689cbf02d719b1e2d8025dcdf1989b04a362e2949394ad73cea838de8abf"
@@ -59,13 +59,13 @@
       "institution": "Google (Google Maps Help)",
       "sourceType": "official_documentation",
       "publishedAt": null,
-      "retrievedAt": "2026-10-26T11:28:27.059Z",
+      "retrievedAt": "2026-10-26T11:40:31.516Z",
       "originId": "google-maps-help",
       "available": true,
-      "retractionCheckedAt": "2026-10-26T11:28:26.536Z",
+      "retractionCheckedAt": "2026-10-26T11:40:31.061Z",
       "retracted": false,
       "correctionNote": null,
-      "contentSha256": "f15ebec4c380d0cf8fdc2033ba4bff13ccf46975dcccd5a4a47bc1c35790eb8f"
+      "contentSha256": "e1599434b4d5574dbcf1d7d83634add7937cea5cc7d252784e528541f26cc664"
     },
     {
       "id": "src-google-timeline-ios",
@@ -76,13 +76,13 @@
       "institution": "Google (Google Maps Help)",
       "sourceType": "official_documentation",
       "publishedAt": null,
-      "retrievedAt": "2026-10-26T11:28:27.059Z",
+      "retrievedAt": "2026-10-26T11:40:31.516Z",
       "originId": "google-maps-help",
       "available": true,
-      "retractionCheckedAt": "2026-10-26T11:28:26.536Z",
+      "retractionCheckedAt": "2026-10-26T11:40:31.061Z",
       "retracted": false,
       "correctionNote": null,
-      "contentSha256": "ecc1bb4415f762915f90d0500bb5af610833e7c2d9e7720875579fbe6407cca4"
+      "contentSha256": "6a2cb6b8534c01ae58ef3dfc5292577e06fcbc1b68a22e687496a721690b15dd"
     }
   ],
   "claims": [
@@ -100,9 +100,9 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-26T11:28:27.059Z",
+      "lastCheckedAt": "2026-10-26T11:40:31.516Z",
       "permittedWording": null,
-      "limitations": "Applies when the setting is on; Apple says the data is used to learn places and routes significant to you.",
+      "limitations": "Applies when the setting is on, on devices signed in to iCloud with an Apple Account; Apple says the data is used to learn places and routes significant to you. Apple's pages cited here do not say whether it is on by default or how to view it on iPhone.",
       "isNumeric": false,
       "isCausal": false,
       "isConsequential": true,
@@ -120,7 +120,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-26T11:28:27.059Z",
+      "lastCheckedAt": "2026-10-26T11:40:31.516Z",
       "permittedWording": null,
       "limitations": "Apple's own statement about its encryption; not independently verified.",
       "isNumeric": false,
@@ -142,7 +142,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-26T11:28:27.059Z",
+      "lastCheckedAt": "2026-10-26T11:40:31.516Z",
       "permittedWording": null,
       "limitations": "Menu names can differ by iOS version and language.",
       "isNumeric": false,
@@ -164,7 +164,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-26T11:28:27.059Z",
+      "lastCheckedAt": "2026-10-26T11:40:31.516Z",
       "permittedWording": null,
       "limitations": "Applies only when Timeline is turned on; Google says the data is saved to each signed-in device.",
       "isNumeric": false,
@@ -186,7 +186,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-26T11:28:27.059Z",
+      "lastCheckedAt": "2026-10-26T11:40:31.516Z",
       "permittedWording": null,
       "limitations": "Menu names can differ by app version and language.",
       "isNumeric": false,
@@ -195,9 +195,51 @@
       "singleOriginJustification": "Platform behaviour is defined by the platform owner; the owner's own documentation is the authoritative source for what its software does."
     },
     {
-      "id": "c-autodelete-options",
+      "id": "c-timeline-off-by-default",
       "topicId": "pilot-tech-location-history",
-      "text": "Google Maps Timeline can automatically delete data older than 3, 18 or 36 months; 36 months is three years.",
+      "text": "Google says Timeline is off by default and can only be turned on if you opt in.",
+      "locations": [
+        "narration",
+        "caption"
+      ],
+      "status": "supported",
+      "statusReason": null,
+      "riskTier": "low",
+      "timeSensitivity": "changing",
+      "freshUntil": null,
+      "lastCheckedAt": "2026-10-26T11:40:31.516Z",
+      "permittedWording": null,
+      "limitations": "Google Account default as stated by Google.",
+      "isNumeric": false,
+      "isCausal": false,
+      "isConsequential": true,
+      "singleOriginJustification": "Platform behaviour is defined by the platform owner; the owner's own documentation is the authoritative source for what its software does."
+    },
+    {
+      "id": "c-timeline-backup",
+      "topicId": "pilot-tech-location-history",
+      "text": "Timeline backup is optional; when you back it up, Maps saves an encrypted copy on Google's servers.",
+      "locations": [
+        "narration",
+        "caption"
+      ],
+      "status": "supported",
+      "statusReason": null,
+      "riskTier": "low",
+      "timeSensitivity": "changing",
+      "freshUntil": null,
+      "lastCheckedAt": "2026-10-26T11:40:31.516Z",
+      "permittedWording": null,
+      "limitations": "Google's own statement about encryption; not independently verified.",
+      "isNumeric": false,
+      "isCausal": false,
+      "isConsequential": true,
+      "singleOriginJustification": "Platform behaviour is defined by the platform owner; the owner's own documentation is the authoritative source for what its software does."
+    },
+    {
+      "id": "c-timeline-kept-until-deleted",
+      "topicId": "pilot-tech-location-history",
+      "text": "Google says you keep your Timeline based on your auto-delete settings, or until you delete it; auto-delete can be switched off.",
       "locations": [
         "narration",
         "visual"
@@ -207,9 +249,92 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-26T11:28:27.059Z",
+      "lastCheckedAt": "2026-10-26T11:40:31.516Z",
       "permittedWording": null,
-      "limitations": "These are the auto-delete choices Google lists; the page does not say what happens when auto-delete is off.",
+      "limitations": "Applies to Google Maps Timeline only.",
+      "isNumeric": false,
+      "isCausal": false,
+      "isConsequential": true,
+      "singleOriginJustification": "Platform behaviour is defined by the platform owner; the owner's own documentation is the authoritative source for what its software does."
+    },
+    {
+      "id": "c-timeline-off-vs-delete",
+      "topicId": "pilot-tech-location-history",
+      "text": "In Google Maps, turning Timeline off and deleting it are separate choices: Turn off, or Turn off and delete activity.",
+      "locations": [
+        "narration",
+        "visual",
+        "caption"
+      ],
+      "status": "supported",
+      "statusReason": null,
+      "riskTier": "low",
+      "timeSensitivity": "changing",
+      "freshUntil": null,
+      "lastCheckedAt": "2026-10-26T11:40:31.516Z",
+      "permittedWording": null,
+      "limitations": "Menu names can differ by app version and language.",
+      "isNumeric": false,
+      "isCausal": false,
+      "isConsequential": true,
+      "singleOriginJustification": "Platform behaviour is defined by the platform owner; the owner's own documentation is the authoritative source for what its software does."
+    },
+    {
+      "id": "c-timeline-view",
+      "topicId": "pilot-tech-location-history",
+      "text": "When Timeline is on, Google Maps Timeline shows where and how you traveled.",
+      "locations": [
+        "narration"
+      ],
+      "status": "supported",
+      "statusReason": null,
+      "riskTier": "low",
+      "timeSensitivity": "changing",
+      "freshUntil": null,
+      "lastCheckedAt": "2026-10-26T11:40:31.516Z",
+      "permittedWording": null,
+      "limitations": "Google Maps only.",
+      "isNumeric": false,
+      "isCausal": false,
+      "isConsequential": true,
+      "singleOriginJustification": "Platform behaviour is defined by the platform owner; the owner's own documentation is the authoritative source for what its software does."
+    },
+    {
+      "id": "c-other-google-location",
+      "topicId": "pilot-tech-location-history",
+      "text": "Other Google settings such as Web & App Activity can also include info about your location from your device's general area and IP address.",
+      "locations": [
+        "caption"
+      ],
+      "status": "supported",
+      "statusReason": null,
+      "riskTier": "low",
+      "timeSensitivity": "changing",
+      "freshUntil": null,
+      "lastCheckedAt": "2026-10-26T11:40:31.516Z",
+      "permittedWording": null,
+      "limitations": "Caption context only.",
+      "isNumeric": false,
+      "isCausal": false,
+      "isConsequential": true,
+      "singleOriginJustification": "Platform behaviour is defined by the platform owner; the owner's own documentation is the authoritative source for what its software does."
+    },
+    {
+      "id": "c-autodelete-options",
+      "topicId": "pilot-tech-location-history",
+      "text": "Google Maps Timeline can automatically delete data older than 3, 18 or 36 months.",
+      "locations": [
+        "narration",
+        "visual"
+      ],
+      "status": "supported",
+      "statusReason": null,
+      "riskTier": "low",
+      "timeSensitivity": "changing",
+      "freshUntil": null,
+      "lastCheckedAt": "2026-10-26T11:40:31.516Z",
+      "permittedWording": null,
+      "limitations": "When auto-delete is off, Google says Timeline is kept until you delete it.",
       "isNumeric": true,
       "isCausal": false,
       "isConsequential": true,
@@ -227,7 +352,7 @@
       "studyType": null,
       "population": null,
       "limitations": null,
-      "createdAt": "2026-10-26T11:28:26.536Z"
+      "createdAt": "2026-10-26T11:40:31.061Z"
     },
     {
       "id": "e2",
@@ -239,7 +364,7 @@
       "studyType": null,
       "population": null,
       "limitations": null,
-      "createdAt": "2026-10-26T11:28:26.536Z"
+      "createdAt": "2026-10-26T11:40:31.061Z"
     },
     {
       "id": "e3",
@@ -251,7 +376,7 @@
       "studyType": null,
       "population": null,
       "limitations": null,
-      "createdAt": "2026-10-26T11:28:26.536Z"
+      "createdAt": "2026-10-26T11:40:31.061Z"
     },
     {
       "id": "e4",
@@ -263,7 +388,7 @@
       "studyType": null,
       "population": null,
       "limitations": null,
-      "createdAt": "2026-10-26T11:28:26.536Z"
+      "createdAt": "2026-10-26T11:40:31.061Z"
     },
     {
       "id": "e5",
@@ -275,7 +400,7 @@
       "studyType": null,
       "population": null,
       "limitations": null,
-      "createdAt": "2026-10-26T11:28:26.536Z"
+      "createdAt": "2026-10-26T11:40:31.061Z"
     },
     {
       "id": "e6",
@@ -287,19 +412,115 @@
       "studyType": null,
       "population": null,
       "limitations": null,
-      "createdAt": "2026-10-26T11:28:26.536Z"
+      "createdAt": "2026-10-26T11:40:31.061Z"
     },
     {
       "id": "e7",
-      "claimId": "c-android-timeline-path",
+      "claimId": "c-timeline-off-vs-delete",
       "sourceId": "src-google-timeline-android",
       "stance": "supports",
-      "supportingPassage": "Under \"Location settings,\" check that it says \"Timeline is on",
+      "supportingPassage": "Tap More Location & privacy settings. Tap Timeline is on. Under \"Timeline,\" from the dropdown menu, tap Turn off or Turn off and delete activity.",
       "locator": "Section: Turn Timeline on or off",
       "studyType": null,
       "population": null,
       "limitations": null,
-      "createdAt": "2026-10-26T11:28:26.536Z"
+      "createdAt": "2026-10-26T11:40:31.061Z"
+    },
+    {
+      "id": "e15",
+      "claimId": "c-android-timeline-path",
+      "sourceId": "src-google-timeline-android",
+      "stance": "supports",
+      "supportingPassage": "Tap More Location & privacy settings. Tap Timeline is on. Under \"Timeline,\" from the dropdown menu, tap Turn off or Turn off and delete activity.",
+      "locator": "Section: Turn Timeline on or off",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-26T11:40:31.061Z"
+    },
+    {
+      "id": "e16",
+      "claimId": "c-timeline-backup",
+      "sourceId": "src-google-timeline-android",
+      "stance": "supports",
+      "supportingPassage": "You have to separately opt-in to turn on Timeline backups on each device.",
+      "locator": "Section: Back up your Timeline",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-26T11:40:31.061Z"
+    },
+    {
+      "id": "e17",
+      "claimId": "c-timeline-kept-until-deleted",
+      "sourceId": "src-google-timeline-android",
+      "stance": "supports",
+      "supportingPassage": "Under \"Location settings,\" tap Auto-delete Timeline Don't auto-delete activity.",
+      "locator": "Section: Automatically delete your Timeline data",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-26T11:40:31.061Z"
+    },
+    {
+      "id": "e10",
+      "claimId": "c-timeline-off-by-default",
+      "sourceId": "src-google-timeline-android",
+      "stance": "supports",
+      "supportingPassage": "Timeline is off by default for your Google Account and can only be turned on if you opt in.",
+      "locator": "Section: Turn on Timeline",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-26T11:40:31.061Z"
+    },
+    {
+      "id": "e11",
+      "claimId": "c-timeline-backup",
+      "sourceId": "src-google-timeline-android",
+      "stance": "supports",
+      "supportingPassage": "When you back up your Timeline data, Maps saves an encrypted copy of your data on Google's servers.",
+      "locator": "Section: Back up your Timeline",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-26T11:40:31.061Z"
+    },
+    {
+      "id": "e12",
+      "claimId": "c-timeline-kept-until-deleted",
+      "sourceId": "src-google-timeline-android",
+      "stance": "supports",
+      "supportingPassage": "You'll keep your Timeline based on your auto-delete settings, or until you delete it.",
+      "locator": "Section: Automatically delete your Timeline data",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-26T11:40:31.061Z"
+    },
+    {
+      "id": "e13",
+      "claimId": "c-timeline-view",
+      "sourceId": "src-google-timeline-android",
+      "stance": "supports",
+      "supportingPassage": "When Timeline is on, your Google Maps Timeline shows where and how you traveled, like walking, biking, driving, or on public transport.",
+      "locator": "Section: Find your travels",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-26T11:40:31.061Z"
+    },
+    {
+      "id": "e14",
+      "claimId": "c-other-google-location",
+      "sourceId": "src-google-timeline-android",
+      "stance": "supports",
+      "supportingPassage": "Other settings like Web & App Activity can also include info about your location from your device's general area and IP address.",
+      "locator": "Section: Turn on Timeline",
+      "studyType": null,
+      "population": null,
+      "limitations": null,
+      "createdAt": "2026-10-26T11:40:31.061Z"
     },
     {
       "id": "e8",
@@ -311,7 +532,7 @@
       "studyType": null,
       "population": null,
       "limitations": null,
-      "createdAt": "2026-10-26T11:28:26.536Z"
+      "createdAt": "2026-10-26T11:40:31.061Z"
     },
     {
       "id": "e9",
@@ -323,21 +544,21 @@
       "studyType": null,
       "population": null,
       "limitations": null,
-      "createdAt": "2026-10-26T11:28:26.536Z"
+      "createdAt": "2026-10-26T11:40:31.061Z"
     }
   ],
   "reviews": [],
   "provenance": {
-    "retrievedAt": "2026-10-26T11:28:26.536Z",
+    "retrievedAt": "2026-10-26T11:40:31.061Z",
     "retrievedBy": "lead session (claude-opus-5-5) via the studio source fetcher (apps/worker/src/source-check.ts)",
     "pageSha256": {
       "src-apple-legal-location": "7f2e0ff34b8dfa4d90f3a0557a16fdc62171d3f6bae867fc56a514a03797dcee",
       "src-apple-safety-location": "2945689cbf02d719b1e2d8025dcdf1989b04a362e2949394ad73cea838de8abf",
-      "src-google-timeline-android": "f15ebec4c380d0cf8fdc2033ba4bff13ccf46975dcccd5a4a47bc1c35790eb8f",
-      "src-google-timeline-ios": "ecc1bb4415f762915f90d0500bb5af610833e7c2d9e7720875579fbe6407cca4"
+      "src-google-timeline-android": "e1599434b4d5574dbcf1d7d83634add7937cea5cc7d252784e528541f26cc664",
+      "src-google-timeline-ios": "6a2cb6b8534c01ae58ef3dfc5292577e06fcbc1b68a22e687496a721690b15dd"
     },
     "licence": "Short quotations for fact-checking; no page content is shown in the video.",
     "pageSha256Note": "sha256 of the normalised extracted page text (stable across requests), set by pilot:recheck.",
-    "lastRecheckAt": "2026-10-26T11:28:27.059Z"
+    "lastRecheckAt": "2026-10-26T11:40:31.516Z"
   }
 }

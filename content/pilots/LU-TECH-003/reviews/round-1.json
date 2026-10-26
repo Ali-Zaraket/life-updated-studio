@@ -1,0 +1,80 @@
+[
+  {
+    "id": "rev-ai-r1-LU-TECH-003-c-iphone-keeps-places",
+    "claimId": "c-iphone-keeps-places",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 1)",
+    "verdict": "pass_with_changes",
+    "notes": "e1 is verbatim (whitespace-normalised) in source-text/src-apple-legal-location.txt and supports the claim text as worded. Script problems: (1) Beat 2 narration 'Apple says it keeps track of where you've been, how often, when, and your routes' drops two qualifiers that the evidence carries: 'places you have RECENTLY been' and the condition that the setting is on (the claim text itself says 'With Significant Locations & Routes on'). As written it reads as an unconditional, complete history. None of the four sources say whether Significant Locations & Routes is on by default. Replace with: 'On iPhone, with Significant Locations & Routes on, Apple says it keeps track of places you've recently been: how often, when, and the routes you take.' (2) Beat 2 visual shows 'a list of visited places with times'. The Apple snapshots document viewing that list only on a Mac ('Click Details to view a list of locations'), not on iPhone. Keep the 'Illustration' label and do not style the list as iPhone Settings UI. (3) Hook 'may be keeping a map of the places you go. Including this one.' is acceptable under 'may': e1 covers places recently visited, e5 covers regularly saved precise locations, and the Google pages say saved home/work addresses show up on Timeline. That holds only if the conditions are stated in beats 2-3 (see fix 1 and the Google off-by-default note under c-android-timeline-saves). (4) Ledger nit: the limitation should also say it applies to devices signed in to iCloud with an Apple Account, as e1 states.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "77f44ec5548d55af88dec14c05e5c6a2e61b8fedcf8ddf6452b2f7f3eac7294d",
+    "createdAt": "2026-10-26T11:33:00.000Z"
+  },
+  {
+    "id": "rev-ai-r1-LU-TECH-003-c-iphone-encrypted",
+    "claimId": "c-iphone-encrypted",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 1)",
+    "verdict": "pass",
+    "notes": "e2 is verbatim in source-text/src-apple-legal-location.txt and is corroborated within the same origin by src-apple-safety-location ('Significant locations are encrypted and can't be read by Apple', Mac section). Beat 4 'Apple says it can't read yours.' is attributed, scoped to the Significant Locations data, and no stronger than the evidence. The caption limit ('Apple and Google describe their own encryption; this video does not test it') is correct. Single-origin justification is acceptable for a platform owner's statement about its own software, provided the line keeps 'Apple says'. This pass covers this line only. The sentence that follows it ('Google keeps it on your phone') is a separate problem, recorded under c-android-timeline-saves. Do not shorten the line to 'Apple can't read it' or generalise it to 'Apple can't see your location': the same Apple page says other location services send anonymised location data to Apple.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "77f44ec5548d55af88dec14c05e5c6a2e61b8fedcf8ddf6452b2f7f3eac7294d",
+    "createdAt": "2026-10-26T11:33:00.000Z"
+  },
+  {
+    "id": "rev-ai-r1-LU-TECH-003-c-iphone-setting-path",
+    "claimId": "c-iphone-setting-path",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 1)",
+    "verdict": "pass_with_changes",
+    "notes": "e3 is verbatim in source-text/src-apple-safety-location.txt. The beat 5 on-screen path and the caption path match it exactly ('Settings > Privacy & Security > Location Services > System Services > Significant Locations & Routes'). Problem: beat 5 narration 'Here's where to find it. Look first.' tells iPhone viewers they can look at their Significant Locations, and the on-screen iPhone path is shown under that line. The Apple snapshots document only TURNING OFF the setting on iPhone/iPad. Viewing the list is documented only for Mac ('Click Details to view a list of locations that you've identified'). So 'Look first' is unsupported for iPhone. Either add an Apple source and claim that documents viewing on iPhone, or scope the line to Google Maps, e.g.: 'Here's where it lives. In Google Maps, you can look through it first. Then keep it, or turn it off.' The Apple pages also don't say whether turning the setting off clears the history already saved on iPhone. Do not imply that it does; add to the caption limits: 'Apple's pages cited here don't say whether turning it off clears what's already saved.'",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "77f44ec5548d55af88dec14c05e5c6a2e61b8fedcf8ddf6452b2f7f3eac7294d",
+    "createdAt": "2026-10-26T11:33:00.000Z"
+  },
+  {
+    "id": "rev-ai-r1-LU-TECH-003-c-android-timeline-saves",
+    "claimId": "c-android-timeline-saves",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 1)",
+    "verdict": "pass_with_changes",
+    "notes": "e4 and e5 are verbatim in source-text/src-google-timeline-android.txt and together support the claim. Beat 3 ('once it's on, saves your visits and routes to your phone, even when Google apps aren't open') is fair: e5 covers 'to that device' and 'including when Google apps aren't open'. Problems: (1) Beat 4 'Google keeps it on your phone.' is unattributed (contrast 'Apple says') and incomplete. The same page says 'When you back up your Timeline data, Maps saves an encrypted copy of your data on Google's servers' (backup is opt-in per device). It also says other settings like Web & App Activity 'can also include info about your location'. Placed right after 'Apple says it can't read yours', the line implies a privacy equivalence that no ledger claim supports. Replace with: 'Google says Timeline is saved on your phone, unless you turn on backup.' Add a claim c-timeline-backup (evidence: the backup passage above). (2) An essential caveat is missing from both the ledger and the script: 'Timeline is off by default for your Google Account and can only be turned on if you opt in.' (both Google snapshots, 'You're in control'). Without it, the hook and beat 6 'It's on your phone right now' overstate it. Add a claim c-timeline-off-by-default and a beat 3 line, e.g.: 'On Android, Google Maps Timeline is off unless you turn it on. Once it's on, it saves your visits and routes to your phone, even when Google apps aren't open.' (3) Beat 4 'it's a diary of your days' is an analogy and is not in the ledger. For Google it is defensible (e4 'go back in time and remember where you've been'; 'Find your travels' gives a per-day calendar view). For Apple, no day view is documented. Either add an analogy claim scoped to these passages, or say 'Either way, it's a record of where you've been.' (4) Beat 4 visual ('trails like handwriting across the city') has no 'Illustration' label. Add it to onScreenText. (5) Optional: Timeline also exists in Google Maps on iPhone (the caption already cites the iOS page). Consider on-screen text 'Google Maps Timeline (Android; also Google Maps on iPhone)'.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "77f44ec5548d55af88dec14c05e5c6a2e61b8fedcf8ddf6452b2f7f3eac7294d",
+    "createdAt": "2026-10-26T11:33:00.000Z"
+  },
+  {
+    "id": "rev-ai-r1-LU-TECH-003-c-android-timeline-path",
+    "claimId": "c-android-timeline-path",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 1)",
+    "verdict": "pass_with_changes",
+    "notes": "e6 and e7 are verbatim in source-text/src-google-timeline-android.txt. e6 supports the path 'Google Maps > profile picture or initial > Your Timeline'. e7 ('Under \"Location settings,\" check that it says \"Timeline is on') is a truncated fragment from the TURN ON steps. It does not support the claim's 'it can be turned off in Location & privacy settings'. Replace e7 with the Turn off Timeline passage, which is verbatim in the snapshot: 'Tap More Location & privacy settings. Tap Timeline is on. Under \"Timeline,\" from the dropdown menu, tap Turn off or Turn off and delete activity.' Script problems: (1) Beat 5 'Then keep it, or turn it off.' withholds an essential instruction. Google offers two options, 'Turn off' and 'Turn off and delete activity', and says 'You'll keep your Timeline based on your auto-delete settings, or until you delete it.' A viewer who just turns it off may think the history is gone. Suggested narration: 'Then keep it, turn it off, or turn it off and delete it.' Suggested on-screen line: 'To erase it too: Turn off and delete activity'. Add a ledger claim c-timeline-off-vs-delete with the passage above. (2) Caption/on-screen 'Google Maps > profile picture > Your Timeline' should read 'profile picture or initial', matching the source. (3) Caption limit to add: 'Deleting Timeline doesn't delete backups, and other Google settings such as Web & App Activity can also save location info' (both on the same page, 'Delete Timeline data' section).",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "77f44ec5548d55af88dec14c05e5c6a2e61b8fedcf8ddf6452b2f7f3eac7294d",
+    "createdAt": "2026-10-26T11:33:00.000Z"
+  },
+  {
+    "id": "rev-ai-r1-LU-TECH-003-c-autodelete-options",
+    "claimId": "c-autodelete-options",
+    "episodeVersionId": null,
+    "reviewerKind": "ai_verification",
+    "reviewer": "claude-opus-5-5 (independent evidence agent, round 1)",
+    "verdict": "fail",
+    "notes": "e8 and e9 are verbatim in the Android and iOS Google snapshots. The numbers 3/18/36 months match exactly, and 36 months = 3 years is correct. The twist misstates them: (1) 'At the longest, that's three years of places.' is FALSE per the same pages. Auto-delete can be off ('tap Auto-delete Timeline Don't auto-delete activity'). Backup REQUIRES auto-delete off ('To turn on Timeline backups, first turn off auto-delete'). And 'You'll keep your Timeline based on your auto-delete settings, or until you delete it.' So 36 months is the longest auto-delete option, not the longest retention. The ledger limitation 'the page does not say what happens when auto-delete is off' is also wrong and must be corrected. (2) 'Google can auto-delete it' makes Google the actor and leaves 'it' ambiguous. Auto-delete is a choice the user makes, and it applies only to Google Maps Timeline, not to the iPhone data discussed in the same breath. (3) 'It's on your phone right now.' is unsupported and contradicted: Google says 'Timeline is off by default ... and can only be turned on if you opt in', and the Apple sources don't state the default. (4) The '36 months' card over a city-wide web, right after 'that's three years of places', implies three years of data is kept by default. Replacement narration: 'In Google Maps, you can set it to auto-delete after three, eighteen or thirty-six months. Or never: Google says it's kept until you delete it. If it's on, it's on your phone right now. Go check.' On-screen: 'Google Maps Timeline auto-delete: 3, 18 or 36 months, or off' / 'Off = kept until you delete it'. Keep 'Illustration' on the web visual. Add a ledger claim c-timeline-kept-until-deleted (evidence: 'You'll keep your Timeline based on your auto-delete settings, or until you delete it.'). 'Go check.' is an instruction to check a setting, not engagement bait, and the ending does not point to another Reel.",
+    "documentRef": null,
+    "authorizedDisplayWording": null,
+    "subjectSha256": "77f44ec5548d55af88dec14c05e5c6a2e61b8fedcf8ddf6452b2f7f3eac7294d",
+    "createdAt": "2026-10-26T11:33:00.000Z"
+  }
+]
