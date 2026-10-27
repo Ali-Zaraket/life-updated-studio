@@ -29,6 +29,22 @@ describe('evidence store', () => {
     const [src] = (await db.select().from(t.sources)).filter((s) => s.id === source.id);
     expect(src!.available).toBe(false);
   });
+
+  it('refuses another topic\'s evidence under an id already in use, instead of silently dropping it', async () => {
+    const fx = fixturePacket(NOW).packet;
+    await saveEvidencePacket(db, { ...fx, reviews: [] });
+    const again = await saveEvidencePacket(db, { ...fx, reviews: [] }).then(() => 'ok');
+    expect(again).toBe('ok'); // re-saving identical evidence is fine
+    const e = fx.evidence[0]!;
+    const other = {
+      ...fx,
+      topic: { ...fx.topic, id: 'other-topic' },
+      claims: fx.claims.map((c) => ({ ...c, id: `other-${c.id}`, topicId: 'other-topic' })),
+      evidence: [{ ...e, claimId: `other-${e.claimId}` }],
+      reviews: [],
+    };
+    await expect(saveEvidencePacket(db, other)).rejects.toThrow(/evidence_id_conflict|already used for other evidence/);
+  });
 });
 
 describe('pilot loader', () => {

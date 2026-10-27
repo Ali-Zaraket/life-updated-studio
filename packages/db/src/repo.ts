@@ -155,7 +155,19 @@ export async function saveEvidencePacket(
         },
       });
     }
-    if (p.evidence.length) await tx.insert(t.claimEvidence).values(p.evidence).onConflictDoNothing();
+    if (p.evidence.length) {
+      // Evidence is immutable, so a re-save of the same row is skipped. A different row under an existing id would be
+      // skipped too and leave its claim unsupported without a word; refuse it instead (ids are global, not per topic).
+      const existing = await tx.select().from(t.claimEvidence).where(inArray(t.claimEvidence.id, p.evidence.map((e) => e.id)));
+      const clash = existing.filter((row) => {
+        const mine = p.evidence.find((e) => e.id === row.id)!;
+        return row.claimId !== mine.claimId || row.sourceId !== mine.sourceId || row.supportingPassage !== mine.supportingPassage;
+      });
+      if (clash.length) {
+        throw new DomainError('evidence_id_conflict', `evidence id(s) already used for other evidence: ${clash.map((r) => `${r.id} (claim ${r.claimId})`).join(', ')}; give this packet's evidence unique ids`);
+      }
+      await tx.insert(t.claimEvidence).values(p.evidence).onConflictDoNothing();
+    }
     if (p.reviews.length) await tx.insert(t.reviewRecords).values(p.reviews).onConflictDoNothing();
   });
 }
