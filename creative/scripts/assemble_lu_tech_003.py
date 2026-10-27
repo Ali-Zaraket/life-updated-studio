@@ -9,7 +9,13 @@ S = os.path.join(root, 'storage', 'creative')
 FPS = 30
 script = json.load(open(os.path.join(root, 'content', 'pilots', 'LU-TECH-003', 'script.json'), encoding='utf-8'))
 timing = json.load(open(os.path.join(S, 'narration-timing.json'), encoding='utf-8'))
-narration = os.path.join(root, 'storage', 'episodes', 'LU-TECH-003', 'v2', 'narration', 'audition-elevenlabs-eleven-chris_v1792795415.wav')
+def latest_narration(root):
+    """The narration recorded for the newest script version (storage/episodes/LU-TECH-003/v<n>/narration/*.wav)."""
+    base = os.path.join(root, 'storage', 'episodes', 'LU-TECH-003')
+    versions = sorted((int(d[1:]), d) for d in os.listdir(base) if d.startswith('v') and d[1:].isdigit() and os.path.isdir(os.path.join(base, d, 'narration')))
+    folder = os.path.join(base, versions[-1][1], 'narration')
+    return os.path.join(folder, next(f for f in sorted(os.listdir(folder)) if f.endswith('.wav')))
+narration = latest_narration(root)
 on_screen = {i: b.get('onScreenText', []) for i, b in enumerate(script['beats'])}
 
 sc = bpy.context.scene
@@ -42,9 +48,11 @@ def effect(name, kind, channel, start, end):
 
 font = bpy.data.fonts.load(os.path.join(os.path.dirname(bpy.app.binary_path), '5.2', 'datafiles', 'fonts', 'Inter.woff2'), check_existing=True)
 
-def text(name, body, t0, t1, channel, y, size, x=0.5, anchor_x='CENTER', box=False, color=(1, 1, 1, 1)):
+def text(name, body, t0, t1, channel, y, size, x=0.5, anchor_x='CENTER', box=False, color=(1, 1, 1, 1), bold=False):
     st = effect(name, 'TEXT', channel, fr(t0), fr(t1))
     st.text = body; st.font = font; st.font_size = size * k
+    if bold:
+        st.use_bold = True
     st.location = (x, y); st.anchor_x = anchor_x; st.anchor_y = 'CENTER'; st.alignment_x = anchor_x
     st.color = color; st.wrap_width = 0.88
     st.use_shadow = True; st.shadow_color = (0, 0, 0, 0.85)
@@ -66,24 +74,26 @@ def sound(name, path, t0, channel, volume, src_from=0.0, src_to=None):
 starts = {}
 for s in timing:
     starts.setdefault(s['beat'], s['start'])
-b1, b2, b3, b4, b5 = (starts[i] for i in range(1, 6))
+b1, b2, b3, b4 = (starts[i] for i in range(1, 5))       # hook | iPhone | Android | stakes | where it lives | twist
 never = next(s['start'] for s in timing if s['text'].startswith('Or never'))
-end_C = never + 6.10                                    # screen dies just after "...right now."
+right_now = next(s['end'] for s in timing if s['text'].startswith("If it's on"))
+end_C = right_now + 0.12                                # screen dies just after "...right now."
 end_A = never - 6.0                                     # ending clip's dead stop (its 6.0 s) lands on "Or never"
 total = end_C + 110 / FPS
 
-# ---- picture (channel 1) ----
+# ---- picture (channel 1); each section opens on a different kind of shot (owner note 2) ----
 frames_strip('hook', 'shot01v3_frames', range(1, int(round(b1 * FPS)) + 1), 1, 1)
-n = fr(b2) - fr(b1); frames_strip('iphone', 'scene2_frames', range(16, 16 + n), fr(b1), 1)
-n = fr(b3) - fr(b2); frames_strip('android', 'scene3_frames', range(19, 19 + n), fr(b2), 1)
-n = fr(b4) - fr(b3); frames_strip('stakes', 'scene4_frames', stretch(31, 252, n), fr(b3), 1)
-plate = se.strips.new_image('steps', os.path.join(S, 'shot01v3_frames', 'f_0150.png'), 1, fr(b4))
+wide = min(110, fr(b2) - fr(b1) - 90)                   # wide moonlit bedroom, then the macro of the place list
+frames_strip('iphone_wide', 'scene2a_frames', range(1, wide + 1), fr(b1), 1)
+n = fr(b2) - fr(b1) - wide; frames_strip('iphone', 'scene2_frames', range(300 - n + 1, 301), fr(b1) + wide, 1)
+n = fr(b3) - fr(b2); frames_strip('android', 'scene3b_frames', stretch(1, 300, n), fr(b2), 1)
+n = fr(b4) - fr(b3); frames_strip('stakes', 'scene4_frames', stretch(1, 252, n), fr(b3), 1)
+plate = se.strips.new_image('where', os.path.join(S, 'shot01v3_frames', 'f_0150.png'), 1, fr(b4))   # dimmed nightstand under the paths
 plate.frame_final_duration = fr(end_A) - fr(b4)
 plate.color_multiply = 0.38
-plate.transform.scale_x = plate.transform.scale_y = 1.0
-plate.transform.keyframe_insert('scale_x', frame=fr(b4)); plate.transform.keyframe_insert('scale_y', frame=fr(b4))
-plate.transform.scale_x = plate.transform.scale_y = 1.08
-plate.transform.keyframe_insert('scale_x', frame=fr(end_A)); plate.transform.keyframe_insert('scale_y', frame=fr(end_A))
+for v, f_ in ((1.0, fr(b4)), (1.06, fr(end_A))):
+    plate.transform.scale_x = plate.transform.scale_y = v
+    plate.transform.keyframe_insert('scale_x', frame=f_); plate.transform.keyframe_insert('scale_y', frame=f_)
 frames_strip('end_A', 'ending_frames', range(1, 181), fr(end_A), 1)
 frames_strip('end_B', 'ending_frames', stretch(181, 330, fr(end_C) - fr(never)), fr(never), 1)
 frames_strip('end_C', 'ending_frames', range(331, 441), fr(end_C), 1)
@@ -92,19 +102,15 @@ frames_strip('end_C', 'ending_frames', range(331, 441), fr(end_C), 1)
 ILL = 'Illustration'
 def ill(t0, t1): text(f'ill_{t0:.1f}', ILL, t0, t1, 5, 0.955, 26, x=0.06, anchor_x='LEFT', color=(1, 1, 1, 0.75))
 def credit(t0, t1): text(f'osm_{t0:.1f}', '© OpenStreetMap contributors', t0, t1, 6, 0.035, 20, x=0.95, anchor_x='RIGHT', color=(1, 1, 1, 0.7))
-assert ILL in on_screen[0] and ILL in on_screen[1] and ILL in on_screen[2] and ILL in on_screen[3] and ILL in on_screen[5]
+assert all(ILL in on_screen[i] for i in (0, 1, 2, 3, 5))
 ill(0, b1); ill(b1, b2); ill(b2, b3); ill(b3, b4); ill(end_A, end_C)       # the web stays on screen until it goes dark
 credit(0, b1); credit(b3, b4); credit(end_A, end_C)
 text('card_iphone', on_screen[1][0], b1 + 0.3, b2, 4, 0.83, 44, box=True)
 text('card_android', on_screen[2][0], b2 + 0.3, b3, 4, 0.83, 44, box=True)
-steps = on_screen[4]
-iphone_t = next(s['start'] for s in timing if s['text'].startswith('On iPhone, you can'))
-maps_t = next(s['start'] for s in timing if s['text'].startswith('In Google Maps'))
-text('step1', steps[0], iphone_t, end_A, 4, 0.80, 34, box=True)
-text('step2', steps[1], iphone_t + 0.4, end_A, 5, 0.75, 34, box=True)
-text('step3', steps[2], maps_t, end_A, 6, 0.66, 34, box=True)
-text('step4', steps[3], maps_t + 0.4, end_A, 7, 0.61, 34, box=True)
-text('step5', steps[4], maps_t + 2.2, end_A, 8, 0.52, 34, box=True)
+b5 = starts[5]
+for j, (line, y) in enumerate(zip(on_screen[4], (0.62, 0.57, 0.47, 0.42))):   # where each setting lives
+    # held ~3 s into the twist so the paths can actually be read (independent review, round 6)
+    text(f'where_{j}', line, b4 + 0.25 + 0.35 * j, max(end_A, b5 + 3.0), 4 + j, y, 34, box=True)
 auto_t = next(s['start'] for s in timing if s['text'].startswith('You can set'))
 text('card_auto', on_screen[5][0], auto_t + 1.0, never, 4, 0.83, 44, box=True)
 text('card_off', on_screen[5][1], never, end_C, 4, 0.83, 52, box=True)
@@ -124,18 +130,18 @@ for i, s in enumerate(timing):
         chunks.append(cur)
     weights = [sum(syl(w) for w in c) for c in chunks]; total_w = sum(weights)
     t = s['start']
+    # one caption at a time: the last chunk may hold into the pause, but never past the next sentence's start
+    hold_until = timing[i + 1]['start'] if i + 1 < len(timing) else s['end'] + 0.4
     for j, (c, wgt) in enumerate(zip(chunks, weights)):
         d = (s['end'] - s['start']) * wgt / total_w
-        text(f'cap_{i}_{j}', ' '.join(c), t, t + d + (0.15 if j == len(chunks) - 1 else 0), 9, 0.27, 50)
+        t1 = min(s['end'] + 0.3, hold_until) if j == len(chunks) - 1 else t + d
+        if fr(t1) > fr(t):
+            text(f'cap_{i}_{j}', ' '.join(c), t, t1, 9, 0.27, 52, bold=True)
         t += d
 
-# ---- sound: narration on top, scene sound ducked underneath ----
+# ---- sound: narration on top; one evolving score (already ducked under the voice) up to the ending ----
 sound('voice', narration, 0, 10, 1.0)
-sound('s_hook', os.path.join(S, 'shot01-sound.wav'), 0, 11, 0.42, 0, b1)
-sound('s_iphone', os.path.join(S, 'scene2-sound.wav'), b1, 12, 0.30, 0.5, 0.5 + (b2 - b1))
-sound('s_android', os.path.join(S, 'scene3-sound.wav'), b2, 13, 0.30, 0.6, 0.6 + (b3 - b2))
-sound('s_stakes', os.path.join(S, 'scene4-sound.wav'), b3, 14, 0.32, 1.0, 1.0 + (b4 - b3))
-sound('s_steps', os.path.join(S, 'steps-sound.wav'), b4, 15, 0.30, 0, end_A - b4)
+sound('score', os.path.join(S, 'score-lu-tech-003.wav'), 0, 11, 0.9, 0, end_A)
 end_wav = os.path.join(S, 'ending-sound-v2.wav')
 sound('s_end_A', end_wav, end_A, 16, 0.40, 0, 6.0)
 sound('s_end_B', end_wav, never, 17, 0.40, 6.0, 11.0)
@@ -149,6 +155,6 @@ sc.render.ffmpeg.audio_codec = 'AAC'; sc.render.ffmpeg.audio_bitrate = 192; sc.r
 sc.render.ffmpeg.audio_channels = 'STEREO'
 sc.render.filepath = out
 bpy.ops.wm.save_as_mainfile(filepath=os.path.join(S, 'lu-tech-003-edit.blend'))
-print(f'timeline {total:.2f}s: b1 {b1:.2f} b2 {b2:.2f} b3 {b3:.2f} b4 {b4:.2f} endA {end_A:.2f} never {never:.2f} endC {end_C:.2f}')
+print(f'timeline {total:.2f}s: b1 {b1:.2f} b2 {b2:.2f} b3 {b3:.2f} endA {end_A:.2f} never {never:.2f} endC {end_C:.2f}')
 bpy.ops.render.render(animation=True)
 print('wrote', out)

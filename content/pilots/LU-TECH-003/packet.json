@@ -25,7 +25,7 @@
       "institution": "Apple",
       "sourceType": "official_documentation",
       "publishedAt": null,
-      "retrievedAt": "2026-10-27T08:30:53.202Z",
+      "retrievedAt": "2026-10-27T09:20:12.064Z",
       "originId": "apple-official-docs",
       "available": true,
       "retractionCheckedAt": "2026-10-27T08:30:51.898Z",
@@ -42,7 +42,7 @@
       "institution": "Apple",
       "sourceType": "official_documentation",
       "publishedAt": "2026-02-01T00:00:00.000Z",
-      "retrievedAt": "2026-10-27T08:30:53.202Z",
+      "retrievedAt": "2026-10-27T09:20:12.064Z",
       "originId": "apple-official-docs",
       "available": true,
       "retractionCheckedAt": "2026-10-27T08:30:51.898Z",
@@ -59,13 +59,13 @@
       "institution": "Google (Google Maps Help)",
       "sourceType": "official_documentation",
       "publishedAt": null,
-      "retrievedAt": "2026-10-27T08:30:53.202Z",
+      "retrievedAt": "2026-10-27T09:20:12.064Z",
       "originId": "google-maps-help",
       "available": true,
       "retractionCheckedAt": "2026-10-27T08:30:51.898Z",
       "retracted": false,
       "correctionNote": null,
-      "contentSha256": "afda96d392fc3a603fd7f748856b095c52f99bf7964e01c76aba174c2740b4f3"
+      "contentSha256": "c16aff7e3f71141800f439bd572497b93139640150152c1dea447daea83e3665"
     },
     {
       "id": "src-google-timeline-ios",
@@ -76,13 +76,13 @@
       "institution": "Google (Google Maps Help)",
       "sourceType": "official_documentation",
       "publishedAt": null,
-      "retrievedAt": "2026-10-27T08:30:53.202Z",
+      "retrievedAt": "2026-10-27T09:20:12.064Z",
       "originId": "google-maps-help",
       "available": true,
       "retractionCheckedAt": "2026-10-27T08:30:51.898Z",
       "retracted": false,
       "correctionNote": null,
-      "contentSha256": "91a69001dd69b593caab73109de43b93a95611257c06231589a073bec276323c"
+      "contentSha256": "e9a9cea074c2f4e857695dc9566a18789d6240c376b1e8bd1062ab73c48cbd2f"
     }
   ],
   "claims": [
@@ -100,7 +100,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-27T08:30:53.202Z",
+      "lastCheckedAt": "2026-10-27T09:20:12.064Z",
       "permittedWording": null,
       "limitations": "Applies when the setting is on, on devices signed in to iCloud with an Apple Account; Apple says the data is used to learn places and routes significant to you. Apple's pages cited here do not say whether it is on by default or how to view it on iPhone.",
       "isNumeric": false,
@@ -120,7 +120,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-27T08:30:53.202Z",
+      "lastCheckedAt": "2026-10-27T09:20:12.064Z",
       "permittedWording": null,
       "limitations": "Apple's own statement about its encryption; not independently verified.",
       "isNumeric": false,
@@ -133,7 +133,6 @@
       "topicId": "pilot-tech-location-history",
       "text": "On iPhone the setting is at Settings > Privacy & Security > Location Services > System Services > Significant Locations & Routes, where it can be turned off.",
       "locations": [
-        "narration",
         "visual",
         "caption"
       ],
@@ -142,7 +141,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-27T08:30:53.202Z",
+      "lastCheckedAt": "2026-10-27T09:20:12.064Z",
       "permittedWording": null,
       "limitations": "Menu names can differ by iOS version and language.",
       "isNumeric": false,
@@ -164,7 +163,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-27T08:30:53.202Z",
+      "lastCheckedAt": "2026-10-27T09:20:12.064Z",
       "permittedWording": null,
       "limitations": "Applies only when Timeline is turned on; Google says the data is saved to each signed-in device.",
       "isNumeric": false,
@@ -177,7 +176,6 @@
       "topicId": "pilot-tech-location-history",
       "text": "On Android, Timeline is in Google Maps: tap your profile picture or initial, then Your Timeline; it can be turned off in Location & privacy settings.",
       "locations": [
-        "narration",
         "visual",
         "caption"
       ],
@@ -186,7 +184,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-27T08:30:53.202Z",
+      "lastCheckedAt": "2026-10-27T09:20:12.064Z",
       "permittedWording": null,
       "limitations": "Menu names can differ by app version and language.",
       "isNumeric": false,
@@ -207,7 +205,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-27T08:30:53.202Z",
+      "lastCheckedAt": "2026-10-27T09:20:12.064Z",
       "permittedWording": null,
       "limitations": "Google Account default as stated by Google.",
       "isNumeric": false,
@@ -228,7 +226,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-27T08:30:53.202Z",
+      "lastCheckedAt": "2026-10-27T09:20:12.064Z",
       "permittedWording": null,
       "limitations": "Google's own statement about encryption; not independently verified.",
       "isNumeric": false,
@@ -249,7 +247,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-27T08:30:53.202Z",
+      "lastCheckedAt": "2026-10-27T09:20:12.064Z",
       "permittedWording": null,
       "limitations": "Applies to Google Maps Timeline only.",
       "isNumeric": false,
@@ -262,8 +260,6 @@
       "topicId": "pilot-tech-location-history",
       "text": "In Google Maps, turning Timeline off and deleting it are separate choices: Turn off, or Turn off and delete activity.",
       "locations": [
-        "narration",
-        "visual",
         "caption"
       ],
       "status": "supported",
@@ -271,7 +267,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-27T08:30:53.202Z",
+      "lastCheckedAt": "2026-10-27T09:20:12.064Z",
       "permittedWording": null,
       "limitations": "Menu names can differ by app version and language.",
       "isNumeric": false,
@@ -284,16 +280,16 @@
       "topicId": "pilot-tech-location-history",
       "text": "When Timeline is on, Google Maps Timeline shows where and how you traveled.",
       "locations": [
-        "narration"
+        "caption"
       ],
       "status": "supported",
       "statusReason": null,
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-27T08:30:53.202Z",
+      "lastCheckedAt": "2026-10-27T09:20:12.064Z",
       "permittedWording": null,
-      "limitations": "Google Maps only.",
+      "limitations": "Google Maps only; not used in the video since the owner cut the viewing step (kept for the caption context).",
       "isNumeric": false,
       "isCausal": false,
       "isConsequential": true,
@@ -311,7 +307,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-27T08:30:53.202Z",
+      "lastCheckedAt": "2026-10-27T09:20:12.064Z",
       "permittedWording": null,
       "limitations": "Caption context only.",
       "isNumeric": false,
@@ -332,7 +328,7 @@
       "riskTier": "low",
       "timeSensitivity": "changing",
       "freshUntil": null,
-      "lastCheckedAt": "2026-10-27T08:30:53.202Z",
+      "lastCheckedAt": "2026-10-27T09:20:12.064Z",
       "permittedWording": null,
       "limitations": "When auto-delete is off, Google says Timeline is kept until you delete it.",
       "isNumeric": true,
@@ -554,11 +550,11 @@
     "pageSha256": {
       "src-apple-legal-location": "7f2e0ff34b8dfa4d90f3a0557a16fdc62171d3f6bae867fc56a514a03797dcee",
       "src-apple-safety-location": "2945689cbf02d719b1e2d8025dcdf1989b04a362e2949394ad73cea838de8abf",
-      "src-google-timeline-android": "afda96d392fc3a603fd7f748856b095c52f99bf7964e01c76aba174c2740b4f3",
-      "src-google-timeline-ios": "91a69001dd69b593caab73109de43b93a95611257c06231589a073bec276323c"
+      "src-google-timeline-android": "c16aff7e3f71141800f439bd572497b93139640150152c1dea447daea83e3665",
+      "src-google-timeline-ios": "e9a9cea074c2f4e857695dc9566a18789d6240c376b1e8bd1062ab73c48cbd2f"
     },
     "licence": "Short quotations for fact-checking; no page content is shown in the video.",
     "pageSha256Note": "sha256 of the normalised extracted page text (stable across requests), set by pilot:recheck.",
-    "lastRecheckAt": "2026-10-27T08:30:53.202Z"
+    "lastRecheckAt": "2026-10-27T09:20:12.064Z"
   }
 }
