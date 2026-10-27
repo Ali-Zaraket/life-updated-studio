@@ -78,7 +78,8 @@ b1, b2, b3, b4 = (starts[i] for i in range(1, 5))       # hook | iPhone | Androi
 never = next(s['start'] for s in timing if s['text'].startswith('Or never'))
 right_now = next(s['end'] for s in timing if s['text'].startswith("If it's on"))
 end_C = right_now + 0.12                                # screen dies just after "...right now."
-end_A = never - 6.0                                     # ending clip's dead stop (its 6.0 s) lands on "Or never"
+end_A = starts[5]                                       # the ending starts with the twist; its build is fitted so the
+                                                        # dead stop (clip 6.0 s) lands on "Or never"
 total = end_C + 110 / FPS
 
 # ---- picture (channel 1); each section opens on a different kind of shot (owner note 2) ----
@@ -94,7 +95,7 @@ plate.color_multiply = 0.38
 for v, f_ in ((1.0, fr(b4)), (1.06, fr(end_A))):
     plate.transform.scale_x = plate.transform.scale_y = v
     plate.transform.keyframe_insert('scale_x', frame=f_); plate.transform.keyframe_insert('scale_y', frame=f_)
-frames_strip('end_A', 'ending_frames', range(1, 181), fr(end_A), 1)
+frames_strip('end_A', 'ending_frames', stretch(1, 180, fr(never) - fr(end_A)), fr(end_A), 1)
 frames_strip('end_B', 'ending_frames', stretch(181, 330, fr(end_C) - fr(never)), fr(never), 1)
 frames_strip('end_C', 'ending_frames', range(331, 441), fr(end_C), 1)
 
@@ -112,7 +113,7 @@ for j, (line, y) in enumerate(zip(on_screen[4], (0.62, 0.57, 0.47, 0.42))):   # 
     # held ~3 s into the twist so the paths can actually be read (independent review, round 6)
     text(f'where_{j}', line, b4 + 0.25 + 0.35 * j, max(end_A, b5 + 3.0), 4 + j, y, 34, box=True)
 auto_t = next(s['start'] for s in timing if s['text'].startswith('You can set'))
-text('card_auto', on_screen[5][0], auto_t + 1.0, never, 4, 0.83, 44, box=True)
+text('card_auto', on_screen[5][0], max(auto_t + 1.0, b5 + 3.0), never, 4, 0.83, 44, box=True)   # after the path cards clear
 text('card_off', on_screen[5][1], never, end_C, 4, 0.83, 52, box=True)
 
 # ---- captions: each sentence split into short chunks, timed by syllables ----
@@ -143,7 +144,7 @@ for i, s in enumerate(timing):
 sound('voice', narration, 0, 10, 1.0)
 sound('score', os.path.join(S, 'score-lu-tech-003.wav'), 0, 11, 0.9, 0, end_A)
 end_wav = os.path.join(S, 'ending-sound-v2.wav')
-sound('s_end_A', end_wav, end_A, 16, 0.40, 0, 6.0)
+sound('s_end_A', end_wav, end_A, 16, 0.40, max(0.0, 6.0 - (never - end_A)), 6.0)   # the build's last part, ending on the stop
 sound('s_end_B', end_wav, never, 17, 0.40, 6.0, 11.0)
 sound('s_end_C', end_wav, end_C, 18, 0.65, 11.0, 440 / FPS)
 

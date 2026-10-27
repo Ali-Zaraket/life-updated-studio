@@ -19,7 +19,7 @@ for s in timing:
     starts.setdefault(s['beat'], s['start'])
 b1, b2, b3 = starts[1], starts[2], starts[3]
 never = next(s['start'] for s in timing if s['text'].startswith('Or never'))
-END = never - 6.0                                       # the ending clip (and its sound) starts here
+END = starts[5]                                         # the ending clip (and its sound) starts with the twist
 t = np.arange(int(SR * END)) / SR
 rng = np.random.default_rng(3)
 mix = np.zeros((len(t), 2))
