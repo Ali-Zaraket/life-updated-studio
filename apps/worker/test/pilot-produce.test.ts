@@ -1,10 +1,11 @@
 import { readFileSync } from 'node:fs';
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { approveVoiceProfile, eq, ensureOwner, getEpisode, openPgliteDb, saveVoiceProfile, setSpending, tables as t, type Db } from '@life/db';
+import { approveVoiceProfile, eq, ensureOwner, getEpisode, getEpisodeVersion, openPgliteDb, saveVoiceProfile, setSpending, tables as t, type Db } from '@life/db';
+import { reviewSubjectSha256 } from '@life/contracts';
 import { buildWavFromPcm16, type TtsProvider, type TtsResult } from '@life/media';
 import type { RenderEpisodeInput, RenderResult } from '@life/render';
 import { LocalStorage, loadPilot, producePilot, type ProduceRender } from '../src/index';
@@ -186,6 +187,44 @@ describe('pilot production (fake TTS and render)', () => {
     } finally {
       await s.close();
       await rm(s.root, { recursive: true, force: true });
+    }
+  });
+
+  it('a visual-only edit becomes a new version that copies the paid narration instead of calling the provider again', async () => {
+    const s = await setup();
+    const dir = await mkdtemp(join(tmpdir(), 'life-pilot-'));
+    try {
+      await cp(PILOT, dir, { recursive: true, filter: (p) => !p.includes('source-text') });
+      const tts = new FakeTts();
+      const narrate = () => producePilot({ db: s.db, storage: s.storage, tts: () => tts, render: fakeRender().render, now: () => NOW, log: () => {} }, { code: CODE, accountId: 'mock-account', confirmSpend: true, narrateOnly: true });
+      expect((await narrate()).state).toBe('narrated');
+
+      const script = JSON.parse(await readFile(join(dir, 'script.json'), 'utf8'));
+      script.beats[0].visual = `${script.beats[0].visual} Shot from a different angle.`;
+      await writeFile(join(dir, 'script.json'), JSON.stringify(script));
+      expect((await loadPilot(s.db, dir, NOW)).state).toBe('blocked'); // new version, not yet reviewed
+      // the independent review of the edited version (copied verdicts, bound to the new script)
+      const ep = await getEpisode(s.db, s.episodeId);
+      const v2 = await getEpisodeVersion(s.db, ep.currentVersionId!);
+      expect(v2.versionNumber).toBe(2);
+      const subject = reviewSubjectSha256(v2);
+      const last = (await readdir(join(dir, 'reviews'))).filter((f) => f.endsWith('.json')).sort().at(-1)!;
+      const prior = JSON.parse(await readFile(join(dir, 'reviews', last), 'utf8')) as Record<string, unknown>[];
+      await writeFile(join(dir, 'reviews', 'zz-visual-edit.json'), JSON.stringify(prior.map((r) => ({ ...r, id: `${r.id}-v2`, subjectSha256: subject, createdAt: NOW.toISOString() }))));
+      expect((await loadPilot(s.db, dir, NOW)).state).toBe('verified');
+
+      const r = await narrate();
+      expect(r.state).toBe('narrated');
+      const current = await getEpisodeVersion(s.db, (await getEpisode(s.db, s.episodeId)).currentVersionId!);
+      expect(current.versionNumber).toBeGreaterThan(1);
+      expect(r.message).toContain(`storage/episodes/LU-TECH-002/v${current.versionNumber}/narration/`);
+      expect(r.costMicroUsd).toBe(0);
+      expect(tts.calls).toBe(1);
+      expect(await s.db.select().from(t.costEvents)).toHaveLength(1);
+    } finally {
+      await s.close();
+      await rm(s.root, { recursive: true, force: true });
+      await rm(dir, { recursive: true, force: true });
     }
   });
 

@@ -7,7 +7,7 @@
  * kept in storage and reused, so a failed render never pays for the same audio twice.
  */
 import { createHash } from 'node:crypto';
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { basename, dirname } from 'node:path';
 import { evaluateCreativeRules, evaluateEvidenceGate } from '@life/content';
 import type { Actor, Disclosure, EpisodeFormat } from '@life/contracts';
@@ -177,12 +177,21 @@ export async function producePilot(deps: ProduceDeps, o: ProduceOptions): Promis
     .update(JSON.stringify({ text, provider, voiceId: profile.voiceId, modelVersion: profile.modelVersion, profileId: profile.id, profileVersion: profile.version }))
     .digest('hex');
   let narration = await readNarration(narrationPath, key);
+  // A new version whose narration text and voice are unchanged (a visual-only edit) reuses the audio already paid for.
+  let reusedFrom: string | null = null;
+  for (let v = version.versionNumber - 1; !narration && v >= 1; v--) {
+    const rel = `episodes/${o.code}/v${v}/narration/${basename(narrationRel)}`;
+    if (await readNarration(storage.resolve(`storage://${rel}`), key)) reusedFrom = rel;
+    if (reusedFrom) break;
+  }
   const template = TEMPLATE_FOR_FORMAT[ep.format as EpisodeFormat];
   const estimate = estimateCostMicroUsd(provider, text);
 
   if (!o.confirmSpend) {
     if (narration) {
       log(`Narration already recorded (${narration.durationSec.toFixed(1)} s): the next run reuses it, no provider call`);
+    } else if (reusedFrom) {
+      log(`Same narration text and voice as storage/${reusedFrom}: the next run copies it, no provider call`);
     } else {
       const s = await spendStatus(db, now);
       log(`One ${provider} call, estimated ${usd(estimate)} (UNVERIFIED price). This month: ${usd(s.monthToDateMicroUsd)} of ${s.capMicroUsd === null ? 'no cap (paid calls disabled)' : usd(s.capMicroUsd)}`);
@@ -195,6 +204,14 @@ export async function producePilot(deps: ProduceDeps, o: ProduceOptions): Promis
 
   // 3. Narration with the approved voice: paid once, then reused.
   let costMicroUsd = 0;
+  if (!narration && reusedFrom) {
+    const from = storage.resolve(`storage://${reusedFrom}`);
+    await mkdir(dirname(narrationPath), { recursive: true });
+    await copyFile(from, narrationPath);
+    await copyFile(`${from}.json`, `${narrationPath}.json`);
+    narration = await readNarration(narrationPath, key);
+    if (narration) log(`Copied the narration from storage/${reusedFrom} (same text and voice)`);
+  }
   if (narration) {
     log(`Reusing recorded narration (${narration.durationSec.toFixed(1)} s, no provider call)`);
   } else {

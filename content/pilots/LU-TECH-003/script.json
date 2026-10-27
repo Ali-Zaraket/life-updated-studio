@@ -33,7 +33,7 @@
       "endSec": 26.9,
       "role": "mechanism",
       "narration": "On Android, Google Maps Timeline is off until you turn it on. Then it saves your visits and routes to your phone, even with Google apps closed.",
-      "visual": "Overhead view, slowly turning, of a second phone on rumpled bed linen in moonlight; generic Timeline-style day view (no Google branding). On-screen label: 'Illustration'.",
+      "visual": "Night aerial over an unnamed city (street layout from OpenStreetMap, buildings modelled, no place names). The city is quiet at first; then a red line draws one made-up day's route along the streets, a light marks each stop as it is reached, and the camera rises to show the whole route. No phone UI, no Google branding. On-screen labels: 'Illustration' and the map-data credit.",
       "claimIds": [
         "c-timeline-off-by-default",
         "c-android-timeline-saves"

@@ -83,16 +83,33 @@ open_ = 500 + 1800 * np.clip((t - b1) / max(0.1, b2 - b1), 0, 1)
 arp = lowpass(arp, open_) * section(b1, b2, 0.5)
 mix[:, 0] += arp * 0.10; mix[:, 1] += np.roll(arp, int(0.011 * SR)) * 0.10          # a little stereo width
 
-# 4. Android: slow plucked notes (piano-like) with an echo, a different colour from the arpeggio
-pluck = np.zeros_like(t); melody = ['F4', 'C4', 'A3', 'C4', 'G4', 'F4', 'C4', 'E4']
-tt, i = b2 + 0.5, 0
+# 4. Android (night aerial, android-city-events.json): only the pad while Timeline is "off"; a soft click and a rising
+# tone when the route starts; then plucked notes (piano-like, with an echo) pulse under it and each stop rings a bell
+# note as its light comes on, climbing the F chord (a revisit rings lower)
+city = json.load(open(os.path.join(S, 'android-city-events.json'), encoding='utf-8'))
+at = lambda frame: b2 + (frame - 1) / city['fps']
+route_on = at(city['routeOn'])
+n0 = int(route_on * SR); seg = t[n0:n0 + int(0.6 * SR)] - route_on
+click = np.zeros_like(t); click[n0:n0 + len(seg)] = rng.standard_normal(len(seg)) * np.exp(-seg * 90)
+rise = np.zeros_like(t); m = (t > route_on - 0.9) & (t < route_on + 0.05)
+rise[m] = np.sin(2 * np.pi * np.cumsum(300 + 900 * ((t[m] - route_on + 0.9) / 0.95) ** 2) / SR) * ((t[m] - route_on + 0.9) / 0.95) ** 3
+add(lowpass(click, 3500), 0.35); add(reverb(rise, 1.2, 0.4), 0.05)
+pluck = np.zeros_like(t); melody = ['F3', 'C4', 'A3', 'C4']
+tt, i = route_on, 0
 while tt < b3 - 0.6:
-    f = hz(melody[i % len(melody)]); n0 = int(tt * SR); n1 = min(len(t), n0 + int(1.6 * SR)); seg = t[n0:n1] - tt
+    f = hz(melody[i % len(melody)]); n0 = int(tt * SR); n1 = min(len(t), n0 + int(1.2 * SR)); seg = t[n0:n1] - tt
     tone = sum(np.sin(2 * np.pi * f * h * seg) / h ** 1.6 for h in (1, 2, 3, 4))
-    pluck[n0:n1] += tone * np.exp(-seg * 3.2) * (1 - np.exp(-seg * 300))
-    i += 1; tt += 60 / 72
+    pluck[n0:n1] += tone * np.exp(-seg * 4.5) * (1 - np.exp(-seg * 300))
+    i += 1; tt += 60 / 140
+bells = np.zeros_like(t); ladder = ['F4', 'A4', 'C5', 'E5', 'F5', 'A5', 'C6']; k_ = 0
+for ev in city['events']:
+    s0 = at(ev['frame']); f = hz('C5' if ev['kind'] == 'revisit' else ladder[min(k_, len(ladder) - 1)])
+    k_ += ev['kind'] != 'revisit'
+    n0 = int(s0 * SR); n1 = min(len(t), n0 + int(2.2 * SR)); seg = t[n0:n1] - s0
+    bells[n0:n1] += (np.sin(2 * np.pi * f * seg) + 0.4 * np.sin(2 * np.pi * f * 2.76 * seg) * np.exp(-seg * 6)) * np.exp(-seg * 2.4) * (1 - np.exp(-seg * 500))
 echo = np.zeros_like(pluck); d = int(0.42 * SR); echo[d:] = pluck[:-d] * 0.35
-add(reverb((pluck + echo) * section(b2, b3, 0.5), 1.6, 0.35), 0.11, pan=-0.1)
+add(reverb((pluck + echo) * section(route_on, b3, 0.3), 1.6, 0.35), 0.07, pan=-0.1)
+add(reverb(bells * section(b2, b3, 0.3), 2.2, 0.45), 0.13, pan=0.1)
 
 # 5. stakes: tremolo strings (detuned saws with fast volume flutter) and a riser into the ending
 strings = np.zeros_like(t)

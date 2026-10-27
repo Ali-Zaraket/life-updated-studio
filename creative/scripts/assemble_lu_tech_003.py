@@ -87,7 +87,8 @@ frames_strip('hook', 'shot01v3_frames', range(1, int(round(b1 * FPS)) + 1), 1, 1
 wide = min(110, fr(b2) - fr(b1) - 90)                   # wide moonlit bedroom, then the macro of the place list
 frames_strip('iphone_wide', 'scene2a_frames', range(1, wide + 1), fr(b1), 1)
 n = fr(b2) - fr(b1) - wide; frames_strip('iphone', 'scene2_frames', range(300 - n + 1, 301), fr(b1) + wide, 1)
-n = fr(b3) - fr(b2); frames_strip('android', 'scene3b_frames', stretch(1, 300, n), fr(b2), 1)
+n = fr(b3) - fr(b2); frames_strip('android', 'scene5_frames', range(1, n + 1), fr(b2), 1)   # night aerial, 1:1 so the
+                                                                                         # route starts just before "Then it saves..."
 n = fr(b4) - fr(b3); frames_strip('stakes', 'scene4_frames', stretch(1, 252, n), fr(b3), 1)
 plate = se.strips.new_image('where', os.path.join(S, 'shot01v3_frames', 'f_0150.png'), 1, fr(b4))   # dimmed nightstand under the paths
 plate.frame_final_duration = fr(end_A) - fr(b4)
@@ -105,9 +106,9 @@ def ill(t0, t1): text(f'ill_{t0:.1f}', ILL, t0, t1, 5, 0.955, 26, x=0.06, anchor
 def credit(t0, t1): text(f'osm_{t0:.1f}', '© OpenStreetMap contributors', t0, t1, 6, 0.035, 20, x=0.95, anchor_x='RIGHT', color=(1, 1, 1, 0.7))
 assert all(ILL in on_screen[i] for i in (0, 1, 2, 3, 5))
 ill(0, b1); ill(b1, b2); ill(b2, b3); ill(b3, b4); ill(end_A, end_C)       # the web stays on screen until it goes dark
-credit(0, b1); credit(b3, b4); credit(end_A, end_C)
+credit(0, b1); credit(b2, b4); credit(end_A, end_C)
 text('card_iphone', on_screen[1][0], b1 + 0.3, b2, 4, 0.83, 44, box=True)
-text('card_android', on_screen[2][0], b2 + 0.3, b3, 4, 0.83, 44, box=True)
+text('card_android', on_screen[2][0], b2 + 0.3, b3, 4, 0.83, 38, box=True)   # one line, so the box draws
 b5 = starts[5]
 for j, (line, y) in enumerate(zip(on_screen[4], (0.62, 0.57, 0.47, 0.42))):   # where each setting lives
     # held ~3 s into the twist so the paths can actually be read (independent review, round 6)
