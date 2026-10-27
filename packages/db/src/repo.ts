@@ -130,7 +130,9 @@ export async function saveEvidencePacket(
   await db.transaction(async (tx) => {
     await tx.insert(t.topics).values(p.topic).onConflictDoNothing();
     // Rechecks change availability, retraction and claim status; those must reach the gate, so they update in place.
-    // Identity fields (URL, origin, claim text) are left as first stored.
+    // A reviewed ledger edit to a claim's locations or limitations updates too: it changes the ledger hash, so every
+    // version bound to the old ledger fails the gate until re-verified. Identity fields (URL, origin, claim text) are
+    // left as first stored.
     if (p.sources.length) {
       await tx.insert(t.sources).values(p.sources).onConflictDoUpdate({
         target: t.sources.id,
@@ -152,6 +154,8 @@ export async function saveEvidencePacket(
           statusReason: sql`excluded.status_reason`,
           lastCheckedAt: sql`excluded.last_checked_at`,
           freshUntil: sql`excluded.fresh_until`,
+          locations: sql`excluded.locations`,
+          limitations: sql`excluded.limitations`,
         },
       });
     }

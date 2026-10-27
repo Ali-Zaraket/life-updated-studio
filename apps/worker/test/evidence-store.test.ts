@@ -21,11 +21,11 @@ describe('evidence store', () => {
     const source = fx.sources[0]!;
     await saveEvidencePacket(db, {
       ...packet,
-      claims: fx.claims.map((c) => (c.id === claim.id ? { ...c, status: 'unresolved' as const, statusReason: 'passage no longer on the page', text: 'edited text is ignored' } : c)),
+      claims: fx.claims.map((c) => (c.id === claim.id ? { ...c, status: 'unresolved' as const, statusReason: 'passage no longer on the page', text: 'edited text is ignored', limitations: 'reviewed limitation', locations: ['caption'] } : c)),
       sources: fx.sources.map((s) => (s.id === source.id ? { ...s, available: false } : s)),
     });
     const stored = await loadEvidencePacket(db, fx.topic.id);
-    expect(stored.claims.find((c) => c.id === claim.id)).toMatchObject({ status: 'unresolved', statusReason: 'passage no longer on the page', text: claim.text });
+    expect(stored.claims.find((c) => c.id === claim.id)).toMatchObject({ status: 'unresolved', statusReason: 'passage no longer on the page', text: claim.text, limitations: 'reviewed limitation', locations: ['caption'] });
     const [src] = (await db.select().from(t.sources)).filter((s) => s.id === source.id);
     expect(src!.available).toBe(false);
   });
