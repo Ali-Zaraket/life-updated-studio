@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { fixturePacket } from '@life/content';
-import { loadEvidencePacket, openPgliteDb, saveEvidencePacket, tables as t, type Db } from '@life/db';
+import { eq, loadEvidencePacket, openPgliteDb, saveEvidencePacket, tables as t, type Db } from '@life/db';
 import { loadPilot } from '../src/index';
 
 const NOW = new Date('2026-10-23T09:00:00.000Z');
@@ -54,6 +54,25 @@ describe('pilot loader', () => {
     await cp(join(__dirname, '../../../content/pilots/LU-TECH-002'), dir, { recursive: true, filter: (p) => !p.includes('source-text') });
   });
   afterEach(async () => rm(dir, { recursive: true, force: true }));
+
+  it('turns a changed script into a new version once verified, and leaves an unchanged one alone', async () => {
+    const lastCheck = JSON.parse(await readFile(join(dir, 'packet.json'), 'utf8')).provenance.lastRecheckAt as string;
+    const at = new Date(Date.parse(lastCheck) + 3_600_000);
+    expect((await loadPilot(db, dir, at)).state).toBe('verified');
+    const again = await loadPilot(db, dir, at);
+    expect(again.state).toBe('verified');
+    expect(again.blockers[0]).toMatch(/unchanged; not reloading/);
+    const scriptPath = join(dir, 'script.json');
+    const script = JSON.parse(await readFile(scriptPath, 'utf8'));
+    script.caption = `${script.caption}\nEdited after review.`;
+    await writeFile(scriptPath, JSON.stringify(script));
+    const r = await loadPilot(db, dir, at);
+    const versions = await db.select().from(t.episodeVersions).where(eq(t.episodeVersions.episodeId, r.episodeId));
+    expect(versions).toHaveLength(2);
+    // the old reviews were bound to the old script, so the edit must be reviewed again
+    expect(r.state).toBe('blocked');
+    expect(r.blockers.join(' ')).toMatch(/missing_ai_verification/);
+  });
 
   it('refuses qualified human reviews that arrive as files', async () => {
     const [first] = JSON.parse(await readFile(join(dir, 'reviews', 'round-1.json'), 'utf8')) as Record<string, unknown>[];

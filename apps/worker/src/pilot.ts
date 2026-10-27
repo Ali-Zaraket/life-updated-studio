@@ -1,8 +1,11 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { claimLedgerSha256, evaluateCreativeRules, evaluateEvidenceGate } from '@life/content';
-import { Claim, ClaimEvidence, EpisodeFormat, ReviewRecord, ScriptBeat, Source, Topic, type Actor } from '@life/contracts';
-import { createEpisode, createEpisodeVersion, eq, getEpisode, loadEvidencePacket, saveEpisodeLink, saveEvidencePacket, tables as t, transitionEpisode, type Db } from '@life/db';
+import { Claim, ClaimEvidence, EpisodeFormat, ReviewRecord, ScriptBeat, Source, Topic, hashCanonical, type Actor } from '@life/contracts';
+import { createEpisode, createEpisodeVersion, eq, getEpisode, getEpisodeVersion, loadEvidencePacket, saveEpisodeLink, saveEvidencePacket, tables as t, transitionEpisode, type Db } from '@life/db';
+
+/** States after the gates where a changed script must become a new version (publishing and later use corrections). */
+const POST_SCRIPT = new Set(['verified', 'preview_ready', 'awaiting_user_approval', 'approved', 'scheduled']);
 import { z } from 'zod';
 
 const PacketFile = z.object({
@@ -56,17 +59,19 @@ export async function loadPilot(db: Db, dir: string, now = new Date()): Promise<
     await transitionEpisode(db, { episodeId, to: 'evidence_ready', actor, now });
   }
   const ep = await getEpisode(db, episodeId);
-  if (!['evidence_ready', 'scripted', 'blocked'].includes(ep.state)) {
+  const content = { beats: script.beats, caption: script.caption, sourceList: script.sourceList, claimIds: script.claimIds, claimLedgerSha256: claimLedgerSha256(packet.claims, packet.evidence) };
+  if (POST_SCRIPT.has(ep.state)) {
+    // Past the gates already: an unchanged script is not reloaded. A changed one becomes a new version, which
+    // revokes any approval and sends the episode back through the gates (createEpisodeVersion does both).
+    const current = ep.currentVersionId ? await getEpisodeVersion(db, ep.currentVersionId) : null;
+    const same = current && hashCanonical({ beats: current.beats, caption: current.caption, sourceList: current.sourceList, claimIds: current.claimIds, claimLedgerSha256: current.claimLedgerSha256 }) === hashCanonical(content);
+    if (same) return { episodeId, state: ep.state, blockers: [`episode is ${ep.state} and the script is unchanged; not reloading`] };
+  } else if (!['evidence_ready', 'scripted', 'blocked'].includes(ep.state)) {
     return { episodeId, state: ep.state, blockers: [`episode is ${ep.state}; not reloading`] };
   }
   if (ep.state === 'blocked') await transitionEpisode(db, { episodeId, to: 'scripted', actor, now });
 
-  const version = await createEpisodeVersion(db, {
-    episodeId,
-    content: { beats: script.beats, caption: script.caption, sourceList: script.sourceList, claimIds: script.claimIds, claimLedgerSha256: claimLedgerSha256(packet.claims, packet.evidence) },
-    actor,
-    now,
-  });
+  const version = await createEpisodeVersion(db, { episodeId, content, actor, now });
   await saveEpisodeLink(db, { ...script.link, episodeId });
   if ((await getEpisode(db, episodeId)).state === 'evidence_ready') await transitionEpisode(db, { episodeId, to: 'scripted', actor, now });
 
