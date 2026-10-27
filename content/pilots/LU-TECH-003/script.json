@@ -1,0 +1,132 @@
+{
+  "beats": [
+    {
+      "startSec": 0,
+      "endSec": 6.4,
+      "role": "hook",
+      "narration": "Your phone may be keeping a map of the places you go. Including this one.",
+      "visual": "Dark bedroom at night, phone on a nightstand. Screen snaps on: an unnamed city map at night; a red trail draws itself pin by pin; the last pin pulses. On-screen label: 'Illustration'.",
+      "claimIds": [
+        "c-iphone-keeps-places",
+        "c-android-timeline-saves"
+      ],
+      "onScreenText": [
+        "Illustration"
+      ]
+    },
+    {
+      "startSec": 6.4,
+      "endSec": 16.4,
+      "role": "mechanism",
+      "narration": "On iPhone, with Significant Locations and Routes on, Apple says it keeps track of where you've recently been, how often, when, and your routes.",
+      "visual": "Macro shot along the phone; the trail redraws as a list of visited places with times (generic place names, no real person's data, not styled as iPhone Settings). On-screen label: 'Illustration'.",
+      "claimIds": [
+        "c-iphone-keeps-places"
+      ],
+      "onScreenText": [
+        "iPhone: Significant Locations & Routes",
+        "Illustration"
+      ]
+    },
+    {
+      "startSec": 16.4,
+      "endSec": 27.7,
+      "role": "mechanism",
+      "narration": "On Android, Google Maps Timeline is off until you turn it on. Then it saves your visits and routes to your phone, even with Google apps closed.",
+      "visual": "Second phone on the bed in moonlight; generic Timeline-style day view (no Google branding). On-screen label: 'Illustration'.",
+      "claimIds": [
+        "c-timeline-off-by-default",
+        "c-android-timeline-saves"
+      ],
+      "onScreenText": [
+        "Android: Google Maps Timeline (off by default)",
+        "Illustration"
+      ]
+    },
+    {
+      "startSec": 27.7,
+      "endSec": 36.1,
+      "role": "problem",
+      "narration": "On iPhone, Apple says it can't read yours. Google says Timeline stays on your phone, unless you turn on backup.",
+      "visual": "Slow push into the glowing map; trails like handwriting across the city. On-screen label: 'Illustration'.",
+      "claimIds": [
+        "c-iphone-encrypted",
+        "c-android-timeline-saves",
+        "c-timeline-backup"
+      ],
+      "onScreenText": [
+        "Illustration"
+      ]
+    },
+    {
+      "startSec": 36.1,
+      "endSec": 48.3,
+      "role": "takeaway",
+      "narration": "Here's where it lives. On iPhone, you can turn it off. In Google Maps, look through it, then keep it, turn it off, or delete it.",
+      "visual": "Clean on-screen steps over the dimmed bedroom, each line appearing in turn.",
+      "claimIds": [
+        "c-iphone-setting-path",
+        "c-android-timeline-path",
+        "c-timeline-view",
+        "c-timeline-off-vs-delete"
+      ],
+      "onScreenText": [
+        "iPhone: Settings > Privacy & Security > Location Services",
+        "> System Services > Significant Locations & Routes",
+        "Android: Google Maps > profile picture or initial",
+        "> Your Timeline",
+        "To erase it too: Turn off and delete activity"
+      ]
+    },
+    {
+      "startSec": 48.3,
+      "endSec": 62.9,
+      "role": "twist",
+      "narration": "You can set Google Maps to auto-delete it after three, eighteen or thirty-six months. Or never: Google says it's kept until you delete it. If it's on, it's on your phone right now. Go check.",
+      "visual": "The map zooms out: one night's trail becomes a dense glowing web over the whole city (on-screen label 'Illustration'); heartbeat accelerates then stops; silence; the auto-delete card appears, then 'Off = kept until you delete it'; the screen switches off and its black glass reflects the bedroom; one low hit; cut to black.",
+      "claimIds": [
+        "c-autodelete-options",
+        "c-timeline-kept-until-deleted",
+        "c-android-timeline-saves",
+        "c-iphone-keeps-places"
+      ],
+      "onScreenText": [
+        "Timeline auto-delete: 3, 18 or 36 months, or off",
+        "Off = kept until you delete it",
+        "Illustration"
+      ]
+    }
+  ],
+  "caption": "Your phone may keep a map of where you go. Here is where to find it.\nLU-TECH-003\n\niPhone: Settings > Privacy & Security > Location Services > System Services > Significant Locations & Routes.\nAndroid: Google Maps > profile picture or initial > Your Timeline.\n\nSources:\n- Apple, \"Location Services & Privacy\", apple.com/legal/privacy/data/en/location-services\n- Apple Personal Safety User Guide, \"Manage Location Services settings\", support.apple.com\n- Google Maps Help, \"Manage your Google Maps Timeline\" (Android and iPhone), support.google.com/maps/answer/6258979\nLimits: Google says Timeline is off by default and only on if you opt in. Apple's pages cited here don't say whether Significant Locations & Routes is on by default, show how to view it only on a Mac, and don't say whether turning it off clears what's saved. On Google Maps, turning Timeline off isn't the same as deleting it (Turn off and delete activity); optional backups are encrypted copies on Google's servers; other Google settings such as Web & App Activity can also save location info. Menu names can differ by version and language. Apple and Google describe their own encryption; this video does not test it. Map visuals are illustrations; map data © OpenStreetMap contributors.",
+  "sourceList": [
+    "Apple, Location Services & Privacy, www.apple.com/legal/privacy/data/en/location-services/",
+    "Apple, Manage Location Services settings (Apple Personal Safety User Guide), support.apple.com/guide/personal-safety/manage-location-services-settings-ips9bf20ad2f/web",
+    "Google (Google Maps Help), Manage your Google Maps Timeline - Android phone & tablet, support.google.com/maps/answer/6258979?hl=en&co=GENIE.Platform%3DAndroid",
+    "Google (Google Maps Help), Manage your Google Maps Timeline - iPhone & iPad, support.google.com/maps/answer/6258979?hl=en&co=GENIE.Platform%3DiOS"
+  ],
+  "claimIds": [
+    "c-iphone-keeps-places",
+    "c-iphone-encrypted",
+    "c-iphone-setting-path",
+    "c-android-timeline-saves",
+    "c-android-timeline-path",
+    "c-timeline-off-by-default",
+    "c-timeline-backup",
+    "c-timeline-kept-until-deleted",
+    "c-timeline-off-vs-delete",
+    "c-timeline-view",
+    "c-other-google-location",
+    "c-autodelete-options"
+  ],
+  "link": {
+    "parentQuestion": null,
+    "resolvedQuestion": "Is my phone keeping a record of where I go, and how do I check?",
+    "nextQuestion": "Which apps on my phone can see my location right now?",
+    "relatedEpisodeId": null,
+    "relationshipReason": "Natural follow-up; future episode, needs its own evidence.",
+    "endingReferencesRelated": false
+  },
+  "format": "everyday_mystery",
+  "code": "LU-TECH-003",
+  "author": "lead session (claude-opus-5-5), draft for owner and independent review"
+}
