@@ -94,11 +94,11 @@ if BASE:                                                # the finished picture, 
 else:
     frames_strip('hook', 'shot01v3_frames', range(1, int(round(b1 * FPS)) + 1), 1, 1)
     wide = min(110, fr(b2) - fr(b1) - 90)                   # wide moonlit bedroom, then the macro of the place list
-    frames_strip('iphone_wide', 'scene2a_frames', range(1, wide + 1), fr(b1), 1)
-    n = fr(b2) - fr(b1) - wide; frames_strip('iphone', 'scene2_frames', range(300 - n + 1, 301), fr(b1) + wide, 1)
+    frames_strip('iphone_wide', 'scene2ac_frames', range(1, wide + 1), fr(b1), 1)
+    n = fr(b2) - fr(b1) - wide; frames_strip('iphone', 'scene2c_frames', range(300 - n + 1, 301), fr(b1) + wide, 1)
     n = fr(b3) - fr(b2); frames_strip('android', 'scene5_frames', range(1, n + 1), fr(b2), 1)   # night aerial, 1:1 so the
                                                                                              # route starts just before "Then it saves..."
-    n = fr(b4) - fr(b3); frames_strip('stakes', 'scene4_frames', stretch(1, 252, n), fr(b3), 1)
+    n = fr(b4) - fr(b3); frames_strip('stakes', 'scene4c_frames', stretch(1, 252, n), fr(b3), 1)
     plate = se.strips.new_image('where', os.path.join(S, 'shot01v3_frames', 'f_0150.png'), 1, fr(b4))   # dimmed nightstand under the paths
     plate.frame_final_duration = fr(end_A) - fr(b4)
     plate.color_multiply = 0.38

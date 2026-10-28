@@ -141,6 +141,23 @@ for i_ in range(len(speaking)):
 gain = 1 - 0.82 * smooth
 mix *= gain[:, None]
 
+# 8. in-scene sound (CINEMATIC.md section 4), added after the ducking so the room stays audible but quiet:
+# bedroom shots get room tone (soft pink noise), an appliance hum and a distant traffic swell now and then;
+# the aerial gets wind at height and the low rumble of a city below
+def pink(n):
+    w = rng.standard_normal(n); f = np.fft.rfft(w); f[1:] /= np.sqrt(np.arange(1, len(f))); return np.fft.irfft(f, n)
+bed_room = section(b1, b2, 0.5) + section(b3, END, 0.5)
+room = lowpass(pink(len(t)), 1800); room /= np.max(np.abs(room))
+hum = sum(np.sin(2 * np.pi * h * 50 * t) / h for h in (1, 2, 3)) * (0.8 + 0.2 * np.sin(2 * np.pi * 0.13 * t))
+swell = np.zeros_like(t)
+for c0 in (b1 + 2.5, b3 + 2.0):                                     # a car passing far below the window
+    env = np.exp(-((t - c0) / 1.3) ** 2); swell += lowpass(rng.standard_normal(len(t)), 300 + 500 * env) * env
+air = section(b2, b3, 0.4)
+wind = lowpass(pink(len(t)), 500 + 300 * np.sin(2 * np.pi * 0.21 * t) ** 2); wind /= np.max(np.abs(wind))
+rumble = lowpass(rng.standard_normal(len(t)), 120)
+mix[:, 0] += (room * 0.035 + hum * 0.006 + swell * 0.05) * bed_room + (wind * 0.06 + rumble * 0.12) * air
+mix[:, 1] += (np.roll(room, 2400) * 0.035 + hum * 0.006 + swell * 0.04) * bed_room + (np.roll(wind, 4800) * 0.06 + rumble * 0.12) * air
+
 peak = np.max(np.abs(mix)); mix = np.tanh(mix / peak * 1.2) * 0.85
 with wave.open(out, 'wb') as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
