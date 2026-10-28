@@ -13,6 +13,7 @@ Everything generated lives in `storage/creative/` (git-ignored): the scene (`loc
 | `scripts/sound_shot01.py` | Synthesises shot 01's sound (screen click, accelerating heartbeat, drone, riser, ticks, impact), timed to the animation's frames. No paid audio. | `blender -b --factory-startup --python creative/scripts/sound_shot01.py -- storage/creative/shot01-sound.wav` |
 | `scripts/osm-city.mjs` | Fetches building footprints and streets for a box around a point from the public Overpass API, once (skips if the file exists). Same credit rule. | `node creative/scripts/osm-city.mjs storage/creative/assets/osm/city-aerial.json 33.8960 35.4835 650` |
 | `scripts/build_android_city.py` | Builds the LU-TECH-003 Android shot: a night aerial of the extruded street grid, lit windows, street lamps, moving cars, a route that draws itself along real streets with a light at each stop, haze and glow. Writes `scene5-android-city.blend` and `android-city-events.json` (stop timings for the score). | `blender -b --factory-startup --python creative/scripts/build_android_city.py -- <repo root> 280` |
+| `scripts/finish.sh` | Film finish (subtle halation, vignette, moving grain) for a picture-only cut; see `CINEMATIC.md` section 6 for the three-step order. | `sh finish.sh <in.mp4> <out.mp4> [grain=7] [halation=0.28]` (inside the tools container) |
 | `scripts/encode_av.py` | Joins a PNG frame sequence and a WAV into an H.264/AAC MP4 with Blender (no Docker needed). | `blender -b --factory-startup --python creative/scripts/encode_av.py -- <frames dir> <sound.wav> <out.mp4>` |
 
 ## Rendering
@@ -21,6 +22,10 @@ Everything generated lives in `storage/creative/` (git-ignored): the scene (`loc
 - On the owner's RTX 3060, OptiX fails to load with the current NVIDIA driver; CUDA works. A driver update should bring OptiX back and speed renders up.
 - Half size at 48 samples takes roughly 30–60 minutes per 5-second shot. Iterate on single stills first.
 - The Blender MCP add-on needs Preferences → System → Network → Allow Online Access, then Add-ons → MCP → Start MCP Bridge Server (port 9876). Don't reload the scene while an agent is working in it.
+
+## Craft
+
+`CINEMATIC.md` holds the realism and camera rules every new shot follows (camera report per shot, imperfection pass, coverage, two-layer sound, finish).
 
 ## Rules that still apply
 
