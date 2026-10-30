@@ -25,14 +25,15 @@ export interface RenderManifest {
   episodeCode: string;
   script: { versionId: string; sha256: string };
   claimLedgerSha256: string;
-  template: { name: TemplateName; version: number };
+  /** 'external-cut': the picture was made outside the templates (e.g. Blender) and packaged by packageExternalCut. */
+  template: { name: TemplateName | 'external-cut'; version: number };
   fonts: FontRecord[];
   voice: { profileId: string; profileVersion: number | null } | 'mock';
   narration: { sha256: string; durationSec: number; source: 'mock' | 'live' };
   captions: { cuesSha256: string; cueCount: number; wordsPerMinute: number };
   color: typeof COLOR_SETTINGS;
   remotionVersion: string;
-  master: { kind: 'prores-422' | 'h264-mezzanine'; nonProRes: boolean; fallbackReason: string | null; codecProfile: string };
+  master: { kind: 'prores-422' | 'h264-mezzanine' | 'external-cut-1080'; nonProRes: boolean; fallbackReason: string | null; codecProfile: string };
   timing: { startedAt: string; bundleMs: number; masterMs: number; deliveryMs: number; coverMs: number; totalMs: number };
   outputs: Record<'master' | 'delivery' | 'cover' | 'srt' | 'vtt', { path: string; sha256: string; bytes: number }>;
   probes: { master: ProbeResult; delivery: ProbeResult };
@@ -42,6 +43,8 @@ export interface RenderManifest {
     loudness: ValidationRecord & { integratedLufs: number; truePeakDbtp: number };
     captions: { ok: boolean; issues: { code: string; cueIndex: number; message: string }[] };
   };
+  /** Present only for external cuts: what made the picture, and the hash of the cut file that was packaged. */
+  externalCut?: { tool: string; sourceSha256: string; sourceBytes: number };
   /** Hash of the deterministic inputs only (excludes timing, paths and outputs). */
   inputsSha256: string;
 }

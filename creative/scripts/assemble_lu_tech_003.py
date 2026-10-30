@@ -11,7 +11,9 @@ args = sys.argv[sys.argv.index('--') + 1:]
 root, out = args[:2]
 PICTURE_ONLY = '--picture-only' in args
 BASE = args[args.index('--base') + 1] if '--base' in args else None
+#   --full                cut from the full-resolution frames in storage/creative/full/ (render_full.py)
 S = os.path.join(root, 'storage', 'creative')
+FR = os.path.join(S, 'full') if '--full' in args else S       # where the rendered frame folders are
 FPS = 30
 script = json.load(open(os.path.join(root, 'content', 'pilots', 'LU-TECH-003', 'script.json'), encoding='utf-8'))
 timing = json.load(open(os.path.join(S, 'narration-timing.json'), encoding='utf-8'))
@@ -26,7 +28,7 @@ on_screen = {i: b.get('onScreenText', []) for i, b in enumerate(script['beats'])
 
 sc = bpy.context.scene
 se = sc.sequence_editor_create()
-first_img = os.path.join(S, 'shot01v3_frames', 'f_0001.png')
+first_img = os.path.join(FR, 'shot01v3_frames', 'f_0001.png')
 img = bpy.data.images.load(first_img)
 sc.render.resolution_x, sc.render.resolution_y = img.size
 sc.render.resolution_percentage = 100
@@ -37,7 +39,7 @@ fr = lambda t: int(round(t * FPS)) + 1                  # seconds -> sequencer f
 def frames_strip(name, folder, src_frames, start, channel):
     """Image strip from an explicit list of rendered frames (allows trimming and retiming)."""
     files = [f'f_{n:04d}.png' for n in src_frames]
-    st = se.strips.new_image(name, os.path.join(S, folder, files[0]), channel, start)
+    st = se.strips.new_image(name, os.path.join(FR, folder, files[0]), channel, start)
     for f in files[1:]:
         st.elements.append(f)
     return st
@@ -99,7 +101,7 @@ else:
     n = fr(b3) - fr(b2); frames_strip('android', 'scene5_frames', range(1, n + 1), fr(b2), 1)   # night aerial, 1:1 so the
                                                                                              # route starts just before "Then it saves..."
     n = fr(b4) - fr(b3); frames_strip('stakes', 'scene4c_frames', stretch(1, 252, n), fr(b3), 1)
-    plate = se.strips.new_image('where', os.path.join(S, 'shot01v3_frames', 'f_0150.png'), 1, fr(b4))   # dimmed nightstand under the paths
+    plate = se.strips.new_image('where', os.path.join(FR, 'shot01v3_frames', 'f_0150.png'), 1, fr(b4))   # dimmed nightstand under the paths
     plate.frame_final_duration = fr(end_A) - fr(b4)
     plate.color_multiply = 0.38
     for v, f_ in ((1.0, fr(b4)), (1.06, fr(end_A))):
@@ -128,6 +130,16 @@ if not PICTURE_ONLY:
     text('card_off', on_screen[5][1], never, end_C, 4, 0.83, 52, box=True)
 
     # ---- captions: each sentence split into short chunks, timed by syllables ----
+    # the same cues go to <out>.cues.json, so the delivery's SRT/VTT say exactly what is burned in (32 chars a line)
+    cues = []
+    def lines_of(txt, width=32):
+        out_, cur_ = [], ''
+        for w in txt.split():
+            if cur_ and len(cur_) + 1 + len(w) > width:
+                out_.append(cur_); cur_ = w
+            else:
+                cur_ = f'{cur_} {w}'.strip()
+        return out_ + [cur_]
     def syl(w):
         import re
         v = re.findall(r'[aeiouy]+', w.lower()); return max(1, len(v) - (1 if w.lower().endswith('e') and len(w) > 3 else 0))
@@ -149,9 +161,13 @@ if not PICTURE_ONLY:
             t1 = min(s['end'] + 0.3, hold_until) if j == len(chunks) - 1 else t + d
             if fr(t1) > fr(t):
                 text(f'cap_{i}_{j}', ' '.join(c), t, t1, 9, 0.27, 52, bold=True)
+                cues.append({'index': len(cues), 'startSec': round((fr(t) - 1) / FPS, 3), 'endSec': round((fr(t1) - 1) / FPS, 3),
+                             'lines': lines_of(' '.join(c)), 'beatIndex': s['beat']})
             t += d
 
     # ---- sound: narration on top; one evolving score (already ducked under the voice) up to the ending ----
+    assert all(len(c['lines']) <= 2 for c in cues), 'a caption needs more than two lines'
+    json.dump(cues, open(os.path.splitext(out)[0] + '.cues.json', 'w', encoding='utf-8'), indent=1)
     sound('voice', narration, 0, 10, 1.0)
     sound('score', os.path.join(S, 'score-lu-tech-003.wav'), 0, 11, 0.9, 0, end_A)
     end_wav = os.path.join(S, 'ending-sound-v2.wav')

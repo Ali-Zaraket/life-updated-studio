@@ -34,7 +34,7 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 export const END_HOLD_SEC = 0.5;
 export const DEFAULT_WORDS_PER_MINUTE = 150;
 /** Loudnorm target true peak is below the -1 dBTP limit to leave headroom for AAC encoding overshoot. */
-const LOUDNORM_TP = -1.5;
+export const LOUDNORM_TP = -1.5;
 
 /** Documented fallback when ProRes cannot be produced: high-bitrate H.264 in MP4 with AAC audio. */
 export const MASTER_FALLBACK_SPEC: VideoSpec = {
@@ -86,7 +86,7 @@ export interface RenderResult {
 // Helpers
 // ---------------------------------------------------------------------------
 
-async function run(cmd: string, args: string[], timeoutMs = 30 * 60_000): Promise<{ stdout: string; stderr: string }> {
+export async function run(cmd: string, args: string[], timeoutMs = 30 * 60_000): Promise<{ stdout: string; stderr: string }> {
   return execFileAsync(cmd, args, { maxBuffer: 128 * 1024 * 1024, timeout: timeoutMs });
 }
 
@@ -145,7 +145,7 @@ export function getBundle(): Promise<string> {
 
 // Loudness ----------------------------------------------------------------------
 
-interface LoudnormStats {
+export interface LoudnormStats {
   input_i: string;
   input_tp: string;
   input_lra: string;
@@ -153,9 +153,9 @@ interface LoudnormStats {
   target_offset: string;
 }
 
-const STEREO_48K = 'aformat=sample_rates=48000:channel_layouts=stereo';
+export const STEREO_48K = 'aformat=sample_rates=48000:channel_layouts=stereo';
 
-async function loudnormPass1(audioPath: string, durationSec: number): Promise<LoudnormStats> {
+export async function loudnormPass1(audioPath: string, durationSec: number): Promise<LoudnormStats> {
   const { stderr } = await run('ffmpeg', [
     '-hide_banner', '-nostats', '-t', String(durationSec), '-i', audioPath, '-vn',
     '-af', `${STEREO_48K},loudnorm=I=-14:TP=${LOUDNORM_TP}:LRA=11:print_format=json`,

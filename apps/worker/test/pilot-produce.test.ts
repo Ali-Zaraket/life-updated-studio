@@ -7,8 +7,8 @@ import { describe, expect, it } from 'vitest';
 import { approveVoiceProfile, eq, ensureOwner, getEpisode, getEpisodeVersion, openPgliteDb, saveVoiceProfile, setSpending, tables as t, type Db } from '@life/db';
 import { reviewSubjectSha256 } from '@life/contracts';
 import { buildWavFromPcm16, type TtsProvider, type TtsResult } from '@life/media';
-import type { RenderEpisodeInput, RenderResult } from '@life/render';
-import { LocalStorage, loadPilot, producePilot, type ProduceRender } from '../src/index';
+import type { PackageCutInput, RenderEpisodeInput, RenderResult } from '@life/render';
+import { LocalStorage, loadPilot, producePilot, type ProducePackageCut, type ProduceRender } from '../src/index';
 
 const PILOT = fileURLToPath(new URL('../../../content/pilots/LU-TECH-002', import.meta.url));
 const CODE = 'LU-TECH-002';
@@ -143,6 +143,40 @@ describe('pilot production (fake TTS and render)', () => {
       expect(await s.db.select().from(t.approvals)).toEqual([]);
       expect((await run(s, tts, render, true)).state).toBe('refused');
       expect(tts.calls).toBe(1);
+    } finally {
+      await s.close();
+      await rm(s.root, { recursive: true, force: true });
+    }
+  });
+
+  it('packages a finished external cut instead of rendering a template, and still stops for the owner', async () => {
+    const s = await setup();
+    try {
+      const tts = new FakeTts();
+      const { render, calls } = fakeRender();
+      const cuts: PackageCutInput[] = [];
+      const packageCut: ProducePackageCut = async (input) => {
+        cuts.push(input);
+        return render({ ...(input as unknown as RenderEpisodeInput), template: 'EverydayMystery' });
+      };
+      await mkdir(join(s.root, 'creative'), { recursive: true });
+      await writeFile(join(s.root, 'creative', 'cut.mp4'), 'fake cut');
+      const cues = [{ index: 0, startSec: 0.1, endSec: 2, lines: ['Your phone may be keeping'], beatIndex: 0 }];
+      await writeFile(join(s.root, 'creative', 'cut.cues.json'), JSON.stringify(cues));
+      const go = (cuesFile: string) => producePilot(
+        { db: s.db, storage: s.storage, tts: () => tts, render, packageCut, now: () => NOW, log: () => {} },
+        { code: CODE, accountId: 'mock-account', confirmSpend: true, externalCut: { cut: 'creative/cut.mp4', cues: cuesFile, tool: 'Blender test' } },
+      );
+      expect((await go('creative/missing.json')).message).toMatch(/caption cues .* unreadable/);
+      const r = await go('creative/cut.cues.json');
+      expect(r.state).toBe('awaiting_user_approval');
+      expect(cuts).toHaveLength(1);
+      expect(cuts[0]!.cutPath).toBe(s.storage.resolve('storage://creative/cut.mp4'));
+      expect(cuts[0]!.cues).toEqual(cues);
+      expect(cuts[0]!.narration).toMatchObject({ source: 'live', voiceProfile: { id: 'audition-elevenlabs-test', version: 1 } });
+      expect(calls).toHaveLength(1); // only through the packager, no template render of its own
+      expect(await s.db.select().from(t.approvals)).toEqual([]);
+      expect((await getEpisode(s.db, s.episodeId)).state).toBe('awaiting_user_approval');
     } finally {
       await s.close();
       await rm(s.root, { recursive: true, force: true });

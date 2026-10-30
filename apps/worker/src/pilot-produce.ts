@@ -28,7 +28,7 @@ import {
   type RenderFileInput,
 } from '@life/db';
 import { TTS_PROVIDER_IDS, VoiceProfile, estimateCostMicroUsd, sha256File, type TtsProvider, type TtsProviderId } from '@life/media';
-import type { RenderEpisodeInput, RenderResult, TemplateName } from '@life/render';
+import type { CaptionCue, PackageCutInput, RenderEpisodeInput, RenderResult, TemplateName } from '@life/render';
 import type { LocalStorage } from './storage';
 
 const pipeline: Actor = { kind: 'system', component: 'pilot.produce' };
@@ -54,6 +54,7 @@ export const SYNTHETIC_VOICE_DISCLOSURE: Disclosure = {
 };
 
 export type ProduceRender = (input: RenderEpisodeInput) => Promise<Pick<RenderResult, 'ok' | 'paths' | 'validation' | 'manifest'>>;
+export type ProducePackageCut = (input: PackageCutInput) => Promise<Pick<RenderResult, 'ok' | 'paths' | 'validation' | 'manifest'>>;
 
 export interface ProduceDeps {
   db: Db;
@@ -61,6 +62,8 @@ export interface ProduceDeps {
   /** Live TTS client for the approved voice. Built only with confirmSpend, before any spend is authorized. */
   tts: (profile: VoiceProfile) => TtsProvider;
   render: ProduceRender;
+  /** Packages a finished external cut (e.g. a Blender edit) instead of rendering a template. */
+  packageCut?: ProducePackageCut;
   now: () => Date;
   log: (line: string) => void;
 }
@@ -79,6 +82,11 @@ export interface ProduceOptions {
    * scenes). No render, no release package, no state change.
    */
   narrateOnly?: boolean;
+  /**
+   * The picture was made elsewhere (e.g. the Blender scenes): package this finished cut instead of rendering a template.
+   * Paths are relative to the storage root. `cues` is the JSON list of the captions burned into the cut, for SRT/VTT.
+   */
+  externalCut?: { cut: string; cues: string; tool: string };
 }
 
 export interface ProduceResult {
@@ -198,7 +206,9 @@ export async function producePilot(deps: ProduceDeps, o: ProduceOptions): Promis
     }
     log(o.narrateOnly
       ? 'Narration only: nothing is rendered or packaged'
-      : `Then: ${template} render (4K master, 1080×1920 delivery, first-frame cover, captions) and a release package for the owner's approval`);
+      : o.externalCut
+        ? `Then: package the finished cut storage/${o.externalCut.cut} (delivery, first-frame cover, captions, validation) and a release package for the owner's approval`
+        : `Then: ${template} render (4K master, 1080×1920 delivery, first-frame cover, captions) and a release package for the owner's approval`);
     return { state: 'dry_run', message: 'DRY RUN: nothing was called or written. Add --confirm-spend to run.', costMicroUsd: 0 };
   }
 
@@ -269,13 +279,35 @@ export async function producePilot(deps: ProduceDeps, o: ProduceOptions): Promis
   // 4. Full render, written straight into storage (the master is hundreds of MB).
   const outRel = `${base}/final`;
   let lastStage = '';
-  const r = await deps.render({
+  const narrationInput = { audioPath: narrationPath, durationSec: narration.durationSec, source: 'live' as const, voiceProfile: { id: profile.id, version: profile.version } };
+  let r: Awaited<ReturnType<ProduceRender>>;
+  if (o.externalCut) {
+    if (!deps.packageCut) return refused('this run cannot package an external cut (no packager wired in)');
+    let cues: CaptionCue[];
+    try {
+      cues = JSON.parse(await readFile(storage.resolve(`storage://${o.externalCut.cues}`), 'utf8')) as CaptionCue[];
+      if (!Array.isArray(cues) || cues.some((c) => typeof c.startSec !== 'number' || typeof c.endSec !== 'number' || !Array.isArray(c.lines))) throw new Error('not a list of caption cues');
+    } catch (e) {
+      return refused(`caption cues storage/${o.externalCut.cues} are unreadable: ${e instanceof Error ? e.message : String(e)}`);
+    }
+    log(`Packaging the finished cut storage/${o.externalCut.cut} (${o.externalCut.tool})`);
+    r = await deps.packageCut({
+      episodeCode: o.code,
+      script: { versionId: version.id, sha256: version.contentSha256, beats: version.beats },
+      claimLedgerSha256: version.claimLedgerSha256,
+      narration: narrationInput,
+      cutPath: storage.resolve(`storage://${o.externalCut.cut}`),
+      cues,
+      tool: o.externalCut.tool,
+      outDir: storage.resolve(`storage://${outRel}`),
+    });
+  } else r = await deps.render({
     template,
     episodeCode: o.code,
     title: packet.topic.title,
     script: { versionId: version.id, sha256: version.contentSha256, beats: version.beats },
     claimLedgerSha256: version.claimLedgerSha256,
-    narration: { audioPath: narrationPath, durationSec: narration.durationSec, source: 'live', voiceProfile: { id: profile.id, version: profile.version } },
+    narration: narrationInput,
     outDir: storage.resolve(`storage://${outRel}`),
     options: {
       onProgress: (stage) => {
@@ -313,7 +345,7 @@ export async function producePilot(deps: ProduceDeps, o: ProduceOptions): Promis
     now,
   });
   if (ep.state === 'verified') await transitionEpisode(db, { episodeId: ep.id, to: 'preview_ready', actor: pipeline, now });
-  log(`${template} render recorded: master, delivery, cover and captions pass validation`);
+  log(`${o.externalCut ? 'External cut' : `${template} render`} recorded: master, delivery, cover and captions pass validation`);
 
   // 5. Release package: the exact thing the owner approves.
   const ref = (f: RenderFileInput) => ({ uri: f.uri, sha256: f.sha256, bytes: f.bytes, mimeType: f.mimeType });
